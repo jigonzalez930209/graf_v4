@@ -1,11 +1,16 @@
-import './assets/main.css'
-
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import './assets/index.css'
 import App from './App'
+import { GraftProvider, INITIAL_STATE } from './context/GraftProvider'
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+window.Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(123456.789)
+
+root.render(
   <React.StrictMode>
-    <App />
+    <GraftProvider initialState={INITIAL_STATE}>
+      <App />
+    </GraftProvider>
   </React.StrictMode>
 )

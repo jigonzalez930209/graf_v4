@@ -1,19 +1,44 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import {
+  GetProject,
+  ReadFilesFromPath,
+  SaveExcelFile,
+  SaveProject,
+  SaveTemplate
+} from './../shared/types'
+import { app, shell, BrowserWindow, ipcMain, Notification } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { getFiles, getGrafState, getTemplates, saveProject, saveTemplate } from './lib'
+import {
+  getBinaryFiles,
+  importFilesFromLoader,
+  readFilesFromPath,
+  saveExcelFile
+} from './lib/files'
+import { autoUpdater } from 'electron-updater'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
-    height: 670,
+    height: 800,
+    minWidth: 800,
+    minHeight: 600,
     show: false,
     autoHideMenuBar: true,
+    skipTaskbar: false,
+    visualEffectState: 'active',
+    titleBarStyle: 'hidden',
+    titleBarOverlay: false,
+    trafficLightPosition: { x: 10, y: 10 },
+    modal: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      contextIsolation: true,
+      nodeIntegration: true
     }
   })
 
@@ -48,9 +73,85 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+  // Get files from current path in main process.
+  ipcMain.handle('getFiles', () => getFiles())
+  ipcMain.handle('getGrafState', (_, ...args: Parameters<GetProject>) => getGrafState(...args))
+  ipcMain.handle('getTemplates', () => getTemplates())
+  ipcMain.handle('getBinaryFiles', () => getBinaryFiles())
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  // Saver files to current path from renderer process.
+  ipcMain.handle('saveGrafState', (_, ...args: Parameters<SaveProject>) => saveProject(...args))
+  ipcMain.handle('saveTemplates', (_, ...args: Parameters<SaveTemplate>) => saveTemplate(...args))
+  ipcMain.handle('saveExcelFile', (_, ...args: Parameters<SaveExcelFile>) => saveExcelFile(...args))
+
+  // Read files from path in main process.
+  ipcMain.handle('readFilesFromPath', (_, ...args: Parameters<ReadFilesFromPath>) =>
+    readFilesFromPath(...args)
+  )
+
+  // Import files from loader in main process.
+  ipcMain.handle('importFilesFromLoader', () => importFilesFromLoader())
+
+  ipcMain.handle('getAppName', () => app.name)
+  ipcMain.handle('getAppInfo', () => ({
+    name: app.name,
+    version: app.getVersion(),
+    arc: process.arch,
+    electronVersion: process.versions.electron
+  }))
+
+  ipcMain.handle('onLoadFileInfo', () => {
+    return process.argv[1]
+  })
+
+  ipcMain.handle('checkUpdates', async () => {
+    const version = app.getVersion()
+    const response = await autoUpdater.checkForUpdates()
+    if (response?.updateInfo?.version !== version) {
+      BrowserWindow.getAllWindows()[0].webContents.send('update-available', response?.updateInfo)
+    } else {
+      BrowserWindow.getAllWindows()[0].webContents.send('update-available', 'not updates available')
+    }
+
+    autoUpdater.signals.progress((info) => {
+      BrowserWindow.getAllWindows()[0].webContents.send('download-progress', info)
+    })
+
+    autoUpdater.signals.updateDownloaded((info) => {
+      BrowserWindow.getAllWindows()[0].webContents.send('update-downloaded', info)
+      new Notification({
+        title: 'Update downloaded successfully',
+        body: 'Please restart the app to apply the update'
+      }).show()
+    })
+    return response?.updateInfo && response.updateInfo.version !== version
+      ? response.updateInfo
+      : undefined
+  })
+
+  ipcMain.handle('quit', () => {
+    app.quit()
+  })
+
+  ipcMain.handle('maximize', () => {
+    const window = BrowserWindow.getFocusedWindow()
+    if (window) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      window.isMaximized() ? window.unmaximize() : window.maximize()
+    }
+    return window?.isMaximized()
+  })
+
+  ipcMain.handle('minimize', () => {
+    const window = BrowserWindow.getFocusedWindow()
+    if (window) {
+      window.minimize()
+    }
+  })
+  ipcMain.handle('get-window-size', async () => {
+    const bounds = BrowserWindow.getFocusedWindow()?.getBounds()
+    return { width: bounds?.width || 0, height: bounds?.height || 0 }
+  })
 
   createWindow()
 
