@@ -4,8 +4,70 @@
   "private": true,
   "description": "A graphical app to view and modify files .teq4, teq4Z and .csv",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": {
+    "name": "Jose Ivan",
+    "email": "jigonzalez930209@gmail.com"
+  },
+  "license": "MIT",
+  "email": "jigonzalez930209@gmail.com",
+  "homepage": "https://github.com/jigonzalez930209/graf_v4/releases",
+  "build": {
+    "appId": "com.jigonzalez930209.graf_v4",
+    "asar": true,
+    "publish": {
+      "provider": "github",
+      "owner": "jigonzalez930209",
+      "repo": "graf_v4",
+      "releaseType": "release"
+    },
+    "productName": "graf_v4",
+    "win": {
+      "icon": "resources/graph-icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "msi",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-Windows-${version}-Setup-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "deleteAppDataOnUninstall": true
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip",
+        "pkg"
+      ],
+      "artifactName": "${productName}-Mac-${version}-Setup.${ext}"
+    },
+    "linux": {
+      "icon": "resources/graph-icon.png",
+      "category": "Office",
+      "maintainer": "Jose Ivan <jigonzalez@gmail.com>",
+      "description": "Graf is a data visualization tool for the TEQ4",
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.gz"
+      ],
+      "artifactName": "${productName}-Linux-${version}-Setup.${ext}"
+    }
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
