@@ -32,8 +32,13 @@ linux:
   target:
     - AppImage
     - deb
-  maintainer: electronjs.org
-  category: Utility
+  maintainer:jigonzalez930209
+  executableName: graf_v4
+  desktop:
+    Categories: Utility
+    StartupNotify: false
+  files:
+    - 'resources/chrome-sandbox:chrome-sandbox'
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false

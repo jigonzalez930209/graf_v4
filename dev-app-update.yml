@@ -1,3 +1,3 @@
-provider: generic
-url: https://example.com/auto-updates
+provider: github
+url: https://github.com/jigonzalez930209/graf_v4/
 updaterCacheDirName: graf_v4-updater
