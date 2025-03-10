@@ -5,7 +5,6 @@ import { useTheme } from 'next-themes'
 
 import { cn } from '@/utils'
 
-import { Checkbox } from '../ui/checkbox'
 import {
   HoverCard,
   HoverCardArrow,
@@ -13,6 +12,7 @@ import {
   HoverCardPortal,
   HoverCardTrigger
 } from '../ui/hover-card'
+import { SquareCheckIcon, SquareIcon } from 'lucide-react'
 
 type ItemProps = React.PropsWithChildren & {
   className?: string
@@ -29,6 +29,7 @@ const Item = React.forwardRef<HTMLLIElement, ItemProps>((props, ref) => {
   } = React.useContext(GrafContext)
 
   const color = theme === 'dark' ? 'white' : 'black'
+  const isSelected = Boolean(files.find((d) => d.id === file.id)?.selected)
 
   return (
     <HoverCard openDelay={100} closeDelay={100}>
@@ -39,23 +40,27 @@ const Item = React.forwardRef<HTMLLIElement, ItemProps>((props, ref) => {
           className={cn(
             className,
             'w-full flex select-none items-center space-x-2 px-2 my-1.5 hover:bg-secondary rounded-md cursor-pointer',
-            Boolean(files.find((d) => d.id === file.id)?.selected) &&
-              'bg-secondary/70 shadow-md ring-1 ring-primary/15'
+            isSelected && 'bg-secondary/70 shadow-md ring-1 ring-primary/15'
           )}
           {...rest}
+          onClick={() => setFile(file.id)}
         >
-          <Checkbox
-            checked={Boolean(files.find((d) => d.id === file.id)?.selected)}
-            onCheckedChange={() => setFile(file.id)}
-            id={file.id}
-          />
-          <label
-            htmlFor={file.id}
+          <span
+            className="w-6 h-6 rounded-md flex items-center justify-center"
+            style={{ color: file.color }}
+          >
+            {isSelected ? (
+              <SquareCheckIcon className="w-5 h-5" />
+            ) : (
+              <SquareIcon className="w-5 h-5 text-primary" />
+            )}
+          </span>
+          <div
             className="ml-2 cursor-pointer w-full overflow-hidden truncate font-extrabold hover:text-ellipsis m-1"
             style={{ color: `color-mix(in srgb, ${color} 20%, ${file.color})` }}
           >
             {file.name}
-          </label>
+          </div>
         </li>
       </HoverCardTrigger>
       <HoverCardPortal>
