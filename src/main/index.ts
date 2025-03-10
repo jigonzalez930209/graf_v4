@@ -5,7 +5,7 @@ import {
   SaveProject,
   SaveTemplate
 } from './../shared/types'
-import { app, shell, BrowserWindow, ipcMain, Notification } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -16,7 +16,6 @@ import {
   readFilesFromPath,
   saveExcelFile
 } from './lib/files'
-import { autoUpdater } from 'electron-updater'
 
 function createWindow(): void {
   // Create the browser window.
@@ -27,13 +26,15 @@ function createWindow(): void {
     minHeight: 600,
     show: false,
     autoHideMenuBar: true,
+    modal: true,
     skipTaskbar: false,
+    ...(process.platform === 'linux'
+      ? { icon }
+      : { icon: join(__dirname, '../../resources/icon.png') }),
     visualEffectState: 'active',
     titleBarStyle: 'hidden',
     titleBarOverlay: false,
     trafficLightPosition: { x: 10, y: 10 },
-    modal: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -102,31 +103,6 @@ app.whenReady().then(() => {
 
   ipcMain.handle('onLoadFileInfo', () => {
     return process.argv[1]
-  })
-
-  ipcMain.handle('checkUpdates', async () => {
-    const version = app.getVersion()
-    const response = await autoUpdater.checkForUpdates()
-    if (response?.updateInfo?.version !== version) {
-      BrowserWindow.getAllWindows()[0].webContents.send('update-available', response?.updateInfo)
-    } else {
-      BrowserWindow.getAllWindows()[0].webContents.send('update-available', 'not updates available')
-    }
-
-    autoUpdater.signals.progress((info) => {
-      BrowserWindow.getAllWindows()[0].webContents.send('download-progress', info)
-    })
-
-    autoUpdater.signals.updateDownloaded((info) => {
-      BrowserWindow.getAllWindows()[0].webContents.send('update-downloaded', info)
-      new Notification({
-        title: 'Update downloaded successfully',
-        body: 'Please restart the app to apply the update'
-      }).show()
-    })
-    return response?.updateInfo && response.updateInfo.version !== version
-      ? response.updateInfo
-      : undefined
   })
 
   ipcMain.handle('quit', () => {
