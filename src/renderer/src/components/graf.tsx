@@ -26,7 +26,7 @@ const Graf = () => {
       {isLoading && <Loader />}
       <div className="flex max-h-full max-w-full">
         <ResizablePanelGroup direction="horizontal" className="w-full h-full">
-          <ResizablePanel defaultSize={25}>
+          <ResizablePanel defaultSize={25} minSize={15}>
             <Drawer />
           </ResizablePanel>
           <ResizableHandle withHandle />
