@@ -123,7 +123,9 @@ export const saveExcelFile = async (
       title: 'Warning'
     }
   try {
-    await writeFile(result.filePath as string, Buffer.from(content))
+    const name = result.filePath
+    const withExtension = name.includes('.xlsx') ? name : `${name}.xlsx`
+    await writeFile(withExtension, Buffer.from(content))
     return {
       type: 'success',
       content: 'File saved successfully',
