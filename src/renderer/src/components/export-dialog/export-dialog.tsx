@@ -3,7 +3,14 @@ import { GrafContext } from '@/context/GraftContext'
 import { COLUMNS_IMPEDANCE, COLUMNS_VOLTAMETER } from '@/utils'
 
 import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '../ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription
+} from '../ui/dialog'
 import { Input } from '../ui/input'
 import { IProcessFile } from '@shared/models/files'
 import { exportExcelImpedance, exportExcelVoltametry } from '@renderer/utils/common'
@@ -123,58 +130,64 @@ const ExportDialog = ({ children }: ExportDialogProps) => {
       teq4z: filesState.filter((file) => file.type === 'teq4z')
     })
     setSelectedTab(fileType === 'teq4' ? 'teq4' : 'teq4z')
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   return (
     <Dialog open={open} onOpenChange={(o) => setOpen(o)}>
       <DialogTrigger>{children}</DialogTrigger>
-      <DialogContent className="h-[80%]">
+      <DialogContent className="sm:max-w-3xl w-full">
         <DialogTitle showCloseButton={false}>Select a columns to export</DialogTitle>
-        {open && (
-          <div className="flex flex-row gap-4 w-[100%] ">
-            <div className="flex flex-col gap-3 mt-2">
-              <label>Select columns to save</label>
-              <div className="flex w-full flex-col gap-4">
-                {selectedTab === 'teq4z' && (
-                  <ul className="flex flex-col gap-2 my-1 py-1">
-                    {COLUMNS_IMPEDANCE.map((column) => (
-                      <SelectedItem
-                        key={column}
-                        name={column}
-                        id={column}
-                        idPrefix="column-"
-                        isSelected={columnsState[selectedTab][column]}
-                        setChecked={handleChange}
-                      />
-                    ))}
-                  </ul>
-                )}
-                {selectedTab === 'teq4' && (
-                  <ul className="flex flex-col gap-2 my-1 py-1">
-                    {COLUMNS_VOLTAMETER.map((column) => (
-                      <SelectedItem
-                        key={column}
-                        name={column}
-                        id={column}
-                        idPrefix="column-"
-                        isSelected={columnsState[selectedTab][column]}
-                        setChecked={handleChange}
-                      />
-                    ))}
-                  </ul>
-                )}
+        <DialogDescription>Anyone who has this link will be able to view this.</DialogDescription>
+        <div className="w-full h-full min-h-max flex  justify-center -center">
+          {open && (
+            <div className="flex flex-row gap-10">
+              <div className="flex flex-col gap-3 mt-2">
+                <label>Select columns to save</label>
+                <div className="flex w-full flex-col gap-4">
+                  {selectedTab === 'teq4z' && (
+                    <ul className="flex flex-col gap-2 my-1 py-1">
+                      {COLUMNS_IMPEDANCE.map((column) => (
+                        <SelectedItem
+                          key={column}
+                          name={column}
+                          id={column}
+                          idPrefix="column-"
+                          isSelected={columnsState[selectedTab][column]}
+                          setChecked={handleChange}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                  {selectedTab === 'teq4' && (
+                    <ul className="flex flex-col gap-2 my-1 py-1">
+                      {COLUMNS_VOLTAMETER.map((column) => (
+                        <SelectedItem
+                          key={column}
+                          name={column}
+                          id={column}
+                          idPrefix="column-"
+                          isSelected={columnsState[selectedTab][column]}
+                          setChecked={handleChange}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+              <div>
+                <FilesTabs
+                  onChangeTabs={(e) => setSelectedTab(e as FilesTabsProps['selectedTab'])}
+                  selectedTab={selectedTab}
+                  filesByTabs={filesByTabs}
+                  onChangeSelectedFiles={handleSelectFiles}
+                />
               </div>
             </div>
-            <div>
-              <FilesTabs
-                onChangeTabs={(e) => setSelectedTab(e as FilesTabsProps['selectedTab'])}
-                selectedTab={selectedTab}
-                filesByTabs={filesByTabs}
-                onChangeSelectedFiles={handleSelectFiles}
-              />
-            </div>
-          </div>
-        )}
+          )}
+        </div>
+
         <div className="flex gap-3 bg-background">
           <div>
             <div>File Name</div>

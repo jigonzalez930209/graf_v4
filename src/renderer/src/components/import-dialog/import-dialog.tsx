@@ -8,6 +8,7 @@ import { useSnackbar } from 'notistack'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogTitle,
   DialogTrigger
@@ -65,14 +66,15 @@ const ImportDialog = () => {
     stopLoading()
   }
   return (
-    <Dialog open={open}>
-      <DialogTrigger onClick={() => setOpen((prev) => !prev)}>
+    <Dialog open={open} onOpenChange={() => setOpen((prev) => !prev)}>
+      <DialogTrigger>
         <CustomTooltip title="Import files" Icon={<LucideImport className="h-5 w-5" />} />
       </DialogTrigger>
-      <DialogContent className="flex h-[60%] p-6 max-w-[75%] flex-col gap-0 overflow-y-auto overflow-x-hidden">
-        <DialogTitle className="sticky top-0 p-1 flex gap-10" showCloseButton={false}>
-          <h2>Import Dialog</h2>
+      <DialogContent className="flex sm:max-w-3xl w-full flex-col overflow-y-auto overflow-x-hidden">
+        <DialogTitle className="sticky top-0 p-1 flex gap-10">
+          <span>Import Dialog</span>
         </DialogTitle>
+        <DialogDescription></DialogDescription>
         <div className="mt-4 grid h-full grid-cols-4">
           <ImportTemplate
             setSelectedTemplate={setSelectedTemplate}

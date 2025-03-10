@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { LoaderProvider } from '@/context/Loading'
 import useImportData from '@/hooks/useImportData'
 import { IProcessFile } from '@shared/models/files'
 import { HandleSelectColumns, handleImport } from '@/utils/dialog-table-utils'
@@ -8,12 +7,18 @@ import {
   ExcelTableData,
   ExcelTableSelected
 } from '@/utils/import-dialog-interfaces'
-import _ from 'lodash'
 import { LayoutTemplate } from 'lucide-react'
 import { useSnackbar } from 'notistack'
 
 import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '../ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger
+} from '../ui/dialog'
 import CustomTooltip from '../ui/tooltip'
 import ExcelTable from './excel-table'
 import ImportFile from './template-dialog-actions/import-file'
@@ -26,7 +31,7 @@ import useLoader from '@renderer/hooks/useLoader'
 
 const ImportDialog = () => {
   const { importDataTeq4Z } = useImportData()
-  const { isLoading, startLoading, stopLoading } = useLoader()
+  const { startLoading, stopLoading } = useLoader()
   const [data, setData] = useState<ExcelTableData>()
   const [selected, setSelected] = useState<ExcelTableSelected>()
   const [open, setOpen] = useState(false)
@@ -63,6 +68,7 @@ const ImportDialog = () => {
       return
     }
     setColumns((prev) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       let collide = false
       Object.entries(prev).forEach(([key, value]) => {
         if (value?.['col'] === selected?.col) {
@@ -86,7 +92,7 @@ const ImportDialog = () => {
           Icon={<LayoutTemplate className="h-5 w-5" />}
         />
       </DialogTrigger>
-      <DialogContent className="absolute flex h-[91%] max-w-[95%] flex-col gap-0 overflow-y-auto overflow-x-hidden mt-6">
+      <DialogContent className="h-[73%] max-w-[95%] w-[65%] min-w-[70%] flex flex-col gap-0 overflow-y-auto overflow-x-hidden mt-6">
         <DialogTitle className="flex items-center gap-10">
           Import Data From Text File
           <ImportFile
@@ -103,6 +109,7 @@ const ImportDialog = () => {
             setIsModulePhase={setIsModulePhase}
           />
         </DialogTitle>
+        <DialogDescription></DialogDescription>
 
         <ExcelTable
           data={data}

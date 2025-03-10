@@ -19,7 +19,7 @@ const FrequencyAnalysisDialog = () => {
           Icon={<CandlestickChartIcon className="h-5 w-5" />}
         />
       </DialogTrigger>
-      <DialogContent className="h-[93%] max-w-[95%] gap-0 overflow-y-auto overflow-x-hidden mt-5">
+      <DialogContent className="h-[93%] max-w-[95%] w-[95%] min-w-[90%] gap-0 overflow-y-auto overflow-x-hidden mt-5">
         <DialogTitle className="mb-1 flex h-6 w-full items-center gap-6 p-0">
           <div>Frequency Analysis</div>
           <ExportToExcel />
