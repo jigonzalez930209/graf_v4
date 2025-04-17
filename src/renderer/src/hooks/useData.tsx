@@ -422,3 +422,90 @@ export const useData = () => {
     addFiles: addFilesToState
   }
 }
+
+// import * as React from 'react';
+// import _ from 'lodash';
+// import { GrafContext } from '../context/GraftContext';
+// import { IProcessFile, ICsvFileColum } from '@shared/models'; // Assuming models are correctly imported
+
+// // --- Pure utility functions (could be in a separate utils file) ---
+// const calculateZR = (module: number, phase: number): number => module * Math.cos((phase * Math.PI) / 180);
+// const calculateZI = (module: number, phase: number): number => -module * Math.sin((phase * Math.PI) / 180);
+// const log10 = (val: number): number => Math.log10(val);
+
+// // --- Selector Hook ---
+// export const useGrafSelectors = () => {
+//     const { graftState } = React.useContext(GrafContext);
+//     const { files } = graftState;
+
+//     const selectedFiles = React.useMemo(() => {
+//         return files
+//             ?.filter((file) => file.selected)
+//             .sort((a, b) => parseInt(a.selected.toString()) - parseInt(b.selected.toString())) || [];
+//     }, [files]); // Dependency: only files (selection status is part of file object)
+
+//     const impedanceData = React.useMemo(() => {
+//         return selectedFiles
+//             .filter(file => file.type === 'impedance') // Assuming type property exists
+//             .map((file) => ({
+//                 ...file,
+//                 // TODO: Add stronger types for content elements
+//                 content: file.content.map((c) => [
+//                     calculateZR(parseFloat(c[2]), parseFloat(c[3])),
+//                     calculateZI(parseFloat(c[2]), parseFloat(c[3])),
+//                 ]),
+//             }));
+//     }, [selectedFiles]);
+
+//     const moduleFaceData = React.useMemo(() => {
+//          // ... similar memoized calculation using selectedFiles ...
+//          // Use log10 utility
+//     }, [selectedFiles]);
+
+//     // ... other selectors (getVCData, getZIZRvsFrequency) ...
+
+//     const getCSVData = React.useCallback((cols: ICsvFileColum | undefined): ReturnGetCSVData => {
+//         // Find the selected CSV file
+//         const csvFile = files?.find(f => f.selected && f.type === 'csv');
+//         if (!csvFile || !cols || (_.isEmpty(cols.x) && _.isEmpty(cols.y))) {
+//             return undefined;
+//         }
+
+//         // ... rest of the logic to map columns to content ...
+//         // This might not need memoization if `cols` changes frequently,
+//         // but the expensive part (finding the file) is quick.
+//     }, [files]); // Depends on all files to find the selected one
+
+//     return {
+//         selectedFiles, // Expose the memoized selected files list
+//         impedanceData,
+//         moduleFaceData,
+//         getCSVData,
+//         // ... other derived data properties/functions
+//     };
+// };
+
+// // --- Action Hook (Conceptual) ---
+// export const useGrafActions = () => {
+//     const {
+//         // Get only setters from context
+//         setFiles,
+//         setColumns,
+//         setSelectedFile,
+//         // ... other setters
+//     } = React.useContext(GrafContext);
+
+//     const setData = React.useCallback((payload: IProcessFile[]) => {
+//         // ... logic using setFiles, setColumns ...
+//     }, [setFiles, setColumns /* ... */]);
+
+//     const changeSelectedFile = React.useCallback(/* ... complex logic ... */, [/* dependencies */]);
+
+//     // ... other action functions ...
+
+//     return {
+//         setData,
+//         changeSelectedFile,
+//         // ... other actions
+//     };
+// }
