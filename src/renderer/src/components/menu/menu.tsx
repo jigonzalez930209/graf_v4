@@ -27,6 +27,7 @@ import { MenuModeToggle } from './menu-mode-toggle'
 import { ProjectMenu } from './project'
 import EventProgress from './event-progress'
 import WindowControls from './control-buttons'
+import VCAnalysisDialog from '../vc-analysis/dialog'
 
 export function Menu() {
   const [name, setName] = React.useState('')
@@ -98,6 +99,7 @@ export function Menu() {
             </ExportModal>
           )}
           <EventProgress />
+          <VCAnalysisDialog />
         </div>
         <WindowControls />
       </Menubar>
