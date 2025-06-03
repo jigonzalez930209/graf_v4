@@ -1,4 +1,3 @@
-import { INotification } from '@shared/models/graf'
 import {
   GetFiles,
   GetProject,
@@ -40,7 +39,7 @@ declare global {
       importFilesFromLoader: ImportFilesFromLoader
 
       onLoadFileInfo: () => Promise<string[] | string>
-
+      getBinaryFilesFromDirectory: () => Promise<IFileRaw[]>
       openDevTools: () => Promise<void>
 
       getAppName: () => Promise<string>

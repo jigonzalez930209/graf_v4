@@ -23,6 +23,10 @@ try {
       const files = await ipcRenderer.invoke('getFiles')
       return files
     },
+    getBinaryFilesFromDirectory: async () => {
+      const files = await ipcRenderer.invoke('getBinaryFilesFromDirectory')
+      return files
+    },
     getGrafState: async (isSilent = false) => {
       const grafState = await ipcRenderer.invoke('getGrafState', isSilent)
       return grafState

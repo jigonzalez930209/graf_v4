@@ -27,6 +27,7 @@ export const readImpedanceFile = (fileRaw: IFileRaw): IProcessFile | undefined =
     name: fileRaw.name,
     pointNumber,
     content: dataPoint,
+    relativePath: fileRaw.relativePath,
     selected: false,
     impedance
   }
@@ -57,7 +58,8 @@ export const readVoltammeterFile = (fileRaw: IFileRaw): IProcessFile | undefined
     name: fileRaw.name,
     content: dataPoint,
     selected: false,
-    voltammeter
+    voltammeter,
+    relativePath: fileRaw.relativePath
   }
 }
 export const readCsvFile = (fileRaw: IFileRaw): IProcessFile | undefined => {
@@ -85,6 +87,7 @@ export const readCsvFile = (fileRaw: IFileRaw): IProcessFile | undefined => {
     content: content,
     selectedInvariableContentIndex: selectedInvariableContentIndex,
     invariableContent: invariableContent,
+    relativePath: fileRaw.relativePath,
     selected: false,
 
     csv: { columns: columns }

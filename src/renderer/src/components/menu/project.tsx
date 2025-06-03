@@ -19,7 +19,7 @@ import { INITIAL_STATE } from '@renderer/context/GraftProvider'
 export const ProjectMenu = () => {
   const { graftState, setGraftState } = React.useContext(GrafContext)
   const { startLoading, stopLoading } = useLoader()
-  const { addFiles } = useData()
+  const { addFiles, updateData } = useData()
 
   const newProject = () => setGraftState(INITIAL_STATE)
 
@@ -46,7 +46,7 @@ export const ProjectMenu = () => {
       .finally(() => {
         stopLoading()
       })
-  }, [])
+  }, [addFiles, startLoading, stopLoading])
 
   const openProject = React.useCallback(async () => {
     startLoading()
@@ -64,7 +64,34 @@ export const ProjectMenu = () => {
       .finally(() => {
         stopLoading()
       })
-  }, [])
+  }, [setGraftState, startLoading, stopLoading])
+
+  const openFolder = React.useCallback(async () => {
+    startLoading()
+    window.context
+      .getBinaryFilesFromDirectory()
+      .then((files) => {
+        if (files === undefined || files.length === 0) {
+          enqueueSnackbar('No files found in folder', { variant: 'warning' })
+          return
+        }
+        // adapt files to IFileRaw
+
+        const processFiles = readNativeFiles(files)
+        if (processFiles) {
+          updateData(processFiles)
+        } else {
+          enqueueSnackbar('Something went wrong reading the files', { variant: 'error' })
+        }
+      })
+      .catch((err) => {
+        enqueueSnackbar(err.toString(), { variant: 'error' })
+        console.log(err)
+      })
+      .finally(() => {
+        stopLoading()
+      })
+  }, [updateData, startLoading, stopLoading])
 
   const saveProject = React.useCallback(async () => {
     startLoading()
@@ -80,7 +107,7 @@ export const ProjectMenu = () => {
       .finally(() => {
         stopLoading()
       })
-  }, [graftState])
+  }, [graftState, startLoading, stopLoading])
 
   return (
     <MenubarMenu>
@@ -95,6 +122,7 @@ export const ProjectMenu = () => {
           Open files
           {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
         </MenubarItem>
+        <MenubarItem onClick={openFolder}>Open folder (recursive)</MenubarItem>
         <MenubarItem onClick={readFiles}>
           Add files
           {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
