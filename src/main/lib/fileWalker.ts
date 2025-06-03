@@ -28,7 +28,7 @@ export async function walkDirectoryWithFiles(
           name: entry.name,
           type: type as IFileBinary['type'],
           content: file,
-          relativePath: path.normalize(entryPath)
+          relativePath: path.normalize(entryPath).split(path.sep).join('/')
         })
       }
     }
