@@ -12,6 +12,7 @@ import icon from '../../resources/icon.png?asset'
 import { getFiles, getGrafState, getTemplates, saveProject, saveTemplate } from './lib'
 import {
   getBinaryFiles,
+  getBinaryFilesFromDirectory,
   importFilesFromLoader,
   readFilesFromPath,
   saveExcelFile
@@ -79,6 +80,7 @@ app.whenReady().then(() => {
   ipcMain.handle('getGrafState', (_, ...args: Parameters<GetProject>) => getGrafState(...args))
   ipcMain.handle('getTemplates', () => getTemplates())
   ipcMain.handle('getBinaryFiles', () => getBinaryFiles())
+  ipcMain.handle('getBinaryFilesFromDirectory', () => getBinaryFilesFromDirectory())
 
   // Saver files to current path from renderer process.
   ipcMain.handle('saveGrafState', (_, ...args: Parameters<SaveProject>) => saveProject(...args))

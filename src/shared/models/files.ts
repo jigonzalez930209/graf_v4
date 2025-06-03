@@ -34,6 +34,7 @@ type IProcessFile = {
   color: string
   impedance?: ImpedanceParameters
   voltammeter?: VoltameterParameters
+  relativePath?: string
   csv?: {
     columns: string[]
   }
@@ -47,6 +48,7 @@ type IFileRaw = {
   name: string
   type: IFileType
   content: string
+  relativePath?: string
   color?: IColorScheme
 }
 

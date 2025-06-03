@@ -6,6 +6,7 @@ import { readFile, writeFile } from 'fs-extra'
 import { dialog, BrowserWindow } from 'electron'
 import { INotification } from '@shared/models/graf'
 import path from 'path'
+import { walkDirectoryWithFiles } from './fileWalker'
 
 type GetFile = IFileRaw | undefined
 
@@ -180,4 +181,24 @@ export const getBinaryFiles = async (): Promise<IFileBinary[] | undefined> => {
   if (files?.length === 0) return undefined
 
   return Promise.all(files) as Promise<IFileBinary[]>
+}
+
+export interface FileWithRelativePath extends IFileRaw {
+  relativePath: string
+}
+
+export const getBinaryFilesFromDirectory = async (): Promise<
+  FileWithRelativePath[] | undefined
+> => {
+  const result = await dialog.showOpenDialog(BrowserWindow.getAllWindows()[0], {
+    properties: ['openDirectory']
+  })
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return undefined
+  }
+
+  const rootDir = result.filePaths[0]
+  console.log(rootDir)
+  return walkDirectoryWithFiles(rootDir)
 }

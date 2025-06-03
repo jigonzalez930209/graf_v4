@@ -11,8 +11,11 @@ import { GrafContext } from './context/GraftContext'
 import { readFilesUnsortedFileType } from './utils/connectors'
 
 const App = () => {
-  const { setFiles, setGraftState, setUpdateContent, setProgressEvent } =
-    React.useContext(GrafContext)
+  const {
+    setFiles,
+    setGraftState
+    // setUpdateContent, setProgressEvent
+  } = React.useContext(GrafContext)
 
   React.useEffect(() => {
     window.context
@@ -55,39 +58,39 @@ const App = () => {
       })
       .catch(console.error)
 
-    window.context
-      .checkUpdates()
-      .then((updateInfo) => {
-        if (updateInfo?.version) {
-          setUpdateContent(updateInfo)
-          enqueueSnackbar(`New version available version ${updateInfo.version}`, {
-            variant: 'info'
-          })
-        }
-      })
-      .catch(console.error)
-    window.context.on('update-available', (_, arg) => {
-      setUpdateContent(arg)
-    })
+    // window.context
+    //   .checkUpdates()
+    //   .then((updateInfo) => {
+    //     if (updateInfo?.version) {
+    //       setUpdateContent(updateInfo)
+    //       enqueueSnackbar(`New version available version ${updateInfo.version}`, {
+    //         variant: 'info'
+    //       })
+    //     }
+    //   })
+    //   .catch(console.error)
+    // window.context.on('update-available', (_, arg) => {
+    //   setUpdateContent(arg)
+    // })
 
-    window.context.on('update-downloaded', (_, arg) => {
-      setProgressEvent({
-        type: 'success',
-        name: `Update downloaded version ${arg.version}`,
-        message:
-          'Update downloaded and ready to install please restart the app to apply the update',
-        timeOut: 10000
-      })
-    })
+    // window.context.on('update-downloaded', (_, arg) => {
+    //   setProgressEvent({
+    //     type: 'success',
+    //     name: `Update downloaded version ${arg.version}`,
+    //     message:
+    //       'Update downloaded and ready to install please restart the app to apply the update',
+    //     timeOut: 10000
+    //   })
+    // })
 
-    window.context.on('download-progress', (_, arg) => {
-      setProgressEvent({
-        type: 'progress',
-        name: 'Downloading update',
-        message: `Downloading update ${Math.round(arg.percent)}%`,
-        timeOut: undefined
-      })
-    })
+    // window.context.on('download-progress', (_, arg) => {
+    //   setProgressEvent({
+    //     type: 'progress',
+    //     name: 'Downloading update',
+    //     message: `Downloading update ${Math.round(arg.percent)}%`,
+    //     timeOut: undefined
+    //   })
+    // })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
