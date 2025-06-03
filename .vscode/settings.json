@@ -7,5 +7,24 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "cSpell.words": [
+    "asar",
+    "cmdk",
+    "embla",
+    "handsontable",
+    "hyperformula",
+    "ianvs",
+    "jigonzalez",
+    "levenberg",
+    "marquardt",
+    "notistack",
+    "nsis",
+    "plotly",
+    "sheetjs",
+    "taze",
+    "unmaximize",
+    "usehooks",
+    "vaul"
+  ]
 }
