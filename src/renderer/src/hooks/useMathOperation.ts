@@ -1,7 +1,6 @@
 import { generateRandomId } from '@renderer/utils/common'
 import { IProcessFile } from '@shared/models/files'
 import Decimal from 'decimal.js'
-import { subtract, multiply } from 'mathjs'
 
 function validatePairArray(arr: unknown, name: string): asserts arr is Decimal[][] {
   // Check if input is an array
@@ -45,15 +44,8 @@ export const useMathOperation = () => {
     return a.map((item, idx) => {
       const r1 = item[0].add(b[idx][0]).div(2)
       const r2 = item[1].add(b[idx][1])
-      if (
-        Array.isArray(r1) &&
-        r1.length === 2 &&
-        typeof r1[0] === 'number' &&
-        typeof r1[1] === 'number'
-      ) {
-        return [r1, r2]
-      }
-      throw new Error('Result is not a number[] pair')
+
+      return [r1, r2]
     })
   }
 
@@ -69,11 +61,9 @@ export const useMathOperation = () => {
     validatePairArray(a, 'First array')
     validatePairArray(b, 'Second array')
     validateSameLength(a, b)
-    console.log({ here: subtract(a[0][1], b[0][1]) })
     return a.map((item, idx) => {
       const r1 = item[1].sub(b[idx][1])
       const r2 = item[0].add(b[idx][0]).div(2)
-      console.log(r1, r2)
       return [r2, r1]
     })
   }
@@ -91,16 +81,9 @@ export const useMathOperation = () => {
     validatePairArray(b, 'Second array')
     validateSameLength(a, b)
     return a.map((item, idx) => {
-      const result = multiply(item, b[idx])
-      if (
-        Array.isArray(result) &&
-        result.length === 2 &&
-        typeof result[0] === 'number' &&
-        typeof result[1] === 'number'
-      ) {
-        return result
-      }
-      throw new Error('Result is not a number[] pair')
+      const r1 = item[0].add(b[idx][0]).div(2)
+      const r2 = item[1].mul(b[idx][1])
+      return [r1, r2]
     })
   }
 
