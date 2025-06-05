@@ -17,25 +17,19 @@ import Loader from './loader'
 const Graf = () => {
   const { graftState } = React.useContext(GrafContext)
   const { isLoading } = useLoading()
-  const [width, setWidth] = React.useState(0)
 
-  const { data, layout, config } = usePlotlyOptions()
+  const { data, config, layout } = usePlotlyOptions()
 
   return (
-    <div>
+    <div className="h-full">
       {isLoading && <Loader />}
-      <div className="flex max-h-full max-w-full">
+      <div className="flex max-h-full max-w-full h-full">
         <ResizablePanelGroup direction="horizontal" className="w-full h-full">
           <ResizablePanel defaultSize={25} minSize={15}>
             <Drawer />
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel
-            defaultSize={75}
-            onResize={(i) => {
-              setWidth(i)
-            }}
-          >
+          <ResizablePanel defaultSize={75} className="h-full flex-1">
             {graftState?.fileType === 'csv' ? (
               <DragDrop
                 PlotlyChart={
@@ -44,7 +38,6 @@ const Graf = () => {
                     config={config}
                     data={data}
                     fileType={graftState.fileType}
-                    width={width}
                     exportFileName={
                       graftState.files.find((file) => file.selected)?.name ?? undefined
                     }
@@ -56,7 +49,6 @@ const Graf = () => {
                 layout={layout as PlotParams['layout']}
                 config={config}
                 data={data}
-                width={width}
                 fileType={graftState.fileType as IProcessFile['type']}
                 exportFileName={graftState.files.find((file) => file.selected)?.name}
               />

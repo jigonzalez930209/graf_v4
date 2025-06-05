@@ -109,7 +109,7 @@ const App = () => {
               className={cn(
                 'z-0 overflow-auto border-t bg-background pb-8',
                 'scrollbar-none',
-                ' max-h-[calc(100vh-0.1rem)] min-h-[calc(100vh-0.1rem)] min-w-[calc(100vw-0.1rem)] max-w-[calc(100vw-0.1rem)]',
+                ' h-screen max-h-[calc(100vh-0.1rem)] min-h-[calc(100vh-0.1rem)] min-w-[calc(100vw-0.1rem)] max-w-[calc(100vw-0.1rem)]',
                 'scrollbar scrollbar-track-transparent',
                 'scrollbar-thumb-accent scrollbar-thumb-rounded-md'
               )}
