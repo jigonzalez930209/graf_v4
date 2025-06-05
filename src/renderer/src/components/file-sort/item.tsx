@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { GrafContext } from '@/context/GraftContext'
 import { IProcessFile } from '@shared/models/files'
 import { useTheme } from 'next-themes'
 
@@ -20,16 +19,11 @@ type ItemProps = React.PropsWithChildren & {
   setFile: (id: string) => void
 }
 
-// TODO: Eliminate files and pass as reference to avoid files.find() function
 const Item = React.forwardRef<HTMLLIElement, ItemProps>((props, ref) => {
   const { className, file, setFile, ...rest } = props
   const { theme } = useTheme()
-  const {
-    graftState: { files }
-  } = React.useContext(GrafContext)
 
   const color = theme === 'dark' ? 'white' : 'black'
-  const isSelected = Boolean(files.find((d) => d.id === file.id)?.selected)
 
   return (
     <HoverCard openDelay={100} closeDelay={100}>
@@ -40,7 +34,7 @@ const Item = React.forwardRef<HTMLLIElement, ItemProps>((props, ref) => {
           className={cn(
             className,
             'w-full flex select-none items-center space-x-2 px-2 my-1.5 hover:bg-secondary rounded-md cursor-pointer',
-            isSelected && 'bg-secondary/70 shadow-md ring-1 ring-primary/15'
+            file.selected && 'bg-secondary/70 shadow-md ring-1 ring-primary/15'
           )}
           {...rest}
           onClick={() => setFile(file.id)}
@@ -49,7 +43,7 @@ const Item = React.forwardRef<HTMLLIElement, ItemProps>((props, ref) => {
             className="w-6 h-6 rounded-md flex items-center justify-center"
             style={{ color: file.color }}
           >
-            {isSelected ? (
+            {file.selected ? (
               <SquareCheckIcon className="w-5 h-5" />
             ) : (
               <SquareIcon className="w-5 h-5 text-primary" />
