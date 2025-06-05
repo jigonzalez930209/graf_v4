@@ -24,11 +24,12 @@ export async function walkDirectoryWithFiles(
       const type = fileType(entry.name)
       if (supportedFileTypesArray.includes(type as IFileBinary['type'])) {
         const file = await readFile(absolutePath, { encoding })
+        const filePath = path.normalize(entryPath).split(path.sep)
         files.push({
           name: entry.name,
           type: type as IFileBinary['type'],
           content: file,
-          relativePath: path.normalize(entryPath).split(path.sep).join('/')
+          relativePath: filePath.slice(0, -1).join('/')
         })
       }
     }

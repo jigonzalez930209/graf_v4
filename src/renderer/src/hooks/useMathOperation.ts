@@ -1,3 +1,5 @@
+import { generateRandomId } from '@renderer/utils/common'
+import { IProcessFile } from '@shared/models/files'
 import Decimal from 'decimal.js'
 import { subtract, multiply } from 'mathjs'
 
@@ -257,6 +259,96 @@ export const useMathOperation = () => {
     })
   }
 
+  /**
+   * Handles the operation based on the selected operation and returns the result as a new file.
+   * @param operation The selected operation
+   * @param a The first array of pairs
+   * @param b The second array of pairs (optional)
+   * @returns The result as a new file
+   * @throws Error if the operation is not valid or if the arrays are not valid
+   */
+  const handleOperation = (
+    operation: string = 'diff',
+    a: Decimal[][],
+    b?: Decimal[][],
+    folderPath?: string
+  ): IProcessFile => {
+    let res: Decimal[][] = []
+    switch (operation) {
+      case 'sum':
+        if (!b) {
+          throw new Error('Second array is required for sum operation')
+        }
+        res = sum(a, b)
+        break
+      case 'avg':
+        if (!b) {
+          throw new Error('Second array is required for avg operation')
+        }
+        res = sum(a, b).map(([x, y]) => [x.div(2), y.div(2)])
+        break
+      case 'diff':
+        if (!b) {
+          throw new Error('Second array is required for diff operation')
+        }
+        res = subtractArrays(a, b)
+        break
+      case 'multiply':
+        if (!b) {
+          throw new Error('Second array is required for multiply operation')
+        }
+        res = multiplyArrays(a, b)
+        break
+      case 'divide':
+        if (!b) {
+          throw new Error('Second array is required for divide operation')
+        }
+        res = divideArrays(a, b)
+        break
+      case 'projection':
+        if (!b) {
+          throw new Error('Second array is required for projection operation')
+        }
+        res = projection(a, b)
+        break
+      case 'elementWisePower':
+        if (!b) {
+          throw new Error('Second array is required for elementWisePower operation')
+        }
+        res = elementWisePower(a, b)
+        break
+      case 'maxComponentWise':
+        if (!b) {
+          throw new Error('Second array is required for maxComponentWise operation')
+        }
+        res = maxComponentWise(a, b)
+        break
+      case 'minComponentWise':
+        if (!b) {
+          throw new Error('Second array is required for minComponentWise operation')
+        }
+        res = minComponentWise(a, b)
+        break
+      default:
+        alert('Select an operation')
+        break
+    }
+    if (!res) {
+      throw new Error('Result is undefined')
+    }
+    const id = generateRandomId()
+    const generatedFile: IProcessFile = {
+      id,
+      name: `Generated ${operation}-${id}.teq4`,
+      type: 'teq4',
+      content: res.map(([x, y]) => [x.toString(), y.toString()]),
+      selected: true,
+      relativePath: `${folderPath}`,
+      color: 'red'
+    }
+    return generatedFile
+  }
+
   return {
     sum,
     subtract: subtractArrays,
@@ -269,6 +361,7 @@ export const useMathOperation = () => {
     elementWisePower,
     minComponentWise,
     maxComponentWise,
-    projection
+    projection,
+    handleOperation
   }
 }

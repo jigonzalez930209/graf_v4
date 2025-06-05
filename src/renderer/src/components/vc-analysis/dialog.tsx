@@ -68,7 +68,8 @@ export default function VCAnalysisDialog() {
     projection,
     elementWisePower,
     maxComponentWise,
-    minComponentWise
+    minComponentWise,
+    handleOperation
   } = useMathOperation()
 
   const handleProcess = () => {
@@ -142,12 +143,30 @@ export default function VCAnalysisDialog() {
   }
 
   const handleProcessMultiple = () => {
-    if (!inputExpression['1'] || !inputExpression['2']) {
-      alert('Please enter both expressions')
+    if (!inputExpression['1'] || !inputExpression['2'] || !selectedOperation) {
+      alert('Please enter both expressions and select an operation')
       return
     }
     const groupByFolder = _.groupBy(internalFiles, 'relativePath')
-    console.log({ groupByFolder })
+    console.log(groupByFolder)
+
+    const newFiles = Object.entries(groupByFolder).map(([folderPath, files]) => {
+      console.log(folderPath, files)
+      const a = files.find((f) => f.name.toLowerCase().includes(inputExpression['1'].toLowerCase()))
+      const b = files.find((f) => f.name.toLowerCase().includes(inputExpression['2'].toLowerCase()))
+      if (!a || !b) {
+        console.error('Invalid input, Arr1 or Arr2 is undefined')
+        return
+      }
+
+      const arrA = a.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
+      const arrB = b.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
+      const res = handleOperation(selectedOperation, arrA, arrB, folderPath)
+      console.log({ res })
+      return res
+    })
+    console.log({ newFiles })
+    setInternalFiles((prev) => [...prev, ...newFiles.filter((f) => !!f)])
   }
 
   const handleFileSelectedChange = React.useCallback((id: string) => {

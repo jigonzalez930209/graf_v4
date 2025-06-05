@@ -14,24 +14,24 @@ function groupFilesByFolder(files: IProcessFile[]): Record<string, FolderNode> {
   if (!Array.isArray(files) || files.length === 0) return tree
   files.forEach((file) => {
     if (!file || typeof file !== 'object' || !('id' in file)) return
-    const path = typeof file.relativePath === 'string' ? file.relativePath : ''
-    const parts = path.split('/').filter(Boolean)
+
+    // Use file.relativePath for folder path and file.name for filename
+    const folderPath = typeof file.relativePath === 'string' ? file.relativePath : ''
+    const fileName = file.name
+
+    const parts = folderPath.split('/').filter(Boolean)
     let current = tree
 
-    for (let idx = 0; idx < parts.length - 1; idx++) {
+    // Traverse through folder hierarchy
+    for (let idx = 0; idx < parts.length; idx++) {
       const part = parts[idx]
       if (!current[part]) current[part] = { __files: [], __folders: {} }
       current = current[part].__folders
     }
 
-    const fileName = parts.length > 0 ? parts[parts.length - 1] : null
-    if (parts.length === 0) {
-      if (!current.__root) current.__root = { __files: [], __folders: {} }
-      current.__root.__files.push(file)
-    } else {
-      if (!current[fileName!]) current[fileName!] = { __files: [], __folders: {} }
-      current[fileName!].__files.push(file)
-    }
+    // Add file to current node
+    if (!current[fileName]) current[fileName] = { __files: [], __folders: {} }
+    current[fileName].__files.push(file)
   })
   return tree
 }
