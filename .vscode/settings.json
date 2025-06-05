@@ -11,7 +11,9 @@
   "cSpell.words": [
     "asar",
     "cmdk",
+    "dividercolor",
     "embla",
+    "gridcolor",
     "handsontable",
     "hyperformula",
     "ianvs",
@@ -21,10 +23,13 @@
     "notistack",
     "nsis",
     "plotly",
+    "Relayout",
     "sheetjs",
     "taze",
     "unmaximize",
     "usehooks",
-    "vaul"
+    "vaul",
+    "xaxis",
+    "yaxis"
   ]
 }
