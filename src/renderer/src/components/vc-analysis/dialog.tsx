@@ -161,7 +161,10 @@ export default function VCAnalysisDialog() {
 
       const arrA = a.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
       const arrB = b.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
-      const res = handleOperation(selectedOperation, arrA, arrB, folderPath)
+      const res = handleOperation(selectedOperation, arrA, arrB, {
+        name: folderPath,
+        folderPath
+      })
       console.log({ res })
       return res
     })
@@ -237,22 +240,9 @@ export default function VCAnalysisDialog() {
             Process
           </Button>
           <Button
-            disabled={!selectedOperation || internalFiles.filter((f) => f.selected).length < 2}
+            variant="success"
+            disabled={!selectedOperation || !inputExpression['1'] || !inputExpression['2']}
             onClick={handleProcessMultiple}
-            style={{
-              margin: '16px 0',
-              padding: '8px 20px',
-              borderRadius: 8,
-              background: '#0070f3',
-              color: 'white',
-              border: 'none',
-              cursor:
-                !selectedOperation || internalFiles.filter((f) => f.selected).length < 2
-                  ? 'not-allowed'
-                  : 'pointer',
-              fontWeight: 'bold',
-              fontSize: 16
-            }}
           >
             Process Multiple
           </Button>
