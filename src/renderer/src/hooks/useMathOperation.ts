@@ -1,4 +1,5 @@
 import { generateRandomId } from '@renderer/utils/common'
+import { COLORS } from '@shared/constants'
 import { IProcessFile } from '@shared/models/files'
 import Decimal from 'decimal.js'
 
@@ -247,6 +248,9 @@ export const useMathOperation = () => {
    * @param operation The selected operation
    * @param a The first array of pairs
    * @param b The second array of pairs (optional)
+   * @param options Optional parameters
+   * @param options.folderPath The folder path where the file will be saved
+   * @param options.name The name of the file
    * @returns The result as a new file
    * @throws Error if the operation is not valid or if the arrays are not valid
    */
@@ -254,7 +258,10 @@ export const useMathOperation = () => {
     operation: string = 'diff',
     a: Decimal[][],
     b?: Decimal[][],
-    folderPath?: string
+    options?: {
+      folderPath?: string
+      name?: string
+    }
   ): IProcessFile => {
     let res: Decimal[][] = []
     switch (operation) {
@@ -322,12 +329,12 @@ export const useMathOperation = () => {
     const id = generateRandomId()
     const generatedFile: IProcessFile = {
       id,
-      name: `Generated ${operation}-${id}.teq4`,
+      name: `${operation}-${options?.folderPath}.teq4`,
       type: 'teq4',
       content: res.map(([x, y]) => [x.toString(), y.toString()]),
       selected: true,
-      relativePath: `${folderPath}`,
-      color: 'red'
+      relativePath: `${options?.folderPath}`,
+      color: COLORS[Decimal.floor(Decimal.random().mul(COLORS.length)).toNumber()]
     }
     return generatedFile
   }
