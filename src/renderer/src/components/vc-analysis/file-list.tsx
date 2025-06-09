@@ -4,7 +4,7 @@ import { IProcessFile } from '@shared/models/files'
 
 interface FileListProps {
   files: IProcessFile[]
-  onSelect: (id: string) => void
+  onSelect: (id: string, action?: 'selected' | 'deselected') => void
 }
 
 /**
