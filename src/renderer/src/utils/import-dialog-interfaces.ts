@@ -1,5 +1,5 @@
 import React from 'react'
-import { CellValue, RowObject } from 'handsontable/common'
+import { RowObject } from 'handsontable/common'
 
 export type ExcelTableData =
   | Array<{ [key: string]: string }>
