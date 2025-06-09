@@ -38,6 +38,9 @@ jobs:
 
       - name: Build
         run: pnpm run build
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          NODE_OPTIONS: "--max_old_space_size=4096"
 
       - name: |
           Compile artifacts to mac and upload them to github release
