@@ -16,7 +16,7 @@ import { SquareCheckIcon, SquareIcon } from 'lucide-react'
 type ItemProps = React.PropsWithChildren & {
   className?: string
   file: IProcessFile
-  setFile: (id: string) => void
+  setFile: (id: string, action?: 'selected' | 'deselected') => void
 }
 
 const Item = React.forwardRef<HTMLLIElement, ItemProps>((props, ref) => {
@@ -37,7 +37,7 @@ const Item = React.forwardRef<HTMLLIElement, ItemProps>((props, ref) => {
             file.selected && 'bg-secondary/70 shadow-md ring-1 ring-primary/15'
           )}
           {...rest}
-          onClick={() => setFile(file.id)}
+          onClick={() => setFile(file.id, file.selected ? 'deselected' : 'selected')}
         >
           <span
             className="w-6 h-6 rounded-md flex items-center justify-center"
