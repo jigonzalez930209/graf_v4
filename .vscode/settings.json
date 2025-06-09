@@ -10,21 +10,32 @@
   },
   "cSpell.words": [
     "asar",
+    "bordercolor",
+    "borderwidth",
     "cmdk",
+    "coef",
+    "dividercolor",
     "embla",
+    "gridcolor",
     "handsontable",
+    "hovermode",
+    "hovertemplate",
     "hyperformula",
     "ianvs",
     "jigonzalez",
     "levenberg",
+    "lusolve",
     "marquardt",
     "notistack",
     "nsis",
     "plotly",
+    "Relayout",
     "sheetjs",
     "taze",
     "unmaximize",
     "usehooks",
-    "vaul"
+    "vaul",
+    "xaxis",
+    "yaxis"
   ]
 }

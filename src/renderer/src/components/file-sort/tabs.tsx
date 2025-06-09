@@ -107,7 +107,10 @@ const GroupFilesByType = React.forwardRef(() => {
 
   return (
     <div ref={containerRef} className="w-full h-full pr-2">
-      <Tabs defaultValue="all" className="w-full relative h-full overflow-auto mt-1 ml-1">
+      <Tabs
+        defaultValue="all"
+        className="w-full relative h-full overflow-y-auto overflow-x-hidden mt-1 ml-1"
+      >
         {isChange ? (
           <Popover>
             <PopoverTrigger asChild className="bg-secondary">

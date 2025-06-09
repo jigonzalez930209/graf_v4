@@ -27,7 +27,7 @@ import { MenuModeToggle } from './menu-mode-toggle'
 import { ProjectMenu } from './project'
 import EventProgress from './event-progress'
 import WindowControls from './control-buttons'
-import VCAnalysisDialog from '../vc-analysis/dialog'
+import VCAnalysisDialog from '../vc-analysis/vc-dialog'
 
 export function Menu() {
   const [name, setName] = React.useState('')
