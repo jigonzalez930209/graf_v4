@@ -320,10 +320,18 @@ export default function VCAnalysisDialog() {
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-[90vw] h-[90vh] max-w-[90vw] max-h-[90vh]">
-        <AlertDialogTitle className="mb-1 flex h-6 w-full items-center gap-6 p-0">
+        <AlertDialogTitle className="mb-1 relative flex h-6 w-full items-center gap-6 p-0">
           Process VC{' '}
           <Button variant="success" size="icon" onClick={handleSetGlobalSelectedFiles}>
             <PlusIcon className="w-4 h-4" />
+          </Button>
+          <Button
+            className="absolute right-2"
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpen(false)}
+          >
+            <XIcon className="w-4 h-4" />
           </Button>
         </AlertDialogTitle>
         <AlertDialogDescription className="sr-only"></AlertDialogDescription>
