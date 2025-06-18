@@ -17,9 +17,7 @@ export interface FitResult {
  * @returns {FitResult} Fit results
  */
 export const polynomialFit = (points: Point[], degree: Decimal): FitResult => {
-  const X = points.map((p) =>
-    Array.from({ length: degree.add(1).toNumber() }, (_, i) => p[0].pow(i))
-  )
+  const X = points.map((p) => Array.from({ length: degree.toNumber() }, (_, i) => p[0].pow(i)))
   const Y = points.map((p) => [p[1]])
 
   try {
@@ -105,6 +103,7 @@ export const generatePointsFromBestFit = (dataPoints: Point[], numberOfPoints: n
  * @param {number} numberOfPoints - The number of points to generate.
  * @param {number} minX - The minimum x-value for the generated points.
  * @param {number} maxX - The maximum x-value for the generated points.
+ * @param {number} degree - The degree of the polynomial fit.
  * @returns {Point} An array of generated points.
  */
 export const generatePointsFromFitResult = (
@@ -120,9 +119,14 @@ export const generatePointsFromFitResult = (
   for (let i = 0; i < numberOfPoints; i++) {
     const x = minX.add(maxX.sub(minX).mul(i / (numberOfPoints - 1)))
     let y = new Decimal(0)
-    for (let j = 0; j <= maxOrder; j++) {
-      y = y.add(coefficients[j].mul(x.pow(j)))
-    }
+    console.log(
+      coefficients,
+      coefficients.map((c) => c.toNumber()),
+      { maxOrder, degree }
+    )
+    coefficients.forEach((c, j) => {
+      y = y.add(c.mul(x.pow(j)))
+    })
     generatedPoints.push([x, y])
   }
   return generatedPoints
