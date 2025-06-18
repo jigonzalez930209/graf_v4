@@ -124,8 +124,8 @@ export default function VCAnalysisDialog() {
   const [selectedFit, setSelectedFit] = React.useState<string | null>(null)
 
   const [countPoints, setCountPoints] = useLocalStorage<number>('countPoints', 6)
-
   const [selectedPoints, setSelectedPoints] = useLocalStorage<number[]>('selectedPoints', [])
+  const [selectedDegree, setSelectedDegree] = useLocalStorage<number>('selectedDegree', 0)
 
   const [selectionOrder, setSelectionOrder] = React.useState<string[]>([])
   const [inputExpression, setInputExpression] = React.useState<{ '1': string; '2': string }>({
@@ -247,7 +247,8 @@ export default function VCAnalysisDialog() {
     const file = files[0]
     const res = fit(
       file.content.map((c) => [Decimal(c[0]), Decimal(c[1])]),
-      selectedPoints
+      selectedPoints,
+      selectedDegree
     )
     if (!res) return
     console.log({ res })
@@ -262,7 +263,7 @@ export default function VCAnalysisDialog() {
     }
     console.log({ f })
     setNewFiles((prev) => [...prev, f])
-  }, [internalFiles, fit, selectedPoints])
+  }, [internalFiles, fit, selectedPoints, selectedDegree])
 
   const handleFitMultiple = React.useCallback(() => {
     const selectedFiles = internalFiles.filter((f) => f.selected)
@@ -275,17 +276,14 @@ export default function VCAnalysisDialog() {
     setNewFiles((prev) => [...prev, ...res.map((r) => r.file)])
   }, [internalFiles, fitMultiple])
 
-  // const handleSelectPoint = React.useCallback((point: [number, number]) => {
-  //   setCountPoints((prev) => {
-  //     if (prev?.includes(point)) {
-  //       return prev.filter((p) => p !== point)
-  //     } else if (prev?.length) {
-  //       return [...prev, point]
-  //     } else {
-  //       return [point]
-  //     }
-  //   })
-  // }, [])
+  const handleManualSelection = React.useCallback(
+    (points: number[], degree: number) => {
+      setSelectedPoints(points)
+      setSelectedDegree(degree)
+      console.log({ points, degree })
+    },
+    [setSelectedPoints, setSelectedDegree]
+  )
 
   const handleSetGlobalSelectedFiles = React.useCallback(() => {
     const filesToGlobalState = newFiles.filter((f) => f.selected)
@@ -416,7 +414,8 @@ export default function VCAnalysisDialog() {
                 <ManualSelection
                   values={selectedPoints}
                   count={countPoints}
-                  onChange={setSelectedPoints}
+                  onChange={handleManualSelection}
+                  degree={selectedDegree}
                 />
               </div>
             </div>
