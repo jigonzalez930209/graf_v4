@@ -111,14 +111,16 @@ export const generatePointsFromFitResult = (
   fitResult: FitResult,
   numberOfPoints: number,
   minX: Decimal,
-  maxX: Decimal
+  maxX: Decimal,
+  degree: number = 0
 ): Point[] => {
   const { coefficients } = fitResult
   const generatedPoints: Point[] = Array<Point>()
+  const maxOrder = degree === 0 ? coefficients.length - 1 : degree
   for (let i = 0; i < numberOfPoints; i++) {
     const x = minX.add(maxX.sub(minX).mul(i / (numberOfPoints - 1)))
     let y = new Decimal(0)
-    for (let j = 0; j < coefficients.length; j++) {
+    for (let j = 0; j <= maxOrder; j++) {
       y = y.add(coefficients[j].mul(x.pow(j)))
     }
     generatedPoints.push([x, y])
