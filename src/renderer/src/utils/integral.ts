@@ -89,6 +89,7 @@ export class CubicSpline {
       .add(this.c[i].mul(dx.pow(2)))
       .add(this.d[i].mul(dx.pow(3)))
   }
+
   /**
    * Computes the definite integral between the spline and the straight line connecting two points, over [x1, x2].
    * @param p1 [x1, y1] as Decimals
@@ -113,7 +114,7 @@ export class CubicSpline {
     // Integral of the spline from x1 to x2 (sum over relevant segments)
     let splineIntegral = new Decimal(0)
     let a = x1
-    let b_ = x2
+    const b_ = x2
     // Find the first segment
     let i = this.x.length - 2
     for (let j = 0; j < this.x.length - 1; j++) {
@@ -151,7 +152,7 @@ export class CubicSpline {
       if (i >= this.x.length - 1) break
       a = right
     }
-    return splineIntegral.sub(lineIntegral)
+    return splineIntegral.sub(lineIntegral).abs()
   }
 }
 
