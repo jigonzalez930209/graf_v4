@@ -17,17 +17,21 @@ function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive
 
 function TabsList({
   className,
+  NextToElement,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List & { NextToElement?: HTMLDivElement }>) {
+}: React.ComponentProps<typeof TabsPrimitive.List> & { NextToElement?: React.ReactNode }) {
   return (
-    <TabsPrimitive.List
-      data-slot="tabs-list"
-      className={cn(
-        'bg-muted text-muted-foreground select-none inline-flex h-9 w-fit items-center justify-center rounded-lg p-1',
-        className
-      )}
-      {...props}
-    />
+    <div className="flex">
+      <TabsPrimitive.List
+        data-slot="tabs-list"
+        className={cn(
+          'bg-muted text-muted-foreground select-none inline-flex h-9 w-fit items-center justify-center rounded-lg p-1',
+          className
+        )}
+        {...props}
+      />
+      {NextToElement}
+    </div>
   )
 }
 

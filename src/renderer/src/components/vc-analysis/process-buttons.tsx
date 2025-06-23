@@ -46,7 +46,7 @@ interface FitButtonsProps {
 
 export const FitButtons: React.FC<FitButtonsProps> = ({ fitButtons, selected, onSelect }) => {
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="flex gap-2">
       {fitButtons.map((op) => (
         <Button
           key={op.key}

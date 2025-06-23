@@ -7,6 +7,7 @@ import { defaultTheme } from '@/utils'
 import { useLocalStorage } from 'usehooks-ts'
 import './plot.css'
 import PlotlyJS from 'plotly.js-dist'
+import Decimal from 'decimal.js'
 
 function useDebouncedResizeObserver(
   ref: React.RefObject<Element | null>,
@@ -36,9 +37,19 @@ type PlotlyChartProps = {
   data: PlotParams['data']
   layout: PlotParams['layout']
   config: PlotParams['config']
+  onPointClick?: (x: Decimal, y: Decimal, uid: string, pointIndex: number) => void
+  onLegendClick?: (e: Readonly<Plotly.LegendClickEvent>) => boolean
 }
 
-const PlotlyChart = ({ exportFileName, data, layout, config, fileType }: PlotlyChartProps) => {
+const PlotlyChart = ({
+  exportFileName,
+  data,
+  layout,
+  config,
+  fileType,
+  onPointClick,
+  onLegendClick
+}: PlotlyChartProps) => {
   const theme = useTheme()
   const t = defaultTheme(theme)
   const plotDivRef = React.useRef<HTMLElement | null>(null)
@@ -184,13 +195,21 @@ const PlotlyChart = ({ exportFileName, data, layout, config, fileType }: PlotlyC
         }}
         onClick={(event) => {
           if (event.points && event.points.length > 0) {
+            console.log('points', event)
             const pt = event.points[0]
             console.log('coord of point selected:', pt.x, pt.y)
+            onPointClick?.(
+              Decimal(pt.x as number),
+              Decimal(pt.y as number),
+              pt.data.uid,
+              pt.pointIndex
+            )
           } else {
             const { offsetX, offsetY } = event.event as MouseEvent
             console.log('coord of pixel in plot area:', offsetX, offsetY)
           }
         }}
+        onLegendClick={onLegendClick}
       />
     </div>
   )
