@@ -132,3 +132,33 @@ export const ProcessMultipleIcon = (
     <line x1="26" y1="19" x2="25" y2="19" />
   </svg>
 )
+
+export const NumericalDerivativeIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M4 20 l8-16 8 16" />
+    <line x1="4" y1="20" x2="20" y2="20" />
+  </svg>
+)
+
+export const SavitzkyGolayIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M3 12h2l2-4 2 4 2-4 2 4h2l2-4 2 4 2-4 2 4" />
+    <path d="M3 12c4 4 8 4 12 0s4-4 4-4" />
+  </svg>
+)

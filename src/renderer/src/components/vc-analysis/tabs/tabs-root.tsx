@@ -1,12 +1,17 @@
 import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import MathOperationsTab from './operations-tab'
-import IntegralTab from './integral-tab'
+// import IntegralTab from './integral-tab'
 import DerivateTab from './derivate-tab'
 import FitTab from './fit-tab'
 
 export type TabType = 'operations' | 'integral' | 'fit' | 'derivate'
 
-const tabs: TabType[] = ['operations', 'integral', 'fit', 'derivate']
+const tabs: TabType[] = [
+  'operations',
+  //'integral',
+  'fit',
+  'derivate'
+]
 
 type TabsProps = {
   selectedTab: TabType
@@ -16,7 +21,7 @@ type TabsProps = {
 const TabsRoot = ({ selectedTab = tabs[0], setSelectedTab }: TabsProps) => {
   const tabsContent = {
     operations: <MathOperationsTab />,
-    integral: <IntegralTab />,
+    // integral: <IntegralTab />,
     fit: <FitTab />,
     derivate: <DerivateTab />
   }
