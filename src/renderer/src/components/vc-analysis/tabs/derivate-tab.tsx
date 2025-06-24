@@ -14,14 +14,20 @@ import { Label } from '@renderer/components/ui/label'
 const derivateButtons = [
   {
     key: 'numericalDerivative',
-    label: 'Savitzky-Golay Derivative',
-    tooltip: 'Calculate the numerical derivative',
+    label: 'Derivative',
+    tooltip: 'Calculate the standard numerical derivative (no smoothing)',
     icon: NumericalDerivativeIcon
   },
   {
+    key: 'savitzkyGolayDerivative',
+    label: 'SG Derivative',
+    tooltip: 'Calculate a smoothed derivative using the Savitzky-Golay filter',
+    icon: SavitzkyGolayIcon
+  },
+  {
     key: 'savitzkyGolaySmooth',
-    label: 'Savitzky-Golay',
-    tooltip: 'Smooth the data using Savitzky-Golay filter',
+    label: 'SG Smooth',
+    tooltip: 'Smooth the data using the Savitzky-Golay filter',
     icon: SavitzkyGolayIcon
   }
 ]
@@ -92,7 +98,7 @@ const DerivateTab = () => {
         {ProcessMultipleIcon}
       </Button>
 
-      {selectedDerivate && (
+      {['savitzkyGolayDerivative', 'savitzkyGolaySmooth'].includes(selectedDerivate || '') && (
         <div className="flex gap-4 items-center">
           <div className="flex flex-col gap-2 w-40">
             <Label htmlFor="windowSize">Window Size: {windowSize}</Label>

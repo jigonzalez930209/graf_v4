@@ -4,11 +4,12 @@ import { useFit } from '@renderer/hooks/useFit'
 import { useMathOperation } from '@renderer/hooks/useMathOperation'
 import { generateRandomId } from '@renderer/utils/common'
 import { savitzkyGolayDerivative, savitzkyGolaySmooth } from '@renderer/utils/math'
+import init from 'math-lib'
 import { COLORS } from '@shared/constants'
 import { IProcessFile } from '@shared/models/files'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
-import React, { createContext, ReactNode } from 'react'
+import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 export interface VCAnalysisContextType {
@@ -68,12 +69,12 @@ export type VCAnalysisProviderProps = {
 const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open, setOpen }) => {
   const { data: files, addFiles } = useData()
 
-  const [internalFiles, setInternalFiles] = React.useState<IProcessFile[]>([])
-  const [newFiles, setNewFiles] = React.useState<IProcessFile[]>([])
+  const [internalFiles, setInternalFiles] = useState<IProcessFile[]>([])
+  const [newFiles, setNewFiles] = useState<IProcessFile[]>([])
 
-  const [selectedOperation, setSelectedOperation] = React.useState<string | null>(null)
-  const [selectedFit, setSelectedFit] = React.useState<string | null>(null)
-  const [selectedDerivate, setSelectedDerivate] = React.useState<string | null>(null)
+  const [selectedOperation, setSelectedOperation] = useState<string | null>(null)
+  const [selectedFit, setSelectedFit] = useState<string | null>(null)
+  const [selectedDerivate, setSelectedDerivate] = useState<string | null>(null)
 
   const [windowSize, setWindowSize] = useLocalStorage<number>('windowSize', 3)
   const [polyOrder, setPolyOrder] = useLocalStorage<number>('polyOrder', 1)
@@ -82,19 +83,26 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
   const [selectedPoints, setSelectedPoints] = useLocalStorage<number[]>('selectedPoints', [])
   const [selectedDegree, setSelectedDegree] = useLocalStorage<number>('selectedDegree', 0)
 
-  const [selectionOrder, setSelectionOrder] = React.useState<string[]>([])
-  const [inputExpression, setInputExpression] = React.useState<{ '1': string; '2': string }>({
+  const [selectionOrder, setSelectionOrder] = useState<string[]>([])
+  const [inputExpression, setInputExpression] = useState<{ '1': string; '2': string }>({
     '1': '',
     '2': ''
   })
-  const [selectedPoint, setSelectedPoint] = React.useState<
+  const [selectedPoint, setSelectedPoint] = useState<
     Record<string, Array<{ x: Decimal; y: Decimal; uid: string; pointIndex: number }>>
   >({})
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [wasm, setWasm] = useState<any>(null)
+
+  useEffect(() => {
+    init().then(setWasm)
+  }, [])
 
   const { handleOperation } = useMathOperation()
   const { fit, fitMultiple } = useFit()
 
-  const handleProcess = React.useCallback(() => {
+  const handleProcess = useCallback(() => {
     const selectedFiles = [...internalFiles, ...newFiles].filter((f) => f.selected)
 
     if (selectedFiles.length < 2) {
@@ -131,7 +139,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
     setNewFiles((prev) => [...prev, res])
   }, [internalFiles, selectionOrder, selectedOperation, handleOperation, newFiles])
 
-  const handleProcessMultiple = React.useCallback(() => {
+  const handleProcessMultiple = useCallback(() => {
     if (!inputExpression['1'] || !inputExpression['2'] || !selectedOperation) {
       alert('Please enter both expressions and select an operation')
       return
@@ -158,43 +166,40 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
     setNewFiles((prev) => [...prev, ...filesToWork.filter((f) => !!f)])
   }, [internalFiles, inputExpression, selectedOperation, handleOperation, newFiles])
 
-  const handleFileSelectedChange = React.useCallback(
-    (id: string, action?: 'selected' | 'deselected') => {
-      console.log({ id })
-      setSelectionOrder((prev) => {
-        if (action === 'deselected') {
-          return prev.filter((f) => f !== id)
-        } else {
-          return [...prev, id]
+  const handleFileSelectedChange = useCallback((id: string, action?: 'selected' | 'deselected') => {
+    console.log({ id })
+    setSelectionOrder((prev) => {
+      if (action === 'deselected') {
+        return prev.filter((f) => f !== id)
+      } else {
+        return [...prev, id]
+      }
+    })
+    setNewFiles((prev) =>
+      prev.map((file) => {
+        if (file.id === id) {
+          return {
+            ...file,
+            selected: action === 'selected'
+          }
         }
+        return file
       })
-      setNewFiles((prev) =>
-        prev.map((file) => {
-          if (file.id === id) {
-            return {
-              ...file,
-              selected: action === 'selected'
-            }
+    )
+    setInternalFiles((prev) =>
+      prev.map((file) => {
+        if (file.id === id) {
+          return {
+            ...file,
+            selected: action === 'selected'
           }
-          return file
-        })
-      )
-      setInternalFiles((prev) =>
-        prev.map((file) => {
-          if (file.id === id) {
-            return {
-              ...file,
-              selected: action === 'selected'
-            }
-          }
-          return file
-        })
-      )
-    },
-    []
-  )
+        }
+        return file
+      })
+    )
+  }, [])
 
-  const handleFit = React.useCallback(() => {
+  const handleFit = useCallback(() => {
     const files = internalFiles.filter((f) => f.selected)
     if (files.length > 1 || files.length === 0) {
       alert('Please select one file')
@@ -221,7 +226,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
     setNewFiles((prev) => [...prev, f])
   }, [internalFiles, fit, selectedPoints, selectedDegree])
 
-  const handleFitMultiple = React.useCallback(() => {
+  const handleFitMultiple = useCallback(() => {
     const selectedFiles = internalFiles.filter((f) => f.selected)
     if (selectedFiles.length === 0) {
       alert('Please select at least one file')
@@ -231,7 +236,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
     setNewFiles((prev) => [...prev, ...res.map((r) => r.file)])
   }, [internalFiles, fitMultiple])
 
-  const handleManualSelection = React.useCallback(
+  const handleManualSelection = useCallback(
     (points: number[], degree: number) => {
       setSelectedPoints(points)
       setSelectedDegree(degree)
@@ -240,7 +245,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
     [setSelectedPoints, setSelectedDegree]
   )
 
-  const handleSetGlobalSelectedFiles = React.useCallback(() => {
+  const handleSetGlobalSelectedFiles = useCallback(() => {
     const filesToGlobalState = newFiles.filter((f) => f.selected)
     if (filesToGlobalState.length === 0) {
       alert('Please select at least one file')
@@ -254,7 +259,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
     addFiles(filesToGlobalState)
   }, [addFiles, newFiles, setOpen])
 
-  const derivate = React.useCallback(
+  const derivate = useCallback(
     (
       operation: string,
       windowSize?: number,
@@ -273,30 +278,64 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       ])
       let res: [Decimal, Decimal][] = []
 
-      if (operation === 'numericalDerivative' && windowSize && polyOrder) {
-        res = savitzkyGolayDerivative(coords, windowSize, polyOrder)
-      } else if (operation === 'savitzkyGolaySmooth' && windowSize && polyOrder) {
-        res = savitzkyGolaySmooth(coords, windowSize, polyOrder)
-      } else {
+      switch (operation) {
+        case 'numericalDerivative':
+          if (wasm) {
+            const xCoords = Float64Array.from(coords.map((c) => c[0].toNumber()))
+            const yCoords = Float64Array.from(coords.map((c) => c[1].toNumber()))
+            const deriv_flat = wasm.numerical_derivative(xCoords, yCoords)
+
+            // Unflatten the result: [x1, dy/dx1, x2, dy/dx2, ...] -> [[x1, dy/dx1], [x2, dy/dx2], ...]
+            const unflattened_res: [Decimal, Decimal][] = []
+            for (let i = 0; i < deriv_flat.length; i += 2) {
+              unflattened_res.push([new Decimal(deriv_flat[i]), new Decimal(deriv_flat[i + 1])])
+            }
+            res = unflattened_res
+          } else {
+            // Fallback or loading state
+            res = []
+          }
+          break
+        case 'savitzkyGolayDerivative':
+          if (windowSize && polyOrder) {
+            res = savitzkyGolayDerivative(coords, windowSize, polyOrder)
+          }
+          break
+        case 'savitzkyGolaySmooth':
+          if (windowSize && polyOrder) {
+            res = savitzkyGolaySmooth(coords, windowSize, polyOrder)
+          }
+          break
+        default:
+          console.warn(`Unknown derivative operation: ${operation}`)
+          return null
+      }
+
+      if (!res || res.length === 0) {
+        console.warn(`Operation ${operation} produced no result.`)
         return null
       }
 
-      if (!res) return null
-
       const id = generateRandomId()
+
+      const name =
+        operation === 'numericalDerivative'
+          ? `Derivative of ${selectedFile.name}`
+          : `${operation} (w=${windowSize}, p=${polyOrder}) of ${selectedFile.name}`
+
       return {
         ...selectedFile,
         id,
         content: res.map((p) => [p[0].toString(), p[1].toString()]),
         selected: true,
-        name: `${operation} of ${selectedFile.name}`,
+        name,
         color: COLORS[Decimal.floor(Decimal.random().mul(COLORS.length)).toNumber()]
       }
     },
-    [internalFiles, newFiles]
+    [internalFiles, newFiles, wasm]
   )
 
-  const derivateMultiple = React.useCallback(
+  const derivateMultiple = useCallback(
     (operation: string, windowSize?: number, polyOrder?: number): IProcessFile[] => {
       const selectedFiles = [...internalFiles, ...newFiles].filter((f) => f.selected)
       if (selectedFiles.length < 2) {
@@ -310,7 +349,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
     [derivate, internalFiles, newFiles]
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) return setInternalFiles([])
     if (!files) return setInternalFiles([])
     if (files.length === 0) return setInternalFiles([])
