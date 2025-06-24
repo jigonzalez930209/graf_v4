@@ -105,12 +105,14 @@ export function savitzkyGolaySmooth(
     }
 
     const window = coords.slice(i - half, i + half + 1)
+    const xCenter = coords[i][0]
 
-    // Build Vandermonde matrix X and y-vector using Decimal for precision
+    // Build Vandermonde matrix X and y-vector using relative x-coordinates for stability
     const X: Decimal[][] = window.map((p) => {
       const row: Decimal[] = []
+      const xRelative = p[0].minus(xCenter) // Use relative x for numerical stability
       for (let j = 0; j <= polyOrder; j++) {
-        row.push(p[0].pow(j))
+        row.push(xRelative.pow(j))
       }
       return row
     })
@@ -153,12 +155,9 @@ export function savitzkyGolaySmooth(
       // Explicitly cast the result from math.js to a 2D array for TypeScript
       const coeffs: number[] = (coeffsMatrix.valueOf() as number[][]).flat()
 
-      // Calculate the smoothed value at the center of the window using Decimal
-      const xCenter = coords[i][0]
-      let ySmoothed = new Decimal(0)
-      for (let j = 0; j <= polyOrder; j++) {
-        ySmoothed = ySmoothed.plus(new Decimal(coeffs[j]).times(xCenter.pow(j)))
-      }
+      // With relative coordinates, the smoothed value at the center (where x_relative=0)
+      // is simply the first coefficient of the polynomial, c[0].
+      const ySmoothed = new Decimal(coeffs[0])
       result.push([xCenter, ySmoothed])
     } catch (error) {
       console.warn(
@@ -166,6 +165,102 @@ export function savitzkyGolaySmooth(
         error
       )
       result.push(coords[i])
+    }
+  }
+
+  return result
+}
+
+/**
+ * Calculates the first derivative of data using a Savitzky-Golay filter.
+ * This method fits a polynomial to a window of data and then calculates the
+ * analytical derivative of that polynomial at the center point.
+ *
+ * @param coords The array of [x, y] coordinates.
+ * @param windowSize The number of points in the window. Must be an odd integer >= 3.
+ * @param polyOrder The order of the polynomial to fit. Must be >= 1.
+ * @returns A new array of [x, dy/dx] coordinates.
+ */
+export function savitzkyGolayDerivative(
+  coords: [Decimal, Decimal][],
+  windowSize: number,
+  polyOrder: number
+): [Decimal, Decimal][] {
+  if (windowSize % 2 === 0 || windowSize < 3) {
+    alert('windowSize must be odd and >= 3')
+    throw new Error('windowSize must be odd and >= 3')
+  }
+  if (polyOrder >= windowSize) {
+    alert('polyOrder must be less than windowSize')
+    throw new Error('polyOrder must be less than windowSize')
+  }
+  if (polyOrder < 1 || polyOrder > 5) {
+    alert('polyOrder must be between 1 and 5.')
+    throw new Error('polyOrder must be between 1 and 5.')
+  }
+
+  const n = coords.length
+  const half = Math.floor(windowSize / 2)
+  const result: [Decimal, Decimal][] = []
+
+  for (let i = 0; i < n; i++) {
+    if (i < half || i >= n - half) {
+      result.push([coords[i][0], new Decimal(0)]) // Derivative is zero at edges
+      continue
+    }
+
+    const window = coords.slice(i - half, i + half + 1)
+    const xCenter = coords[i][0]
+
+    const X: Decimal[][] = window.map((p) => {
+      const row: Decimal[] = []
+      const xRelative = p[0].minus(xCenter)
+      for (let j = 0; j <= polyOrder; j++) {
+        row.push(xRelative.pow(j))
+      }
+      return row
+    })
+    const y: Decimal[] = window.map((p) => p[1])
+
+    const XT: Decimal[][] = Array.from({ length: polyOrder + 1 }, (_, col) =>
+      X.map((row) => row[col])
+    )
+
+    const XTX: Decimal[][] = Array.from({ length: polyOrder + 1 }, () =>
+      Array(polyOrder + 1).fill(new Decimal(0))
+    )
+    for (let r = 0; r <= polyOrder; r++) {
+      for (let c = 0; c <= polyOrder; c++) {
+        let sum = new Decimal(0)
+        for (let k = 0; k < window.length; k++) {
+          sum = sum.plus(XT[r][k].times(X[k][c]))
+        }
+        XTX[r][c] = sum
+      }
+    }
+
+    const XTY: Decimal[] = Array(polyOrder + 1).fill(new Decimal(0))
+    for (let r = 0; r <= polyOrder; r++) {
+      let sum = new Decimal(0)
+      for (let k = 0; k < window.length; k++) {
+        sum = sum.plus(XT[r][k].times(y[k]))
+      }
+      XTY[r] = sum
+    }
+
+    const XTX_num = XTX.map((row) => row.map((d) => d.toNumber()))
+    const XTY_num = XTY.map((d) => d.toNumber())
+
+    try {
+      const coeffsMatrix = lusolve(XTX_num, XTY_num)
+      const coeffs: number[] = (coeffsMatrix.valueOf() as number[][]).flat()
+
+      // The first derivative at the center (x_relative=0) is the c[1] coefficient.
+      const derivative = new Decimal(coeffs[1] || 0)
+      result.push([xCenter, derivative])
+    } catch (error) {
+      console.warn(`Could not compute derivative at index ${i}. Falling back to zero.`, error)
+      result.push([coords[i][0], new Decimal(0)])
     }
   }
 
