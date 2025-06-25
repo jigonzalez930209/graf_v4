@@ -3,7 +3,7 @@ import { useData } from '@renderer/hooks/useData'
 import { useFit } from '@renderer/hooks/useFit'
 import { useMathOperation } from '@renderer/hooks/useMathOperation'
 import { generateRandomId } from '@renderer/utils/common'
-import { savitzkyGolayDerivative, savitzkyGolaySmooth } from '@renderer/utils/math'
+
 import init from 'math-lib'
 import { COLORS } from '@shared/constants'
 import { IProcessFile } from '@shared/models/files'
@@ -54,7 +54,12 @@ export interface VCAnalysisContextType {
   setPolyOrder: React.Dispatch<React.SetStateAction<number>>
   setSelectionOrder: React.Dispatch<React.SetStateAction<string[]>>
   setNewFiles: React.Dispatch<React.SetStateAction<IProcessFile[]>>
-  derivate: (operation: string, windowSize?: number, polyOrder?: number) => IProcessFile | null
+  derivate: (
+    operation: string,
+    windowSize?: number,
+    polyOrder?: number,
+    file?: IProcessFile
+  ) => IProcessFile | null
   derivateMultiple: (operation: string, windowSize?: number, polyOrder?: number) => IProcessFile[]
 }
 
@@ -79,6 +84,16 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
   const [windowSize, setWindowSize] = useLocalStorage<number>('windowSize', 3)
   const [polyOrder, setPolyOrder] = useLocalStorage<number>('polyOrder', 1)
 
+  useEffect(() => {
+    // This effect sanitizes the windowSize value loaded from localStorage.
+    // It ensures that the value is always odd, preventing panics in the Rust code
+    // if an even number was persisted in a previous session.
+    if (windowSize % 2 === 0) {
+      setWindowSize(windowSize + 1)
+    }
+    // We only want this to run when the component mounts and if the value changes from an external source.
+  }, [windowSize, setWindowSize])
+
   const [countPoints, setCountPoints] = useLocalStorage<number>('countPoints', 6)
   const [selectedPoints, setSelectedPoints] = useLocalStorage<number[]>('selectedPoints', [])
   const [selectedDegree, setSelectedDegree] = useLocalStorage<number>('selectedDegree', 0)
@@ -96,7 +111,11 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
   const [wasm, setWasm] = useState<any>(null)
 
   useEffect(() => {
-    init().then(setWasm)
+    init().then((wasmModule) => {
+      // Initialize the panic hook to get better error messages from Rust
+      wasmModule.set_panic_hook()
+      setWasm(wasmModule)
+    })
   }, [])
 
   const { handleOperation } = useMathOperation()
@@ -266,9 +285,19 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       polyOrder?: number,
       file?: IProcessFile
     ): IProcessFile | null => {
-      const selectedFile = file || [...internalFiles, ...newFiles].find((f) => f.selected)
-      if (!selectedFile) {
-        alert('Please select a file')
+      console.log(
+        `Context 'derivate' received: operation=${operation}, windowSize=${windowSize}, polyOrder=${polyOrder}`
+      )
+
+      const selectedFile = file
+
+      console.log('File being processed in context:', {
+        fileName: selectedFile?.name,
+        fileLength: selectedFile?.content?.length
+      })
+
+      if (!selectedFile || !selectedFile.content || selectedFile.content.length === 0) {
+        alert('Error in context: No valid file or file content to process.')
         return null
       }
 
@@ -297,13 +326,48 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
           }
           break
         case 'savitzkyGolayDerivative':
-          if (windowSize && polyOrder) {
-            res = savitzkyGolayDerivative(coords, windowSize, polyOrder)
+          if (wasm && windowSize && polyOrder) {
+            const xCoords = Float64Array.from(coords.map((c) => c[0].toNumber()))
+            const yCoords = Float64Array.from(coords.map((c) => c[1].toNumber()))
+            const deriv_flat = wasm.savitzky_golay_derivative(
+              windowSize,
+              polyOrder,
+              xCoords,
+              yCoords
+            )
+
+            console.log({ deriv_flat })
+
+            const unflattened_res: [Decimal, Decimal][] = []
+            for (let i = 0; i < deriv_flat.length; i += 2) {
+              unflattened_res.push([new Decimal(deriv_flat[i]), new Decimal(deriv_flat[i + 1])])
+            }
+            res = unflattened_res
+          } else {
+            res = []
           }
           break
         case 'savitzkyGolaySmooth':
-          if (windowSize && polyOrder) {
-            res = savitzkyGolaySmooth(coords, windowSize, polyOrder)
+          if (wasm && windowSize && polyOrder) {
+            const xCoords = Float64Array.from(coords.map((c) => c[0].toNumber()))
+            const yCoords = Float64Array.from(coords.map((c) => c[1].toNumber()))
+            const smoothed_flat = wasm.savitzky_golay_smooth(
+              windowSize,
+              polyOrder,
+              xCoords,
+              yCoords
+            )
+
+            const unflattened_res: [Decimal, Decimal][] = []
+            for (let i = 0; i < smoothed_flat.length; i += 2) {
+              unflattened_res.push([
+                new Decimal(smoothed_flat[i]),
+                new Decimal(smoothed_flat[i + 1])
+              ])
+            }
+            res = unflattened_res
+          } else {
+            res = []
           }
           break
         default:
@@ -332,7 +396,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
         color: COLORS[Decimal.floor(Decimal.random().mul(COLORS.length)).toNumber()]
       }
     },
-    [internalFiles, newFiles, wasm]
+    [wasm]
   )
 
   const derivateMultiple = useCallback(
