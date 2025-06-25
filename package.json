@@ -76,7 +76,7 @@
     "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build:wasm": "cd math-lib && wasm-pack build --target web",
+    "build:wasm": "cd math-lib && PATH=$HOME/.cargo/bin:$PATH wasm-pack build --target web",
     "build": "pnpm run build:wasm && pnpm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "pnpm run build && electron-builder --dir",
@@ -93,6 +93,7 @@
     "embla-carousel-react": "^8.5.2",
     "fs-extra": "^11.3.0",
     "lodash": "^4.17.21",
+    "math-lib": "file:./math-lib/pkg",
     "mathjs": "^14.5.2",
     "ml-levenberg-marquardt": "^4.1.3",
     "plotly.js-dist": "^3.0.1",
@@ -102,8 +103,7 @@
     "rehype-slug": "^6.0.0",
     "sonner": "^2.0.1",
     "vaul": "^1.1.2",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz",
-    "math-lib": "file:./math-lib/pkg"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz"
   },
   "devDependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -213,6 +213,7 @@
     "typescript": "^5.8.2",
     "usehooks-ts": "^3.1.1",
     "vite": "^6.2.1",
+    "wasm-pack": "^0.13.1",
     "zod": "^3.24.2"
   },
   "pnpm": {
@@ -224,7 +225,8 @@
       "electron",
       "es5-ext",
       "esbuild",
-      "sharp"
+      "sharp",
+      "wasm-pack"
     ]
   }
 }
