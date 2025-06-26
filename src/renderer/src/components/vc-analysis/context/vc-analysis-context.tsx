@@ -11,6 +11,10 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
+import {
+  savitzkyGolayDerivative as sgDerivative,
+  savitzkyGolaySmooth as sgSmooth
+} from '@renderer/utils/math'
 
 export interface VCAnalysisContextType {
   selectedPoint: Record<string, Array<{ x: Decimal; y: Decimal; uid: string; pointIndex: number }>>
@@ -325,25 +329,27 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
           }
           break
         case 'savitzkyGolayDerivative':
-          if (wasm && windowSize && polyOrder) {
+          if (wasm) {
             console.log('Calling wasm.savitzky_golay_derivative with:', flatCoords)
-            const deriv_flat = wasm.savitzky_golay_derivative(windowSize, polyOrder, flatCoords)
-            console.log(`TS received deriv_flat with length: ${deriv_flat.length}`)
-
+            const deriv_flat = wasm.savitzky_golay_derivative(windowSize!, polyOrder!, flatCoords)
             const unflattened_res: [Decimal, Decimal][] = []
             for (let i = 0; i < deriv_flat.length; i += 2) {
               unflattened_res.push([new Decimal(deriv_flat[i]), new Decimal(deriv_flat[i + 1])])
             }
             res = unflattened_res
           } else {
-            res = []
+            // Fallback to TS implementation
+            const coordsDecimal: [Decimal, Decimal][] = selectedFile.content.map(([x, y]) => [
+              new Decimal(x),
+              new Decimal(y)
+            ])
+            res = sgDerivative(coordsDecimal, windowSize!, polyOrder!)
           }
           break
         case 'savitzkyGolaySmooth':
-          if (wasm && windowSize && polyOrder) {
+          if (wasm) {
             console.log('Calling wasm.savitzky_golay_smooth with:', flatCoords)
-            const smoothed_flat = wasm.savitzky_golay_smooth(windowSize, polyOrder, flatCoords)
-
+            const smoothed_flat = wasm.savitzky_golay_smooth(windowSize!, polyOrder!, flatCoords)
             const unflattened_res: [Decimal, Decimal][] = []
             for (let i = 0; i < smoothed_flat.length; i += 2) {
               unflattened_res.push([
@@ -353,7 +359,12 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
             }
             res = unflattened_res
           } else {
-            res = []
+            // Fallback to TS implementation
+            const coordsDecimal: [Decimal, Decimal][] = selectedFile.content.map(([x, y]) => [
+              new Decimal(x),
+              new Decimal(y)
+            ])
+            res = sgSmooth(coordsDecimal, windowSize!, polyOrder!)
           }
           break
         default:

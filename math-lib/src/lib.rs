@@ -8,7 +8,8 @@ pub mod fits;
 pub use functions::add::*;
 pub use functions::calculate_polygon_area::*;
 pub use functions::numerical_derivative::*;
-
+pub use functions::savitzky_golay_derivative::*;
+pub use functions::savitzky_golay_smooth::*;
 pub use functions::set_panic_hook::*;
 pub use fits::polynomial_fit::*;
 
@@ -32,4 +33,3 @@ mod tests {
         assert_eq!(result, 4);
     }
 }
-

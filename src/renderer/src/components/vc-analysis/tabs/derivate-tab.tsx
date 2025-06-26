@@ -191,7 +191,7 @@ const DerivateTab = () => {
               value={[windowSize]}
               onValueChange={handleWindowSizeChange}
               min={3}
-              max={maxWindowSize}
+              max={25}
               step={2}
             />
           </div>
@@ -202,7 +202,7 @@ const DerivateTab = () => {
               value={[polyOrder]}
               onValueChange={handlePolyOrderChange}
               min={1}
-              max={windowSize - 1}
+              max={5}
             />
           </div>
         </div>
