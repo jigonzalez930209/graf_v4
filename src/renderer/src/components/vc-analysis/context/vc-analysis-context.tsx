@@ -301,18 +301,18 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
         return null
       }
 
-      const coords: [Decimal, Decimal][] = selectedFile.content.map(([x, y]) => [
-        new Decimal(x),
-        new Decimal(y)
-      ])
       let res: [Decimal, Decimal][] = []
+
+      // Prepare data for Wasm by creating a single, flattened, interleaved array of coordinates.
+      // This is a more robust way to pass data to Wasm.
+      const flatCoords = new Float64Array(selectedFile.content.flat().map((c) => parseFloat(c)))
 
       switch (operation) {
         case 'numericalDerivative':
           if (wasm) {
-            const xCoords = Float64Array.from(coords.map((c) => c[0].toNumber()))
-            const yCoords = Float64Array.from(coords.map((c) => c[1].toNumber()))
-            const deriv_flat = wasm.numerical_derivative(xCoords, yCoords)
+            console.log('Calling wasm.numerical_derivative with:', flatCoords)
+            const deriv_flat = wasm.numerical_derivative(flatCoords)
+            console.log(`TS received deriv_flat with length: ${deriv_flat.length}`)
 
             // Unflatten the result: [x1, dy/dx1, x2, dy/dx2, ...] -> [[x1, dy/dx1], [x2, dy/dx2], ...]
             const unflattened_res: [Decimal, Decimal][] = []
@@ -321,22 +321,14 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
             }
             res = unflattened_res
           } else {
-            // Fallback or loading state
-            res = []
+            res = [] // Fallback or loading state
           }
           break
         case 'savitzkyGolayDerivative':
           if (wasm && windowSize && polyOrder) {
-            const xCoords = Float64Array.from(coords.map((c) => c[0].toNumber()))
-            const yCoords = Float64Array.from(coords.map((c) => c[1].toNumber()))
-            const deriv_flat = wasm.savitzky_golay_derivative(
-              windowSize,
-              polyOrder,
-              xCoords,
-              yCoords
-            )
-
-            console.log({ deriv_flat })
+            console.log('Calling wasm.savitzky_golay_derivative with:', flatCoords)
+            const deriv_flat = wasm.savitzky_golay_derivative(windowSize, polyOrder, flatCoords)
+            console.log(`TS received deriv_flat with length: ${deriv_flat.length}`)
 
             const unflattened_res: [Decimal, Decimal][] = []
             for (let i = 0; i < deriv_flat.length; i += 2) {
@@ -349,14 +341,8 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
           break
         case 'savitzkyGolaySmooth':
           if (wasm && windowSize && polyOrder) {
-            const xCoords = Float64Array.from(coords.map((c) => c[0].toNumber()))
-            const yCoords = Float64Array.from(coords.map((c) => c[1].toNumber()))
-            const smoothed_flat = wasm.savitzky_golay_smooth(
-              windowSize,
-              polyOrder,
-              xCoords,
-              yCoords
-            )
+            console.log('Calling wasm.savitzky_golay_smooth with:', flatCoords)
+            const smoothed_flat = wasm.savitzky_golay_smooth(windowSize, polyOrder, flatCoords)
 
             const unflattened_res: [Decimal, Decimal][] = []
             for (let i = 0; i < smoothed_flat.length; i += 2) {

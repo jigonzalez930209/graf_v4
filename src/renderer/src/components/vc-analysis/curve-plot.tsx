@@ -106,9 +106,13 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
             // Calculate area using wasm if available
             let area = new Decimal(0)
             if (wasm) {
-              const polygonX_f64 = Float64Array.from(polygonX.map((v) => new Decimal(v).toNumber()))
-              const polygonY_f64 = Float64Array.from(polygonY.map((v) => new Decimal(v).toNumber()))
-              const wasmArea = wasm.calculate_polygon_area(polygonX_f64, polygonY_f64)
+              const flatCoords = new Float64Array(polygonX.length * 2)
+              for (let i = 0; i < polygonX.length; i++) {
+                flatCoords[i * 2] = new Decimal(polygonX[i]).toNumber()
+                flatCoords[i * 2 + 1] = new Decimal(polygonY[i]).toNumber()
+              }
+
+              const wasmArea = wasm.calculate_polygon_area(flatCoords)
               area = new Decimal(wasmArea)
             }
 
