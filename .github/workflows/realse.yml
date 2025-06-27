@@ -43,6 +43,12 @@ jobs:
           else
             curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
           fi
+      
+      - name: Build WebAssembly module
+        run: |
+          cd math-lib
+          wasm-pack build --target web
+          cd ..
 
       - run: pnpm install
         env:
