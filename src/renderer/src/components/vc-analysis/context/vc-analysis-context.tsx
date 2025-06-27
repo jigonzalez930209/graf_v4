@@ -161,7 +161,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       operation: selectedOperation,
       arr1: arrA,
       options: {
-        name: `${fileA}-${selectedOperation}-${fileB}`,
+        name: `${fileA?.name}-${selectedOperation}-${fileB?.name}`,
         folderPath: fileA?.relativePath || selectedOperation
       },
       arr2: arrB
