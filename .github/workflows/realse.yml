@@ -36,6 +36,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         
       - name: Install wasm-pack
+        shell: bash
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.ps1 -o init.ps1
