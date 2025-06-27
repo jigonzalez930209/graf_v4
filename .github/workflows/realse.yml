@@ -31,6 +31,18 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10
+          
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        
+      - name: Install wasm-pack
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.ps1 -o init.ps1
+            powershell -File init.ps1
+          else
+            curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+          fi
 
       - run: pnpm install
         env:
