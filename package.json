@@ -1,6 +1,6 @@
 {
   "name": "graf_v4",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "description": "A graphical app to view and modify files .teq4, teq4Z and .csv",
   "main": "./out/main/index.js",
