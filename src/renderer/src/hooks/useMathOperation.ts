@@ -29,6 +29,16 @@ function validateSameLength(a: Decimal[][], b: Decimal[][]) {
   }
 }
 
+interface HandleOperationParams {
+  operation: string
+  arr1: Decimal[][]
+  options: {
+    folderPath: string
+    name: string
+  }
+  arr2?: Decimal[][]
+}
+
 export const useMathOperation = () => {
   // Sum point by point
   /**
@@ -254,70 +264,68 @@ export const useMathOperation = () => {
    * @returns The result as a new file
    * @throws Error if the operation is not valid or if the arrays are not valid
    */
-  const handleOperation = (
-    operation: string = 'diff',
-    a: Decimal[][],
-    options: {
-      folderPath: string
-      name: string
-    },
-    b?: Decimal[][]
-  ): IProcessFile => {
+
+  const handleOperation = ({
+    operation,
+    arr1,
+    options,
+    arr2
+  }: HandleOperationParams): IProcessFile => {
     let res: Decimal[][] = []
     switch (operation) {
       case 'sum':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for sum operation')
         }
-        res = sum(a, b)
+        res = sum(arr1, arr2)
         break
       case 'avg':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for avg operation')
         }
-        res = sum(a, b).map(([x, y]) => [x.div(2), y.div(2)])
+        res = sum(arr1, arr2).map(([x, y]) => [x.div(2), y.div(2)])
         break
       case 'diff':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for diff operation')
         }
-        res = subtractArrays(a, b)
+        res = subtractArrays(arr1, arr2)
         break
       case 'multiply':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for multiply operation')
         }
-        res = multiplyArrays(a, b)
+        res = multiplyArrays(arr1, arr2)
         break
       case 'divide':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for divide operation')
         }
-        res = divideArrays(a, b)
+        res = divideArrays(arr1, arr2)
         break
       case 'projection':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for projection operation')
         }
-        res = projection(a, b)
+        res = projection(arr1, arr2)
         break
       case 'elementWisePower':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for elementWisePower operation')
         }
-        res = elementWisePower(a, b)
+        res = elementWisePower(arr1, arr2)
         break
       case 'maxComponentWise':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for maxComponentWise operation')
         }
-        res = maxComponentWise(a, b)
+        res = maxComponentWise(arr1, arr2)
         break
       case 'minComponentWise':
-        if (!b) {
+        if (!arr2) {
           throw new Error('Second array is required for minComponentWise operation')
         }
-        res = minComponentWise(a, b)
+        res = minComponentWise(arr1, arr2)
         break
       default:
         alert('Select an operation')

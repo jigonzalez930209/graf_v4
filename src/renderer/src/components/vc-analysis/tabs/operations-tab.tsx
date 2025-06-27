@@ -1,7 +1,3 @@
-import { useMathOperation } from '@renderer/hooks/useMathOperation'
-import Decimal from 'decimal.js'
-import _ from 'lodash'
-import React from 'react'
 import { useVCAnalysis } from '../context/use-vc-analysis'
 import { OperationButtons } from '../process-buttons'
 import {
@@ -65,78 +61,10 @@ const MathOperationsTab = () => {
     inputExpression,
     internalFiles,
     newFiles,
-    selectionOrder,
-    setNewFiles,
-    setInputExpression
+    setInputExpression,
+    handleProcess,
+    handleProcessMultiple
   } = useVCAnalysis()
-
-  const { handleOperation } = useMathOperation()
-
-  const handleProcess = React.useCallback(() => {
-    const selectedFiles = [...internalFiles, ...newFiles].filter((f) => f.selected)
-
-    if (selectedFiles.length < 2) {
-      alert('Please select at least two files')
-      return
-    }
-
-    const fileA = _.find(selectedFiles, ['id', selectionOrder[0]])?.name
-    const fileB = _.find(selectedFiles, ['id', selectionOrder[1]])?.name
-
-    const arrA = _.find(selectedFiles, ['id', selectionOrder[0]])?.content.map((c) => [
-      Decimal(c[0]),
-      Decimal(c[1])
-    ])
-    const arrB = _.find(selectedFiles, ['id', selectionOrder[1]])?.content.map((c) => [
-      Decimal(c[0]),
-      Decimal(c[1])
-    ])
-    console.log({ arrA, arrB, selectedFiles, selectionOrder })
-
-    if (!arrA || !arrB) {
-      alert('Invalid input, Arr1 or Arr2 is undefined')
-      return
-    }
-    if (!selectedOperation) {
-      alert('Please select an operation')
-      return
-    }
-
-    const res = handleOperation(selectedOperation, arrA, arrB, {
-      name: `${fileA}-${selectedOperation}-${fileB}`,
-      folderPath: selectedOperation
-    })
-    setNewFiles((prev) => [...prev, res])
-  }, [internalFiles, newFiles, selectionOrder, selectedOperation, handleOperation, setNewFiles])
-
-  const handleProcessMultiple = React.useCallback(() => {
-    if (!inputExpression['1'] || !inputExpression['2'] || !selectedOperation) {
-      alert('Please enter both expressions and select an operation')
-      return
-    }
-    const groupByFolder = _.groupBy([...internalFiles, ...newFiles], 'relativePath')
-    console.log(groupByFolder)
-
-    const filesToWork = Object.entries(groupByFolder).map(([folderPath, files]) => {
-      console.log(folderPath, files)
-      const a = files.find((f) => f.name.toLowerCase().includes(inputExpression['1'].toLowerCase()))
-      const b = files.find((f) => f.name.toLowerCase().includes(inputExpression['2'].toLowerCase()))
-      if (!a || !b) {
-        console.error('Invalid input, Arr1 or Arr2 is undefined')
-        return
-      }
-
-      const arrA = a.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
-      const arrB = b.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
-      const res = handleOperation(selectedOperation, arrA, arrB, {
-        name: `${a.name}-${selectedOperation}-${b.name}`,
-        folderPath
-      })
-      return res
-    })
-    console.log({ newFiles: filesToWork })
-    setNewFiles((prev) => [...prev, ...filesToWork.filter((f) => !!f)])
-  }, [inputExpression, selectedOperation, internalFiles, newFiles, setNewFiles, handleOperation])
 
   return (
     <div className="ml-4 flex gap-3 rounded-md bg-accent/20 p-2 w-full">

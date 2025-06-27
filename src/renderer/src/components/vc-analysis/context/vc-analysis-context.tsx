@@ -114,6 +114,8 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [wasm, setWasm] = useState<any>(null)
 
+  console.log(selectedOperation)
+
   useEffect(() => {
     init().then((wasmModule) => {
       // Initialize the panic hook to get better error messages from Rust
@@ -133,8 +135,8 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       return
     }
 
-    const fileA = _.find(selectedFiles, ['id', selectionOrder[0]])?.name
-    const fileB = _.find(selectedFiles, ['id', selectionOrder[1]])?.name
+    const fileA = _.find(selectedFiles, ['id', selectionOrder[0]])
+    const fileB = _.find(selectedFiles, ['id', selectionOrder[1]])
 
     const arrA = _.find(selectedFiles, ['id', selectionOrder[0]])?.content.map((c) => [
       Decimal(c[0]),
@@ -144,7 +146,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       Decimal(c[0]),
       Decimal(c[1])
     ])
-    console.log({ arrA, arrB, selectedFiles, selectionOrder })
+    console.log({ arrA, arrB, selectedFiles, selectionOrder, selectedOperation })
 
     if (!arrA || !arrB) {
       alert('Invalid input, Arr1 or Arr2 is undefined')
@@ -155,15 +157,15 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       return
     }
 
-    const res = handleOperation(
-      selectedOperation,
-      arrA,
-      {
+    const res = handleOperation({
+      operation: selectedOperation,
+      arr1: arrA,
+      options: {
         name: `${fileA}-${selectedOperation}-${fileB}`,
-        folderPath: selectedOperation
+        folderPath: fileA?.relativePath || selectedOperation
       },
-      arrB
-    )
+      arr2: arrB
+    })
     setNewFiles((prev) => [...prev, res])
   }, [internalFiles, selectionOrder, selectedOperation, handleOperation, newFiles])
 
@@ -185,15 +187,15 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
 
       const arrA = a.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
       const arrB = b.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
-      const res = handleOperation(
-        selectedOperation,
-        arrA,
-        {
+      const res = handleOperation({
+        operation: selectedOperation,
+        arr1: arrA,
+        options: {
           name: `${a.name}-${selectedOperation}-${b.name}`,
           folderPath
         },
-        arrB
-      )
+        arr2: arrB
+      })
       return res
     })
     setNewFiles((prev) => [...prev, ...filesToWork.filter((f) => !!f)])
