@@ -187,15 +187,12 @@ export function savitzkyGolayDerivative(
   polyOrder: number
 ): [Decimal, Decimal][] {
   if (windowSize % 2 === 0 || windowSize < 3) {
-    alert('windowSize must be odd and >= 3')
     throw new Error('windowSize must be odd and >= 3')
   }
   if (polyOrder >= windowSize) {
-    alert('polyOrder must be less than windowSize')
     throw new Error('polyOrder must be less than windowSize')
   }
   if (polyOrder < 1 || polyOrder > 5) {
-    alert('polyOrder must be between 1 and 5.')
     throw new Error('polyOrder must be between 1 and 5.')
   }
 
@@ -203,9 +200,39 @@ export function savitzkyGolayDerivative(
   const half = Math.floor(windowSize / 2)
   const result: [Decimal, Decimal][] = []
 
+  // Fallback for insufficient data points
+  if (n < windowSize) {
+    console.warn(
+      `Not enough data points (${n}) for window size (${windowSize}). Falling back to simple numerical derivative.`
+    )
+    return numericalDerivative(coords)
+  }
+
   for (let i = 0; i < n; i++) {
+    // Fallback to simpler difference methods for edges where the full window is not available
     if (i < half || i >= n - half) {
-      result.push([coords[i][0], new Decimal(0)]) // Derivative is zero at edges
+      let dx: Decimal
+      let dy: Decimal
+      if (i === 0 && n > 1) {
+        // Forward difference for the first point
+        dx = coords[i + 1][0].minus(coords[i][0])
+        dy = coords[i + 1][1].minus(coords[i][1])
+      } else if (i === n - 1 && n > 1) {
+        // Backward difference for the last point
+        dx = coords[i][0].minus(coords[i - 1][0])
+        dy = coords[i][1].minus(coords[i - 1][1])
+      } else if (i > 0 && i < n - 1) {
+        // Central difference for other edge points
+        dx = coords[i + 1][0].minus(coords[i - 1][0])
+        dy = coords[i + 1][1].minus(coords[i - 1][1])
+      } else {
+        // Not enough points for any difference (e.g., n=1), derivative is 0
+        result.push([coords[i][0], new Decimal(0)])
+        continue
+      }
+
+      const deriv = dx.isZero() ? new Decimal(0) : dy.div(dx)
+      result.push([coords[i][0], deriv])
       continue
     }
 

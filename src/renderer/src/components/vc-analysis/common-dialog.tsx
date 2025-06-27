@@ -6,8 +6,8 @@ import { useVCAnalysis } from './context/use-vc-analysis'
 const CommonDialog = () => {
   const { internalFiles, newFiles, handleFileSelectedChange } = useVCAnalysis()
   return (
-    <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel defaultSize={25} minSize={15} className="max-h-[80vh]">
+    <ResizablePanelGroup direction="horizontal" className="w-full">
+      <ResizablePanel defaultSize={25} minSize={15} className="max-h-[70vh] min-h-[70vh]">
         <FileList files={[...internalFiles, ...newFiles]} onSelect={handleFileSelectedChange} />
       </ResizablePanel>
       <ResizableHandle withHandle />

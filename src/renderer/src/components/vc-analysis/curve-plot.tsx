@@ -6,7 +6,7 @@ import { useVCAnalysis } from './context/use-vc-analysis'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { darken, transparentize } from '@/utils/colors'
-import { calculatePolygonArea } from '@/utils/math'
+import init from 'math-lib'
 
 interface CurvePlotProps {
   data: IProcessFile[]
@@ -29,6 +29,13 @@ const hovertemplate = (name: string) => {
  */
 export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
   const { setSelectedPoint, selectedPoint } = useVCAnalysis()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [wasm, setWasm] = React.useState<any | null>(null)
+
+  // Load the wasm module
+  React.useEffect(() => {
+    init().then(setWasm)
+  }, [])
 
   const selectedPointData = React.useMemo(() => {
     return Object.entries(selectedPoint).flatMap(([uid, points]) => {
@@ -96,7 +103,18 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
             const polygonX = [...xSlice, ...xSlice.reverse()]
             const polygonY = [...ySlice, ...yLineSlice.reverse().map((d) => d.toString())]
 
-            const area = calculatePolygonArea(polygonX, polygonY)
+            // Calculate area using wasm if available
+            let area = new Decimal(0)
+            if (wasm) {
+              const flatCoords = new Float64Array(polygonX.length * 2)
+              for (let i = 0; i < polygonX.length; i++) {
+                flatCoords[i * 2] = new Decimal(polygonX[i]).toNumber()
+                flatCoords[i * 2 + 1] = new Decimal(polygonY[i]).toNumber()
+              }
+
+              const wasmArea = wasm.calculate_polygon_area(flatCoords)
+              area = new Decimal(wasmArea)
+            }
 
             const fillTrace = {
               uid: 'area-fill-' + originalCurve.id,
@@ -140,7 +158,7 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
       }
       return []
     })
-  }, [data, selectedPoint])
+  }, [data, selectedPoint, wasm])
 
   const onPointClick = (x: Decimal, y: Decimal, uid: string, pointIndex: number) => {
     const curve = _.find(data, ['id', uid])

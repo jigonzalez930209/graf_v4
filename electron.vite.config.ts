@@ -2,6 +2,8 @@ import tailwindcss from '@tailwindcss/vite'
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import react from '@vitejs/plugin-react'
+import wasm from 'vite-plugin-wasm'
+import topLevelAwait from 'vite-plugin-top-level-await'
 
 export default defineConfig({
   main: {
@@ -17,6 +19,7 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
+    plugins: [tailwindcss(), react(), wasm(), topLevelAwait()],
     assetsInclude: 'src/renderer/assets/**',
     resolve: {
       alias: {
@@ -28,9 +31,14 @@ export default defineConfig({
         '@/components': resolve('src/renderer/src/components'),
         '@/utils': resolve('src/renderer/src/utils'),
         '@/context': resolve('src/renderer/src/context'),
-        '@/mocks': resolve('src/renderer/src/mocks')
+        '@/mocks': resolve('src/renderer/src/mocks'),
+        'math-lib': resolve('math-lib/pkg')
       }
     },
-    plugins: [react(), tailwindcss()]
+    server: {
+      fs: {
+        allow: ['../../']
+      }
+    }
   }
 })
