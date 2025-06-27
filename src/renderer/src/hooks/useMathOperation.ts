@@ -257,11 +257,11 @@ export const useMathOperation = () => {
   const handleOperation = (
     operation: string = 'diff',
     a: Decimal[][],
-    b?: Decimal[][],
-    options?: {
-      folderPath?: string
-      name?: string
-    }
+    options: {
+      folderPath: string
+      name: string
+    },
+    b?: Decimal[][]
   ): IProcessFile => {
     let res: Decimal[][] = []
     switch (operation) {
@@ -329,7 +329,7 @@ export const useMathOperation = () => {
     const id = generateRandomId()
     const generatedFile: IProcessFile = {
       id,
-      name: `${operation}-${options?.folderPath}.teq4`,
+      name: options.name,
       type: 'teq4',
       content: res.map(([x, y]) => [x.toString(), y.toString()]),
       selected: true,

@@ -155,10 +155,15 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       return
     }
 
-    const res = handleOperation(selectedOperation, arrA, arrB, {
-      name: `${fileA}-${selectedOperation}-${fileB}`,
-      folderPath: selectedOperation
-    })
+    const res = handleOperation(
+      selectedOperation,
+      arrA,
+      {
+        name: `${fileA}-${selectedOperation}-${fileB}`,
+        folderPath: selectedOperation
+      },
+      arrB
+    )
     setNewFiles((prev) => [...prev, res])
   }, [internalFiles, selectionOrder, selectedOperation, handleOperation, newFiles])
 
@@ -180,10 +185,15 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
 
       const arrA = a.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
       const arrB = b.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
-      const res = handleOperation(selectedOperation, arrA, arrB, {
-        name: `${a.name}-${selectedOperation}-${b.name}`,
-        folderPath
-      })
+      const res = handleOperation(
+        selectedOperation,
+        arrA,
+        {
+          name: `${a.name}-${selectedOperation}-${b.name}`,
+          folderPath
+        },
+        arrB
+      )
       return res
     })
     setNewFiles((prev) => [...prev, ...filesToWork.filter((f) => !!f)])
