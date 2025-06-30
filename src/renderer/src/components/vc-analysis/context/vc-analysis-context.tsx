@@ -113,9 +113,6 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [wasm, setWasm] = useState<any>(null)
-
-  console.log(selectedOperation)
-
   useEffect(() => {
     init().then((wasmModule) => {
       // Initialize the panic hook to get better error messages from Rust
