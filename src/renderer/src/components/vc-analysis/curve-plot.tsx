@@ -8,6 +8,7 @@ import _ from 'lodash'
 import { darken, transparentize } from '@/utils/colors'
 import init from 'math-lib'
 import { calculatePeakInfo } from '@/utils/peak-height'
+import { calculatePolygonArea } from '@renderer/utils/math'
 
 interface CurvePlotProps {
   data: IProcessFile[]
@@ -138,7 +139,7 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
                 const yLineSlice = xSlice.map((x) => m.times(toSafeDecimal(x)).plus(c))
 
                 const polygonX = [...xSlice, ...xSlice.reverse()]
-                const polygonY = [...ySlice, ...yLineSlice.reverse().map((d) => d.toString())]
+                const polygonY = [...ySlice, ...yLineSlice.reverse()]
 
                 // Calculate area and peak height using wasm if available
                 let area = new Decimal(0)
@@ -157,9 +158,26 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
                   console.log('Points being processed:', { p1, p2 })
                   console.log('Polygon coordinates:', { polygonX, polygonY })
                   console.log('Flattened coordinates:', flatCoords)
+                  console.log('Polygon size:', polygonX.length)
+                  console.log('First few polygon points:', {
+                    point0: { x: flatCoords[0], y: flatCoords[1] },
+                    point1: { x: flatCoords[2], y: flatCoords[3] },
+                    point2: { x: flatCoords[4], y: flatCoords[5] }
+                  })
+
+                  // Calculate area using TypeScript method
+                  const tsArea = calculatePolygonArea(
+                    polygonX.map((x) => toSafeDecimal(x)),
+                    polygonY.map((y) => toSafeDecimal(y))
+                  )
+                  console.log('Area calculated by TypeScript:', tsArea.toString())
+
+                  // Use the TypeScript calculated area instead of WebAssembly
+                  area = tsArea
+
+                  // Still use WebAssembly for other metrics
                   const metrics = wasm.process_curve_data(flatCoords)
                   console.log('Raw metrics from wasm:', metrics)
-                  area = toSafeDecimal(metrics.area)
 
                   // Calculate peak height using our TypeScript function
                   // Convert slicedContent to the expected format
@@ -218,28 +236,24 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
                   marker: { color: darken(originalColor, 20), size: 12, symbol: 'diamond' as const }
                 }
 
-                // Add peak marker if we found a valid peak
-                const traces = [fillTrace, secantTrace, pointsTrace]
-
-                if (peakIndex >= 0) {
-                  const peakMarker = {
-                    uid: 'peak-marker-' + originalCurve.id,
-                    x: [peakX.toString()],
-                    y: [peakY.toString()],
-                    type: 'scatter' as const,
-                    mode: 'markers' as const,
-                    name: `Peak (Height: ${peakHeight.toNumber().toFixed(6)})`,
-                    legendgroup: originalCurve.id,
-                    showlegend: true,
-                    marker: {
-                      color: darken(originalColor, 30),
-                      size: 14,
-                      symbol: 'diamond' as const,
-                      line: { width: 2, color: '#ffffff' }
-                    }
+                const peakMarker = {
+                  uid: 'peak-marker-' + originalCurve.id,
+                  x: [peakX.toString()],
+                  y: [peakY.toString()],
+                  type: 'scatter' as const,
+                  mode: 'markers' as const,
+                  name: `Peak (Height: ${peakHeight.toNumber().toFixed(6)})`,
+                  legendgroup: originalCurve.id,
+                  showlegend: true,
+                  marker: {
+                    color: darken(originalColor, 30),
+                    size: 14,
+                    symbol: 'circle' as const,
+                    line: { width: 1, color: '#ffffff' }
                   }
-                  traces.push(peakMarker)
                 }
+                // Add peak marker if we found a valid peak
+                const traces = [fillTrace, secantTrace, pointsTrace, peakMarker]
 
                 return traces
               }

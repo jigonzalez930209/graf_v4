@@ -32,6 +32,11 @@ pub fn process_curve_data(coords_js: Float64Array) -> CurveMetrics {
             let y2 = coords_y[(i + 1) % n];
             area += x1 * y2 - x2 * y1;
         }
+        // Take the absolute value of half the sum
+        area = (area / 2.0).abs();
+        
+        // Debug output to verify calculation
+        console::log_1(&format!("Rust calculated area: {}", area).into());
     }
 
     // --- Peak Height Calculation ---
@@ -55,7 +60,7 @@ pub fn process_curve_data(coords_js: Float64Array) -> CurveMetrics {
     }
 
     CurveMetrics {
-        area: (area / 2.0).abs(),
+        area,
         peak_height,
     }
 }
