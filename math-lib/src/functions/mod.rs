@@ -1,5 +1,5 @@
 pub mod add;
-pub mod calculate_polygon_area;
+pub mod process_curve;
 pub mod numerical_derivative;
 pub mod savitzky_golay_derivative;
 pub mod savitzky_golay_smooth;

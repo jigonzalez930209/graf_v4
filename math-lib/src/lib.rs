@@ -6,7 +6,7 @@ pub mod fits;
 
 // Expose functions and structs to wasm
 pub use functions::add::*;
-pub use functions::calculate_polygon_area::*;
+pub use functions::process_curve::*;
 pub use functions::numerical_derivative::*;
 pub use functions::savitzky_golay_derivative::*;
 pub use functions::savitzky_golay_smooth::*;
