@@ -7,6 +7,7 @@ import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { darken, transparentize } from '@/utils/colors'
 import init from 'math-lib'
+import { calculatePeakInfo } from '@/utils/peak-height'
 
 interface CurvePlotProps {
   data: IProcessFile[]
@@ -142,6 +143,10 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
                 // Calculate area and peak height using wasm if available
                 let area = new Decimal(0)
                 let peakHeight = new Decimal(0)
+                let peakX = new Decimal(0)
+                let peakY = new Decimal(0)
+                let peakIndex = -1
+
                 if (wasm) {
                   const flatCoords = new Float64Array(polygonX.length * 2)
                   for (let i = 0; i < polygonX.length; i++) {
@@ -155,10 +160,24 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
                   const metrics = wasm.process_curve_data(flatCoords)
                   console.log('Raw metrics from wasm:', metrics)
                   area = toSafeDecimal(metrics.area)
-                  peakHeight = toSafeDecimal(metrics.peak_height)
+
+                  // Calculate peak height using our TypeScript function
+                  // Convert slicedContent to the expected format
+                  const typedContent: [string | number, string | number][] = slicedContent.map(
+                    (point) => [point[0], point[1]]
+                  )
+                  const peakInfo = calculatePeakInfo(typedContent, p1, p2)
+                  peakHeight = peakInfo.peakHeight
+                  peakX = peakInfo.peakX
+                  peakY = peakInfo.peakY
+                  peakIndex = peakInfo.peakIndex
+
                   console.log('Final values:', {
                     area: area.toString(),
-                    peakHeight: peakHeight.toString()
+                    peakHeight: peakHeight.toString(),
+                    peakX: peakX.toString(),
+                    peakY: peakY.toString(),
+                    peakIndex
                   })
                 }
 
@@ -170,7 +189,7 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
                   fillcolor: transparentize(originalColor, 0.4),
                   line: { color: 'transparent' },
                   type: 'scatter' as const,
-                  name: `Area: ${area.toNumber()}, Peak Height: ${peakHeight.toNumber()} | ${originalCurve.name}`,
+                  name: `Area: ${area.toNumber().toFixed(6)}, Peak Height: ${peakHeight.toNumber().toFixed(6)} | ${originalCurve.name}`,
                   legendgroup: originalCurve.id,
                   showlegend: true
                 }
@@ -198,7 +217,31 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
                   showlegend: false,
                   marker: { color: darken(originalColor, 20), size: 12, symbol: 'diamond' as const }
                 }
-                return [fillTrace, secantTrace, pointsTrace]
+
+                // Add peak marker if we found a valid peak
+                const traces = [fillTrace, secantTrace, pointsTrace]
+
+                if (peakIndex >= 0) {
+                  const peakMarker = {
+                    uid: 'peak-marker-' + originalCurve.id,
+                    x: [peakX.toString()],
+                    y: [peakY.toString()],
+                    type: 'scatter' as const,
+                    mode: 'markers' as const,
+                    name: `Peak (Height: ${peakHeight.toNumber().toFixed(6)})`,
+                    legendgroup: originalCurve.id,
+                    showlegend: true,
+                    marker: {
+                      color: darken(originalColor, 30),
+                      size: 14,
+                      symbol: 'diamond' as const,
+                      line: { width: 2, color: '#ffffff' }
+                    }
+                  }
+                  traces.push(peakMarker)
+                }
+
+                return traces
               }
             }
           } catch (error) {
