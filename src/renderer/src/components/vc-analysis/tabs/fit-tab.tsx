@@ -95,7 +95,7 @@ const FitTab = () => {
   }, [internalFiles, fitMultiple, setNewFiles])
 
   return (
-    <div className="ml-4 flex gap-3 items-center bg-accent/20 p-2">
+    <div className="flex gap-3 items-center bg-accent/20 p-2">
       <FitButtons fitButtons={fitButtons} selected={selectedFit} onSelect={setSelectedFit} />
       <Button
         disabled={[...internalFiles, ...newFiles].filter((f) => f.selected).length === 0}

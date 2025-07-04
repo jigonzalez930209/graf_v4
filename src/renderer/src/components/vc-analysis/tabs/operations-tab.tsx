@@ -67,7 +67,7 @@ const MathOperationsTab = () => {
   } = useVCAnalysis()
 
   return (
-    <div className="ml-4 flex gap-3 rounded-md bg-accent/20 p-2 w-full">
+    <div className="flex gap-3 rounded-md bg-accent/20 p-2 w-full">
       <div className="flex gap-3 items-center col-span-6">
         <OperationButtons
           operations={operations}

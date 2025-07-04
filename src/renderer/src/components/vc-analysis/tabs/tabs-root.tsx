@@ -1,17 +1,11 @@
 import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/tabs'
 import MathOperationsTab from './operations-tab'
-// import IntegralTab from './integral-tab'
 import DerivateTab from './derivate-tab'
 import FitTab from './fit-tab'
 
-export type TabType = 'operations' | 'integral' | 'fit' | 'derivate'
+export type TabType = 'operations' | 'integral table' | 'fit' | 'derivate'
 
-const tabs: TabType[] = [
-  'operations',
-  //'integral',
-  'fit',
-  'derivate'
-]
+const tabs: TabType[] = ['operations', 'fit', 'derivate', 'integral table']
 
 type TabsProps = {
   selectedTab: TabType
@@ -21,15 +15,15 @@ type TabsProps = {
 const TabsRoot = ({ selectedTab = tabs[0], setSelectedTab }: TabsProps) => {
   const tabsContent = {
     operations: <MathOperationsTab />,
-    // integral: <IntegralTab />,
     fit: <FitTab />,
-    derivate: <DerivateTab />
+    derivate: <DerivateTab />,
+    integral: <> </>
   }
 
   return (
-    <div className="flex flex-col h-full w-full gap-2">
-      <Tabs defaultValue={selectedTab} className="flex flex-row gap-2 mb-2">
-        <TabsList className="flex-1" NextToElement={selectedTab && tabsContent[selectedTab]}>
+    <div className="flex flex-col w-full">
+      <Tabs defaultValue={selectedTab} className="w-full mt-4">
+        <TabsList className="w-1/3">
           {tabs.map((tab) => (
             <TabsTrigger key={tab} value={tab} onClick={() => setSelectedTab(tab)}>
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -37,6 +31,7 @@ const TabsRoot = ({ selectedTab = tabs[0], setSelectedTab }: TabsProps) => {
           ))}
         </TabsList>
       </Tabs>
+      {tabsContent[selectedTab]}
     </div>
   )
 }

@@ -44,7 +44,7 @@ const toSafeDecimal = (value: unknown): Decimal => {
 }
 
 export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
-  const { setSelectedPoint, selectedPoint } = useVCAnalysis()
+  const { setSelectedPoint, selectedPoint, setIntegralResults } = useVCAnalysis()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [wasm, setWasm] = React.useState<any | null>(null)
 
@@ -52,6 +52,209 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
   React.useEffect(() => {
     init().then(setWasm)
   }, [])
+
+  // Use refs to track processed selections and prevent infinite loops
+  // Define types for point and curve data to improve type safety
+  interface PointData {
+    x: Decimal
+    y: Decimal
+    pointIndex: number
+    uid: string
+  }
+
+  // Define a custom type for curve data that matches what we're actually using
+  interface CurveData {
+    id: string
+    name: string
+    color?: string
+    content: Array<[string | number, string | number]>
+  }
+
+  const processedSelectionIds = React.useRef(new Set<string>())
+  const isCalculating = React.useRef(false)
+  const pendingCalculations = React.useRef<
+    Record<string, { p1: PointData; p2: PointData; curve: CurveData }>
+  >({})
+
+  // Types are now defined above
+
+  // Create a stable callback for calculating integral results
+  const calculateIntegralResult = React.useCallback(
+    (uid: string, p1: PointData, p2: PointData, originalCurve: CurveData) => {
+      try {
+        // If the same point is selected twice, do not proceed
+        if (p1.pointIndex === p2.pointIndex) return
+
+        // Create a unique ID for this selection
+        const selectionId = `${originalCurve.id}-${p1.pointIndex}-${p2.pointIndex}`
+
+        // Skip if we've already processed this selection
+        if (processedSelectionIds.current.has(selectionId)) return
+
+        // Only proceed if we have valid points and curve data
+        if (originalCurve.content && p1 && p2) {
+          const startIndex = p1.pointIndex
+          const endIndex = p2.pointIndex
+
+          if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
+            const directSegmentLength = endIndex - startIndex
+            const totalPoints = originalCurve.content.length
+            const otherSegmentLength = totalPoints - directSegmentLength
+
+            const useDirectSegment = directSegmentLength <= otherSegmentLength
+
+            const slicedContent = (
+              useDirectSegment
+                ? originalCurve.content.slice(startIndex, endIndex + 1)
+                : [
+                    ...originalCurve.content.slice(endIndex),
+                    ...originalCurve.content.slice(0, startIndex + 1)
+                  ]
+            ).filter((p) => {
+              if (!p || p.length !== 2) return false
+              const x = p[0]
+              const y = p[1]
+              return (
+                x != null &&
+                y != null &&
+                x.toString().trim() !== '' &&
+                y.toString().trim() !== '' &&
+                isFinite(Number(x)) &&
+                isFinite(Number(y))
+              )
+            })
+
+            const xSlice = slicedContent.map((p) => p[0])
+            const ySlice = slicedContent.map((p) => p[1])
+
+            const m = p2.y.minus(p1.y).div(p2.x.minus(p1.x))
+            const c = p1.y.minus(m.times(p1.x))
+            const yLineSlice = xSlice.map((x) => m.times(toSafeDecimal(x)).plus(c))
+
+            const polygonX = [...xSlice, ...xSlice.reverse()]
+            const polygonY = [...ySlice, ...yLineSlice.reverse()]
+
+            // Calculate area using TypeScript method
+            const area = calculatePolygonArea(
+              polygonX.map((x) => toSafeDecimal(x)),
+              polygonY.map((y) => toSafeDecimal(y))
+            )
+
+            // Calculate peak info
+            const typedContent = slicedContent.map(
+              (point) => [point[0], point[1]] as [string | number, string | number]
+            )
+            const peakInfo = calculatePeakInfo(typedContent, p1, p2)
+
+            // Mark this selection as processed
+            processedSelectionIds.current.add(selectionId)
+
+            // Store result in context
+            setIntegralResults((prev) => {
+              const exists = prev.find((r) => r.id === selectionId)
+              const newRow = {
+                id: selectionId,
+                curveName: originalCurve.name,
+                area: area.toString(),
+                peakHeight: peakInfo.peakHeight.toString(),
+                peakX: peakInfo.peakX.toString(),
+                peakY: peakInfo.peakY.toString()
+              }
+
+              if (exists) {
+                return prev.map((r) => (r.id === selectionId ? newRow : r))
+              } else {
+                return [...prev, newRow]
+              }
+            })
+          }
+        }
+      } catch (error) {
+        console.error(`Error processing integral data for ${uid}:`, error)
+      }
+    },
+    [setIntegralResults]
+  ) // Include setIntegralResults to avoid stale closures
+
+  // Use state to trigger recalculation when pendingCalculations changes
+  const [pendingCount, setPendingCount] = React.useState(0)
+
+  // Process pending calculations in a separate effect with a delay
+  React.useEffect(() => {
+    if (isCalculating.current) return
+
+    const pendingKeys = Object.keys(pendingCalculations.current)
+    if (pendingKeys.length === 0) return
+
+    // Set flag to prevent concurrent calculations
+    isCalculating.current = true
+
+    // Use setTimeout to break the render cycle
+    const timeoutId = setTimeout(() => {
+      try {
+        // Process one pending calculation at a time
+        const key = pendingKeys[0]
+        const { p1, p2, curve } = pendingCalculations.current[key]
+
+        // Remove from pending
+        delete pendingCalculations.current[key]
+
+        // Update pending count to trigger next calculation
+        setPendingCount((count) => count + 1)
+
+        // Calculate the integral
+        calculateIntegralResult(key, p1, p2, curve)
+      } finally {
+        // Reset flag
+        isCalculating.current = false
+      }
+    }, 0)
+
+    return () => clearTimeout(timeoutId)
+  }, [calculateIntegralResult, pendingCount])
+
+  // Queue calculations when selectedPoint changes
+  React.useEffect(() => {
+    // Skip if no selected points
+    if (Object.keys(selectedPoint).length === 0) return
+
+    // Track if we added any new calculations
+    let addedNewCalculations = false
+
+    // Queue each selection for processing
+    Object.entries(selectedPoint).forEach(([uid, points]) => {
+      if (points.length !== 2) return
+
+      const originalCurve = _.find(data, ['id', uid]) as CurveData | undefined
+      if (!originalCurve) return
+
+      const [p1, p2] =
+        points[0].pointIndex < points[1].pointIndex
+          ? [points[0], points[1]]
+          : [points[1], points[0]]
+
+      // Create a unique ID for this selection
+      const selectionId = `${originalCurve.id}-${p1.pointIndex}-${p2.pointIndex}`
+
+      // Only add to pending if we haven't processed it already
+      if (!processedSelectionIds.current.has(selectionId)) {
+        // Add to pending calculations
+        pendingCalculations.current[uid] = { p1, p2, curve: originalCurve }
+        addedNewCalculations = true
+      }
+    })
+
+    // Trigger the processing effect if we added new calculations
+    if (addedNewCalculations) {
+      setPendingCount((count) => count + 1)
+    }
+
+    // Cleanup function
+    return () => {
+      // Keep the processed IDs but clear pending calculations when dependencies change
+      pendingCalculations.current = {}
+    }
+  }, [selectedPoint, data]) // Don't include setIntegralResults or calculateIntegralResult
 
   const selectedPointData = React.useMemo(() => {
     return Object.entries(selectedPoint).flatMap(([uid, points]) => {
@@ -255,6 +458,8 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
                 // Add peak marker if we found a valid peak
                 const traces = [fillTrace, secantTrace, pointsTrace, peakMarker]
 
+                // The integral results are now handled in the useEffect above
+
                 return traces
               }
             }
@@ -275,7 +480,7 @@ export const CurvePlot: React.FC<CurvePlotProps> = ({ data, layoutTitle }) => {
     const curve = _.find(data, ['id', uid])
     if (!curve) return
 
-    const newPoint = {
+    const newPoint: PointData = {
       x,
       y,
       uid,
