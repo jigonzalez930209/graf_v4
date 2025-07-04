@@ -12,6 +12,7 @@ import VCAnalysisProvider from './context/vc-analysis-context'
 import CommonDialog from './common-dialog'
 import TabsRoot, { TabType } from './tabs/tabs-root'
 import TitleAction from './title-action'
+import IntegralResultsTable from './integral-results-table'
 
 export default function VCAnalysisDialog() {
   const [open, setOpen] = React.useState(false)
@@ -30,13 +31,17 @@ export default function VCAnalysisDialog() {
             <SlidersHorizontal className="w-4 h-4" />
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className="w-[90vw] h-[90vh] max-w-[90vw] max-h-[90vh]">
-          <AlertDialogTitle className="mb-1 relative flex h-6 w-full items-center gap-6 p-0">
-            Process VC <TitleAction setOpen={setOpen} />
-          </AlertDialogTitle>
-          <AlertDialogDescription className="sr-only"></AlertDialogDescription>
-          <TabsRoot selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-          <CommonDialog />
+        <AlertDialogContent className="w-[90vw] h-[90vh] max-w-[90vw] max-h-[90vh] flex flex-col">
+          <div className="flex flex-col space-y-2">
+            <AlertDialogTitle className="relative flex h-6 w-full items-center gap-6 p-0 mb-0">
+              Process VC <TitleAction setOpen={setOpen} />
+            </AlertDialogTitle>
+            <AlertDialogDescription className="sr-only"></AlertDialogDescription>
+            <TabsRoot selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+          </div>
+          <div className="flex-1 overflow-hidden">
+            {selectedTab !== 'integral table' ? <CommonDialog /> : <IntegralResultsTable />}
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </VCAnalysisProvider>

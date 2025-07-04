@@ -16,6 +16,15 @@ import {
   savitzkyGolaySmooth as sgSmooth
 } from '@renderer/utils/math'
 
+export interface IntegralResultRow {
+  id: string
+  curveName: string
+  area: string
+  peakHeight: string
+  peakX: string
+  peakY: string
+}
+
 export interface VCAnalysisContextType {
   selectedPoint: Record<string, Array<{ x: Decimal; y: Decimal; uid: string; pointIndex: number }>>
   setSelectedPoint: React.Dispatch<
@@ -58,6 +67,10 @@ export interface VCAnalysisContextType {
   setPolyOrder: React.Dispatch<React.SetStateAction<number>>
   setSelectionOrder: React.Dispatch<React.SetStateAction<string[]>>
   setNewFiles: React.Dispatch<React.SetStateAction<IProcessFile[]>>
+
+  // Integral results for all analyzed curves
+  integralResults: IntegralResultRow[]
+  setIntegralResults: React.Dispatch<React.SetStateAction<IntegralResultRow[]>>
   derivate: (
     operation: string,
     windowSize?: number,
@@ -110,6 +123,9 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
   const [selectedPoint, setSelectedPoint] = useState<
     Record<string, Array<{ x: Decimal; y: Decimal; uid: string; pointIndex: number }>>
   >({})
+
+  // Store all calculated integrals and peaks for the session
+  const [integralResults, setIntegralResults] = useState<IntegralResultRow[]>([])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [wasm, setWasm] = useState<any>(null)
@@ -433,22 +449,31 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
   return (
     <VCAnalysisContext.Provider
       value={{
-        derivate,
-        derivateMultiple,
         selectedPoint,
         setSelectedPoint,
         internalFiles,
         newFiles,
+        setNewFiles,
         selectedOperation,
+        setSelectedOperation,
         selectedFit,
+        setSelectedFit,
         selectedDerivate,
+        setSelectedDerivate,
         countPoints,
+        setCountPoints,
         selectedPoints,
+        setSelectedPoints,
         selectedDegree,
+        setSelectedDegree,
         windowSize,
+        setWindowSize,
         polyOrder,
+        setPolyOrder,
         selectionOrder,
+        setSelectionOrder,
         inputExpression,
+        setInputExpression,
         handleProcess,
         handleProcessMultiple,
         handleFileSelectedChange,
@@ -456,17 +481,10 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
         handleFitMultiple,
         handleManualSelection,
         handleSetGlobalSelectedFiles,
-        setInputExpression,
-        setSelectedOperation,
-        setSelectedFit,
-        setSelectedDerivate,
-        setCountPoints,
-        setSelectedPoints,
-        setSelectedDegree,
-        setWindowSize,
-        setPolyOrder,
-        setSelectionOrder,
-        setNewFiles
+        derivate,
+        derivateMultiple,
+        integralResults,
+        setIntegralResults
       }}
     >
       {children}
