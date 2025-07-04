@@ -62,14 +62,6 @@ const DerivateTab = () => {
     return size < 3 ? 3 : size
   }, [selectedFile])
 
-  // Diagnostic log to trace state on each render
-  console.log({
-    fileName: selectedFile?.name,
-    fileLength: selectedFile?.content.length,
-    maxWindowSize,
-    windowSize
-  })
-
   React.useEffect(() => {
     // Adjust windowSize if it's larger than the max allowed for the current file
     if (windowSize > maxWindowSize) {
@@ -120,7 +112,6 @@ const DerivateTab = () => {
     }
 
     // Final validation before calling the function
-    console.log(`Executing Derivate with: windowSize=${windowSize}, polyOrder=${polyOrder}`)
     if (selectedDerivate.includes('savitzky') && windowSize % 2 === 0) {
       alert(`Invalid Window Size: ${windowSize}. Window size must be an odd number.`)
       return
@@ -143,9 +134,6 @@ const DerivateTab = () => {
     }
 
     // Final validation before calling the function
-    console.log(
-      `Executing Derivate Multiple with: windowSize=${windowSize}, polyOrder=${polyOrder}`
-    )
     if (selectedDerivate.includes('savitzky') && windowSize % 2 === 0) {
       alert(`Invalid Window Size: ${windowSize}. Window size must be an odd number.`)
       return
@@ -164,7 +152,7 @@ const DerivateTab = () => {
   ])
 
   return (
-    <div className="ml-4 flex gap-3 items-center bg-accent/20 p-2">
+    <div className="flex gap-3 items-center bg-accent/20 p-2">
       <DerivateButtons
         derivateButtons={derivateButtons}
         selected={selectedDerivate}
