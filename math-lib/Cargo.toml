@@ -30,3 +30,6 @@ features = ["js"]
 [features]
 # The default feature enables the panic hook for better error messages in the browser console.
 default = ["console_error_panic_hook"]
+
+[package.metadata.wasm-bindgen]
+wasm-opt = false
