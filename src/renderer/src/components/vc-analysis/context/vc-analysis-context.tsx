@@ -315,7 +315,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       file?: IProcessFile
     ): IProcessFile | null => {
       console.log(
-        `Context 'derivate' received: operation=${operation}, windowSize=${windowSize}, polyOrder=${polyOrder}`
+        `Context 'derivate' received: operation=${operation}-windowSize=${windowSize}-polyOrder=${polyOrder}`
       )
 
       const selectedFile = file
@@ -407,7 +407,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       const name =
         operation === 'numericalDerivative'
           ? `Derivative of ${selectedFile.name}`
-          : `${operation} (w=${windowSize}, p=${polyOrder}) of ${selectedFile.name}`
+          : `${operation} (w=${windowSize}-p=${polyOrder}) of ${selectedFile.name}`
 
       return {
         ...selectedFile,
