@@ -112,7 +112,7 @@ const IntegralResultsTable: React.FC = () => {
       headers.join(','),
       ...dataToExport.map((row) =>
         [
-          `"${row.curveName}"`, // Quote curve name to handle commas
+          `${row.curveName}`, // Quote curve name to handle commas
           row.area,
           row.peakHeight,
           row.peakX,
