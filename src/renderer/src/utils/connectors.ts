@@ -45,11 +45,38 @@ export const readVoltammeterFile = (fileRaw: IFileRaw): IProcessFile | undefined
   const range = parseInt(arrayFile[13].split(',')[1])
   const cicles = parseInt(arrayFile[17].split(',')[1])
   const totalTime = countX / samplesSec
+
+  // Extract voltage range and time from sweep line
+  const vinicial = parseFloat(arrayFile[10].split(',')[1])
+  const vfinal = parseFloat(arrayFile[11].split(',')[1])
+  const voltageRange = vfinal - vinicial
+
+  // Find the sweep line (starts with "3," and contains voltage range)
+  let timeMs = 0
+  for (let i = 90; i < arrayFile.length; i++) {
+    const line = arrayFile[i].trim()
+    if (line.startsWith('3,')) {
+      const params = line.split(',')
+      if (params.length >= 4) {
+        const lineVinicial = parseFloat(params[1])
+        const lineVfinal = parseFloat(params[2])
+        if (Math.abs(lineVinicial - vinicial) < 0.1 && Math.abs(lineVfinal - vfinal) < 0.1) {
+          timeMs = parseInt(params[3])
+          break
+        }
+      }
+    }
+  }
+
+  // Calculate correct scan rate: ScanRate (mV/s) = VoltageRange / (TimeMs / 1000)
+  const scanRate = timeMs > 0 ? voltageRange / (timeMs / 1000) : 0
+
   const voltammeter = {
-    samplesSec,
+    samplesSec: scanRate, // Use calculated scanRate as samplesSec
     range,
     totalTime,
-    cicles
+    cicles,
+    scanRate
   }
   return {
     id: generateRandomId(),

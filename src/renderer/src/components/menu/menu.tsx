@@ -28,12 +28,12 @@ import { ProjectMenu } from './project'
 import EventProgress from './event-progress'
 import WindowControls from './control-buttons'
 import VCAnalysisDialog from '../vc-analysis/vc-dialog'
+import ScanRateAnalysisDialog from '../vc-analysis/scan-rate-dialog'
 
 export function Menu() {
   const [name, setName] = React.useState('')
-  const {
-    graftState: { files }
-  } = React.useContext(GrafContext)
+  const { graftState } = React.useContext(GrafContext)
+  const { files, fileType } = graftState
 
   const progress = React.useRef(0)
 
@@ -100,6 +100,7 @@ export function Menu() {
           )}
           <EventProgress />
           <VCAnalysisDialog />
+          {fileType === 'teq4' && <ScanRateAnalysisDialog />}
         </div>
         <WindowControls />
       </Menubar>

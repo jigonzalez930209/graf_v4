@@ -78,6 +78,7 @@ type VoltameterParameters = {
   range: number
   totalTime: number
   cicles: number
+  scanRate?: number
 }
 
 export type {
