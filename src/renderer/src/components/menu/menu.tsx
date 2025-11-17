@@ -29,6 +29,7 @@ import EventProgress from './event-progress'
 import WindowControls from './control-buttons'
 import VCAnalysisDialog from '../vc-analysis/vc-dialog'
 import ScanRateAnalysisDialog from '../vc-analysis/scan-rate-dialog'
+import CVMultiAnalysisDialog from '../vc-analysis/cv-multi-analysis-dialog'
 
 export function Menu() {
   const [name, setName] = React.useState('')
@@ -101,6 +102,7 @@ export function Menu() {
           <EventProgress />
           <VCAnalysisDialog />
           {fileType === 'teq4' && <ScanRateAnalysisDialog />}
+          {fileType === 'teq4' && <CVMultiAnalysisDialog />}
         </div>
         <WindowControls />
       </Menubar>
