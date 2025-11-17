@@ -73,9 +73,9 @@ describe('Multi-CV Analysis Hook', () => {
       const result = analyzeMultiCV({ files, config: { scanRate: 0.1 } })
 
       expect(result?.correlations.ipVsSqrtV).toBeDefined()
-      if (result?.correlations.ipVsSqrtV) {
-        expect(result.correlations.ipVsSqrtV.slope).not.toBeNaN()
-        expect(result.correlations.ipVsSqrtV.r2).toBeGreaterThanOrEqual(0)
+      if (result?.correlations.ipVsSqrtV?.anodic) {
+        expect(result.correlations.ipVsSqrtV.anodic.slope).not.toBeNaN()
+        expect(result.correlations.ipVsSqrtV.anodic.r2).toBeGreaterThanOrEqual(0)
       }
     })
 

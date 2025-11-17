@@ -54,11 +54,11 @@ export const regressionWithTransform = (
 }
 
 export const regressionLogLog = (x: number[], y: number[]): RegressionResult | null => {
-  // Validate that all values are positive (required for log)
-  if (x.some((v) => v <= 0) || y.some((v) => v <= 0)) {
+  // Validate that all values are non-zero (required for log of absolute value)
+  if (x.some((v) => v === 0) || y.some((v) => v === 0)) {
     return null
   }
-  return regressionWithTransform(x, y, (value) => Math.log(value))
+  return regressionWithTransform(x, y, (value) => Math.log(Math.abs(value)))
 }
 
 export const regressionVsSqrt = (x: number[], y: number[]): RegressionResult | null => {

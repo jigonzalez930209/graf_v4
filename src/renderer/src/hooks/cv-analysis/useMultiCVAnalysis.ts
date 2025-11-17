@@ -151,23 +151,14 @@ export const analyzeMultiCV = (params: UseMultiCVAnalysisParams): MultiCVAnalysi
     }
 
     // log(ip) vs log(v) - separado para anódico y catódico
-    if (finalAnodicCurrents.length >= 2 && finalScanRates.length === finalAnodicCurrents.length) {
-      // Para log-log, transformar ambos ejes
-      const logScanRates = finalScanRates.map((v) => Math.log(v))
-      const logAnodicCurrents = finalAnodicCurrents.map((v) => Math.log(Math.abs(v)))
-      const logCathodicCurrents = finalCathodicCurrents.map((v) => Math.log(Math.abs(v)))
-
-      const regressionFunc = params.includeOrigin ? linearRegressionThroughOrigin : linearRegression
-
-      const anodicReg = params.includeOrigin
-        ? regressionFunc(logScanRates, logAnodicCurrents)
-        : regressionLogLog(finalScanRates, finalAnodicCurrents)
+    // Nota: Para log-log NUNCA forzamos paso por origen, siempre usamos regresión normal
+    // Y NUNCA incluimos el punto (0,0) porque Math.log(0) es indefinido
+    if (anodicCurrents.length >= 2 && scanRates.length === anodicCurrents.length) {
+      const anodicReg = regressionLogLog(scanRates, anodicCurrents)
 
       const cathodicReg =
-        finalCathodicCurrents.length >= 2 && finalScanRates.length === finalCathodicCurrents.length
-          ? params.includeOrigin
-            ? regressionFunc(logScanRates, logCathodicCurrents)
-            : regressionLogLog(finalScanRates, finalCathodicCurrents)
+        cathodicCurrents.length >= 2 && scanRates.length === cathodicCurrents.length
+          ? regressionLogLog(scanRates, cathodicCurrents)
           : null
       correlations.logIpVsLogV = { anodic: anodicReg, cathodic: cathodicReg }
     }
