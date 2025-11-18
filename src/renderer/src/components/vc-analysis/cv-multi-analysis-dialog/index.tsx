@@ -15,6 +15,9 @@ import { ChartsSection } from './charts-section'
 import { TablesSection } from './tables-section'
 import { LavironKineticsSection } from './laviron-kinetics-section'
 import { ExecutiveSummarySection } from './executive-summary-section'
+import { RandlesSevcikSection } from './randles-sevcik-section'
+import { NicholsonSection } from './nicholson-section'
+import { ControlAnalysisSection } from './control-analysis-section'
 
 const CVMultiAnalysisDialog: React.FC = () => {
   const { data } = useData()
@@ -109,6 +112,15 @@ const CVMultiAnalysisDialog: React.FC = () => {
               <div className="space-y-4">
                 {/* Gráficos de correlaciones y Laviron Analysis */}
                 <ChartsSection result={result} baseLayout={baseLayout} />
+
+                {/* Randles-Sevcik Analysis (Diffusion Coefficient) */}
+                <RandlesSevcikSection result={result} includeOrigin={includeOrigin} />
+
+                {/* Nicholson k⁰ Analysis */}
+                <NicholsonSection result={result} />
+
+                {/* Control Analysis (Diffusion vs Adsorption) */}
+                <ControlAnalysisSection result={result} />
 
                 {/* Tablas de resultados */}
                 <TablesSection result={result} />
