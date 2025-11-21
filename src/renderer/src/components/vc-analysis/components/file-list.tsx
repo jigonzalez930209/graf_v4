@@ -1,5 +1,5 @@
 import React from 'react'
-import FolderView from '../file-sort/folder-view'
+import FolderView from '../../file-sort/folder-view'
 import { IProcessFile } from '@shared/models/files'
 
 interface FileListProps {

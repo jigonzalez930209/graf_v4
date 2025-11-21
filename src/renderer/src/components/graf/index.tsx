@@ -4,15 +4,15 @@ import DragDrop from '@/components/drag-drop/drag-drop'
 import Drawer from '@/components/drawer'
 import PlotlyChart from '@/components/plot/plot'
 
-import { GrafContext } from '../context/GraftContext'
-import useLoading from '../hooks/useLoader'
+import { GrafContext } from '@/context/GraftContext'
+import useLoading from '@/hooks/useLoader'
 import { PlotParams } from 'react-plotly.js'
 
 import { IProcessFile } from '@shared/models/files'
 
-import usePlotlyOptions from '../hooks/usePlotlyOptions'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './ui/resizable'
-import Loader from './loader'
+import usePlotlyOptions from '@/hooks/usePlotlyOptions'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+import Loader from '@/components/loader'
 
 const Graf = () => {
   const { graftState } = React.useContext(GrafContext)

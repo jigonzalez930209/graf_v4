@@ -2,11 +2,11 @@ import React from 'react'
 import { useForm, useFieldArray, FieldValues, Controller } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Input } from '../ui/input'
-import { Form } from '../ui/form'
-import { Button } from '../ui/button'
+import { Input } from '../../ui/input'
+import { Form } from '../../ui/form'
+import { Button } from '../../ui/button'
 import { CheckIcon } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
 
 // Schema: array of integers
 const schema = z.object({ points: z.array(z.number().int()), degree: z.number().int() })

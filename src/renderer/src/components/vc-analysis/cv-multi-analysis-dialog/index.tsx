@@ -9,7 +9,7 @@ import { useMultiCVAnalysis, type MultiCVAnalysisResult } from '@renderer/hooks/
 import { useData } from '@renderer/hooks/useData'
 import type { IProcessFile } from '@shared/models/files'
 import { defaultTheme } from '@/utils'
-import CVTheoryTabs from '../cv-theory-tabs'
+import CVTheoryTabs from '../components/cv-theory-tabs'
 import { buildBaseLayout } from './constants'
 import { ChartsSection } from './charts-section'
 import { TablesSection } from './tables-section'

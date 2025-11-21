@@ -4,12 +4,12 @@
  */
 
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { Input } from '../ui/input'
-import { Label } from '../ui/label'
-import { Button } from '../ui/button'
-import { Badge } from '../ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table'
+import { Input } from '../../ui/input'
+import { Label } from '../../ui/label'
+import { Button } from '../../ui/button'
+import { Badge } from '../../ui/badge'
 import { Settings, RefreshCw, Download } from 'lucide-react'
 import type { Peak } from '@renderer/hooks/cv-analysis'
 

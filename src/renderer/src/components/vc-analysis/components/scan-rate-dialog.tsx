@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { LineChartIcon } from 'lucide-react'
-import Plot from '../plot/new-plot'
+import Plot from '../../plot/new-plot'
 import type { Data, Layout, Config } from 'plotly.js'
 import { useTheme } from 'next-themes'
 
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../ui/dialog'
-import { Input } from '../ui/input'
-import { Label } from '../ui/label'
-import { Button } from '../ui/button'
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../../ui/dialog'
+import { Input } from '../../ui/input'
+import { Label } from '../../ui/label'
+import { Button } from '../../ui/button'
 import { ProcessIcon } from './icons'
 import {
   useScanRateCorrelation,

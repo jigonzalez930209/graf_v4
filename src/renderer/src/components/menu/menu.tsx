@@ -27,8 +27,8 @@ import { MenuModeToggle } from './menu-mode-toggle'
 import { ProjectMenu } from './project'
 import EventProgress from './event-progress'
 import WindowControls from './control-buttons'
-import VCAnalysisDialog from '../vc-analysis/vc-dialog'
-import ScanRateAnalysisDialog from '../vc-analysis/scan-rate-dialog'
+import VCAnalysisDialog from '../vc-analysis'
+import ScanRateAnalysisDialog from '../vc-analysis/components/scan-rate-dialog'
 import CVMultiAnalysisDialog from '../vc-analysis/cv-multi-analysis-dialog'
 
 export function Menu() {

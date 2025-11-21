@@ -1,6 +1,6 @@
 import { PlusIcon, XIcon } from 'lucide-react'
-import { Button } from '../ui/button'
-import { useVCAnalysis } from './context/use-vc-analysis'
+import { Button } from '../../ui/button'
+import { useVCAnalysis } from '../context/use-vc-analysis'
 
 const TitleAction = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
   const { handleSetGlobalSelectedFiles } = useVCAnalysis()

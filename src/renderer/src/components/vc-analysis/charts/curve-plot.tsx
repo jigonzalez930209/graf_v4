@@ -2,7 +2,7 @@ import React from 'react'
 import Plot from '@/components/plot/plot'
 
 import { IProcessFile } from '@shared/models/files'
-import { useVCAnalysis } from './context/use-vc-analysis'
+import { useVCAnalysis } from '../context/use-vc-analysis'
 import Decimal from 'decimal.js'
 import _ from 'lodash'
 import { darken, transparentize } from '@/utils/colors'

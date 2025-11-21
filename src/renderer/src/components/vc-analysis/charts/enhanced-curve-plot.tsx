@@ -12,10 +12,10 @@ import { IProcessFile } from '@shared/models/files'
 import { transparentize, darken } from '@/utils/colors'
 import type { Peak } from '@renderer/hooks/cv-analysis'
 import { applyMovingAverage } from '@renderer/hooks/cv-analysis/helpers/smoothing'
-import { Switch } from '../ui/switch'
-import { Label } from '../ui/label'
-import { Slider } from '../ui/slider'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Switch } from '../../ui/switch'
+import { Label } from '../../ui/label'
+import { Slider } from '../../ui/slider'
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 
 interface EnhancedCurvePlotProps {
   data: IProcessFile[]
