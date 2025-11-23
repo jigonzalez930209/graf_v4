@@ -50,7 +50,7 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use once_cell::sync::Lazy;
 
-static COEFFICIENT_CACHE: Lazy<Mutex<HashMap<(usize, usize), Vec<f64>>>> = 
+static COEFFICIENT_CACHE: Lazy<Mutex<HashMap<(usize, usize), Vec<f64>>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 ```
 
@@ -84,24 +84,24 @@ const DerivateTab = React.memo(() => {
 ```typescript
 function processInChunks(data, chunkSize, processFn) {
   return new Promise((resolve) => {
-    const result = [];
-    let index = 0;
-    
+    const result = []
+    let index = 0
+
     function nextChunk() {
-      const chunk = data.slice(index, index + chunkSize);
-      index += chunkSize;
-      
+      const chunk = data.slice(index, index + chunkSize)
+      index += chunkSize
+
       if (chunk.length > 0) {
-        const processedChunk = processFn(chunk);
-        result.push(...processedChunk);
-        setTimeout(nextChunk, 0); // Allow UI to update between chunks
+        const processedChunk = processFn(chunk)
+        result.push(...processedChunk)
+        setTimeout(nextChunk, 0) // Allow UI to update between chunks
       } else {
-        resolve(result);
+        resolve(result)
       }
     }
-    
-    nextChunk();
-  });
+
+    nextChunk()
+  })
 }
 ```
 
@@ -154,7 +154,7 @@ export default defineConfig({
       }
     }
   }
-});
+})
 ```
 
 ### 7. Data Structure Optimization
@@ -172,15 +172,12 @@ export default defineConfig({
 function optimizedCalculation(data) {
   // Fast path with native numbers
   const fastResults = data.map(([x, y]) => [
-    Number(x),
+    Number(x)
     // Fast calculation with native numbers
-  ]);
-  
+  ])
+
   // Convert critical results to Decimal for precision
-  return fastResults.map(([x, y]) => [
-    new Decimal(x),
-    new Decimal(y)
-  ]);
+  return fastResults.map(([x, y]) => [new Decimal(x), new Decimal(y)])
 }
 ```
 
@@ -203,7 +200,7 @@ function VirtualizedTable({ data }) {
     getScrollElement: () => parentRef.current,
     estimateSize: () => 35,
   });
-  
+
   // Only render visible rows
   return (
     <div ref={parentRef} style={{ height: '500px', overflow: 'auto' }}>
@@ -241,7 +238,7 @@ function VirtualizedTable({ data }) {
 pub fn optimized_process(input_ptr: *const f64, input_len: usize, output_ptr: *mut f64) {
     let input_slice = unsafe { std::slice::from_raw_parts(input_ptr, input_len) };
     let output_slice = unsafe { std::slice::from_raw_parts_mut(output_ptr, input_len) };
-    
+
     // Process data directly into output slice
     for i in 0..input_len {
         output_slice[i] = process_value(input_slice[i]);
@@ -261,14 +258,14 @@ pub fn optimized_process(input_ptr: *const f64, input_len: usize, output_ptr: *m
 
 ```typescript
 // Create a memoized version of expensive functions
-import { memoize } from 'lodash';
+import { memoize } from 'lodash'
 
 const memoizedDerivative = memoize(
   (operation, data, windowSize, polyOrder) => {
-    return derivate(operation, data, windowSize, polyOrder);
+    return derivate(operation, data, windowSize, polyOrder)
   },
   (...args) => JSON.stringify(args)
-);
+)
 ```
 
 ## Implementation Plan
@@ -330,7 +327,9 @@ export const FileContext = React.createContext<FileContextProps>({} as FileConte
 export const PlotContext = React.createContext<PlotContextProps>({} as PlotContextProps)
 
 // 3. OperationsContext for math operations
-export const OperationsContext = React.createContext<OperationsContextProps>({} as OperationsContextProps)
+export const OperationsContext = React.createContext<OperationsContextProps>(
+  {} as OperationsContextProps
+)
 ```
 
 ### 12. Optimized Plot Rendering
@@ -349,7 +348,7 @@ const MemoizedPlotly = React.memo(
   (props: PlotParams) => <Plotly {...props} />,
   (prevProps, nextProps) => {
     // Custom deep comparison for plot data
-    return isEqual(prevProps.data, nextProps.data) && 
+    return isEqual(prevProps.data, nextProps.data) &&
            isEqual(prevProps.layout, nextProps.layout);
   }
 );
@@ -373,18 +372,18 @@ const handlePlotUpdate = useCallback((figure, graphDiv) => {
 ```typescript
 async function processDataPipeline(rawData, operations = []) {
   // Create a processing queue
-  const queue = new PQueue({ concurrency: 1 });
-  
+  const queue = new PQueue({ concurrency: 1 })
+
   // Add each operation to the queue
-  let processedData = rawData;
+  let processedData = rawData
   for (const operation of operations) {
-    processedData = await queue.add(() => operation(processedData));
-    
+    processedData = await queue.add(() => operation(processedData))
+
     // Yield to main thread occasionally
-    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0))
   }
-  
-  return processedData;
+
+  return processedData
 }
 ```
 
@@ -426,19 +425,19 @@ const HeavyComponent = lazy(() => import('./HeavyComponent'));
 ```typescript
 // Use useMemo for expensive derived calculations
 const impedanceData = useMemo(() => {
-  if (!graftState.files) return [];
-  
+  if (!graftState.files) return []
+
   return graftState.files
-    .filter(file => file.selected)
+    .filter((file) => file.selected)
     .sort((a, b) => parseInt(a.selected.toString()) - parseInt(b.selected.toString()))
-    .map(file => ({
+    .map((file) => ({
       ...file,
-      content: file.content.map(c => [
+      content: file.content.map((c) => [
         parseFloat(c[2]) * Math.cos((parseFloat(c[3]) * Math.PI) / 180),
         -parseFloat(c[2]) * Math.sin((parseFloat(c[3]) * Math.PI) / 180)
       ])
-    }));
-}, [graftState.files]);
+    }))
+}, [graftState.files])
 ```
 
 ### 16. Optimized File Reader
@@ -454,38 +453,38 @@ const impedanceData = useMemo(() => {
 ```typescript
 function readFileWithProgress(file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    const chunkSize = 1024 * 1024; // 1MB
-    let offset = 0;
-    let buffer = [];
-    
+    const reader = new FileReader()
+    const chunkSize = 1024 * 1024 // 1MB
+    let offset = 0
+    let buffer = []
+
     // Report progress as chunks are read
-    reader.onload = function(e) {
-      const chunk = e.target.result;
-      buffer.push(chunk);
-      offset += chunkSize;
-      
+    reader.onload = function (e) {
+      const chunk = e.target.result
+      buffer.push(chunk)
+      offset += chunkSize
+
       // Report progress
-      setProgress(Math.min(100, Math.round((offset / file.size) * 100)));
-      
+      setProgress(Math.min(100, Math.round((offset / file.size) * 100)))
+
       if (offset >= file.size) {
         // Done, combine chunks and process
-        resolve(buffer.join(''));
+        resolve(buffer.join(''))
       } else {
         // Read next chunk
-        readNextChunk();
+        readNextChunk()
       }
-    };
-    
-    reader.onerror = reject;
-    
-    function readNextChunk() {
-      const slice = file.slice(offset, offset + chunkSize);
-      reader.readAsText(slice);
     }
-    
-    readNextChunk();
-  });
+
+    reader.onerror = reject
+
+    function readNextChunk() {
+      const slice = file.slice(offset, offset + chunkSize)
+      reader.readAsText(slice)
+    }
+
+    readNextChunk()
+  })
 }
 ```
 
@@ -502,23 +501,23 @@ function readFileWithProgress(file) {
 ```typescript
 // Enhanced resize observer with proper debouncing
 function useEnhancedResizeObserver(ref, callback, options = {}) {
-  const { delay = 100, leading = false, trailing = true } = options;
+  const { delay = 100, leading = false, trailing = true } = options
   const debouncedCallback = useMemo(
     () => debounce(callback, delay, { leading, trailing }),
     [callback, delay, leading, trailing]
-  );
+  )
 
   useEffect(() => {
-    if (!ref.current) return;
-    
-    const observer = new ResizeObserver(debouncedCallback);
-    observer.observe(ref.current);
-    
+    if (!ref.current) return
+
+    const observer = new ResizeObserver(debouncedCallback)
+    observer.observe(ref.current)
+
     return () => {
-      debouncedCallback.cancel();
-      observer.disconnect();
-    };
-  }, [ref, debouncedCallback]);
+      debouncedCallback.cancel()
+      observer.disconnect()
+    }
+  }, [ref, debouncedCallback])
 }
 ```
 
@@ -539,6 +538,7 @@ By addressing these areas systematically, the application should see significant
 ### 18. Frequency Analysis Component Optimization
 
 **Problem:** The `frequency-analysis` components have multiple optimization issues:
+
 - Inefficient dependency tracking in `plot-container.tsx` (only tracking first item in array)
 - Redundant data transformation on each render
 - No memoization for transformed plot data
@@ -558,26 +558,26 @@ const PlotContainer = ({ className }: PlotContainerProps) => {
   const {
     graftState: { uniqueFrequencyCalc }
   } = React.useContext(GrafContext)
-  
+
   // Use useMemo for data transformation
   const grafDataByPlots = useMemo(() => {
     if (!uniqueFrequencyCalc || uniqueFrequencyCalc.length === 0) return null;
-    
+
     const module = [];
     const phase = [];
     const zi = [];
     const zr = [];
-    
+
     uniqueFrequencyCalc.forEach((g, i) => {
       module.push([Number(g[i].frequency), g[i].module.m, g[i].module.r]);
       phase.push([Number(g[i].frequency), g[i].phase.m, g[i].module.r]);
       zi.push([Number(g[i].frequency), g[i].zi.m, g[i].module.r]);
       zr.push([Number(g[i].frequency), g[i].zr.m, g[i].module.r]);
     });
-    
+
     return { module, phase, zi, zr };
   }, [uniqueFrequencyCalc]); // Properly track the entire array
-  
+
   return (
     <div className={cn(className, 'h-full w-[100%] overflow-auto overflow-x-hidden')}>
       <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -605,47 +605,50 @@ const PlotContainer = ({ className }: PlotContainerProps) => {
 // Initialize HyperFormula outside component to prevent recreation on each render
 const hyperformulaInstance = HyperFormula.buildEmpty({
   licenseKey: 'internal-use-in-handsontable'
-});
+})
 
 const FileContent = ({ data, template }: FileContentProps) => {
-  const hotTableComponent = React.useRef(null);
-  
+  const hotTableComponent = React.useRef(null)
+
   // Memoize cell renderer function to prevent recreation on each render
   const renderCellColors = React.useCallback((prop: string) => {
-    const color = prop;
-    return function(instance, TD, row, col, prop, value, cellProperties) {
-      textRenderer.apply(this, [instance, TD, row, col, prop, value, cellProperties]);
-      TD.style.fontWeight = 'bold';
-      TD.style.color = color;
-      TD.style.background = tinycolor(color).lighten(40).toString();
-      TD.style.textAlign = 'center';
-    };
-  }, []);
-  
+    const color = prop
+    return function (instance, TD, row, col, prop, value, cellProperties) {
+      textRenderer.apply(this, [instance, TD, row, col, prop, value, cellProperties])
+      TD.style.fontWeight = 'bold'
+      TD.style.color = color
+      TD.style.background = tinycolor(color).lighten(40).toString()
+      TD.style.textAlign = 'center'
+    }
+  }, [])
+
   // Optimize table settings for large datasets
-  const tableSettings = React.useMemo(() => ({
-    height: '37vh',
-    width: '35vw',
-    licenseKey: 'non-commercial-and-evaluation',
-    colHeaders: true,
-    rowHeaders: true,
-    manualRowResize: true,
-    manualColumnResize: true,
-    readOnly: true,
-    // Only render visible data for better performance
-    viewportRowRenderingOffset: 20,
-    viewportColumnRenderingOffset: 5,
-    formulas: {
-      engine: hyperformulaInstance
-    },
-    data
-  }), [data]);
-  
+  const tableSettings = React.useMemo(
+    () => ({
+      height: '37vh',
+      width: '35vw',
+      licenseKey: 'non-commercial-and-evaluation',
+      colHeaders: true,
+      rowHeaders: true,
+      manualRowResize: true,
+      manualColumnResize: true,
+      readOnly: true,
+      // Only render visible data for better performance
+      viewportRowRenderingOffset: 20,
+      viewportColumnRenderingOffset: 5,
+      formulas: {
+        engine: hyperformulaInstance
+      },
+      data
+    }),
+    [data]
+  )
+
   // Rest of component...
 }
 ```
 
-### 20. Import Dialog State Management 
+### 20. Import Dialog State Management
 
 **Problem:** The `import-dialog.tsx` component uses multiple separate state variables for related data, causing excessive re-renders.
 
@@ -660,17 +663,22 @@ const FileContent = ({ data, template }: FileContentProps) => {
 function importDialogReducer(state, action) {
   switch (action.type) {
     case 'SET_SELECTED_TEMPLATE':
-      return { ...state, selectedTemplate: action.payload };
+      return { ...state, selectedTemplate: action.payload }
     case 'SET_SELECTED_FILE':
-      return { ...state, selectedFile: action.payload };
+      return { ...state, selectedFile: action.payload }
     case 'SET_IMPORTED_FILES':
-      return { ...state, importedFiles: action.payload };
+      return { ...state, importedFiles: action.payload }
     case 'SET_TEMPLATES':
-      return { ...state, templates: action.payload };
+      return { ...state, templates: action.payload }
     case 'RESET':
-      return { selectedFile: undefined, templates: [], importedFiles: [], selectedTemplate: undefined };
+      return {
+        selectedFile: undefined,
+        templates: [],
+        importedFiles: [],
+        selectedTemplate: undefined
+      }
     default:
-      return state;
+      return state
   }
 }
 
@@ -681,21 +689,21 @@ const ImportDialog = () => {
     selectedFile: undefined,
     importedFiles: [],
     templates: []
-  });
-  
+  })
+
   // Access state values
-  const { selectedTemplate, selectedFile, importedFiles, templates } = state;
-  
+  const { selectedTemplate, selectedFile, importedFiles, templates } = state
+
   // Update state
   const handleImportFiles = () => {
     // Process files...
-    
+
     // Reset state
-    dispatch({ type: 'RESET' });
-  };
-  
+    dispatch({ type: 'RESET' })
+  }
+
   // Rest of component...
-};
+}
 ```
 
 ### 21. Optimized Table Cell Rendering
@@ -711,16 +719,16 @@ const ImportDialog = () => {
 ```typescript
 const FileContent = ({ data, template }: FileContentProps) => {
   // ... other code
-  
+
   // Create a memoized cells callback that only updates when template changes
   const cellsCallback = React.useCallback((row, col) => {
     const cellProperties: CellProperties = {} as CellProperties;
-    
+
     if (row === template?.template?.row) {
       cellProperties.renderer = renderCellColors('gray');
       return cellProperties;
     }
-    
+
     let color = '';
     if (template?.template?.columns) {
       const column = Object.values(template.template.columns).find((v) => v?.col === col);
@@ -728,14 +736,14 @@ const FileContent = ({ data, template }: FileContentProps) => {
         color = column.color;
       }
     }
-    
+
     if (color) {
       cellProperties.renderer = renderCellColors(color);
     }
-    
+
     return cellProperties;
   }, [template, renderCellColors]);
-  
+
   return (
     <div className="my-3 h-full overflow-hidden">
       {data?.length && (
@@ -771,11 +779,11 @@ const FileContent = lazy(() => import('./import-dialog-actions/file-content'));
 
 const ImportDialog = () => {
   // ... state management
-  
+
   return (
     <Dialog open={open} onOpenChange={() => setOpen((prev) => !prev)}>
       {/* ... dialog header */}
-      
+
       <div className="mt-4 grid h-full grid-cols-4">
         <ImportTemplate
           setSelectedTemplate={setSelectedTemplate}
@@ -804,7 +812,7 @@ const ImportDialog = () => {
           </div>
         </div>
       </div>
-      
+
       {/* ... dialog footer */}
     </Dialog>
   );
@@ -814,6 +822,7 @@ const ImportDialog = () => {
 ### 23. Drag and Drop Performance Optimization
 
 **Problem:** The `drag-drop.tsx` component has several performance issues:
+
 - Uses complex state updates that cause cascading re-renders
 - Has unnecessary validations running on every render
 - Uses inefficient setTimeout for state initialization
@@ -832,11 +841,11 @@ import { useCallback, useMemo } from 'react'
 
 const DragDrop = ({ PlotlyChart }: { PlotlyChart: React.ReactElement }) => {
   // Existing state and context usage...
-  
+
   // Extract validation to a memoized function
   const validationErrors = useMemo(() => {
     const errors = [];
-    
+
     if (
       _.isEmpty(itemGroups.xAxis) &&
       _.isEmpty(itemGroups.yAxis) &&
@@ -844,16 +853,16 @@ const DragDrop = ({ PlotlyChart }: { PlotlyChart: React.ReactElement }) => {
     ) {
       errors.push('No columns selected');
     }
-    
+
     if (_.isEmpty(itemGroups.xAxis)) {
       errors.push('X axis is empty');
     }
-    
+
     // Add other validation rules...
-    
+
     return errors;
   }, [itemGroups.xAxis, itemGroups.yAxis, itemGroups.y2Axis]);
-  
+
   // Memoize handler functions
   const handleApply = useCallback(() => {
     // Check for validation errors
@@ -861,7 +870,7 @@ const DragDrop = ({ PlotlyChart }: { PlotlyChart: React.ReactElement }) => {
       enqueueSnackbar(validationErrors[0], { variant: 'error' });
       return;
     }
-    
+
     setSelectedColumns(
       csvFileColum.map((csv) =>
         csv?.fileName === data?.find((d) => d.selected)?.name
@@ -876,18 +885,18 @@ const DragDrop = ({ PlotlyChart }: { PlotlyChart: React.ReactElement }) => {
       )
     );
   }, [itemGroups, csvFileColum, data, enqueueSnackbar, setSelectedColumns, validationErrors]);
-  
+
   // Memoize handlers for drag operations
   const handleDragStart = useCallback(({ active }) => setActiveId(active.id), []);
   const handleDragCancel = useCallback(() => setActiveId(undefined), []);
   const handleDragEnd = useCallback(({ active, over }) => {
     // Existing drag end logic...
   }, [itemGroups]);
-  
+
   // Use effect with proper dependencies
   React.useEffect(() => {
     const fileColumns = csvFileColum?.find((c) => c.selected);
-    
+
     // Don't use setTimeout, directly update state
     setItemGroups({
       columns: !_.isEmpty(fileColumns) ? fileColumns.notSelected || [] : [],
@@ -896,10 +905,10 @@ const DragDrop = ({ PlotlyChart }: { PlotlyChart: React.ReactElement }) => {
       y2Axis: !_.isEmpty(fileColumns) ? (fileColumns.y2?.map((d) => ({ name: d.name, index: d.index })) || []) : []
     });
   }, [csvFileColum]);
-  
+
   // Optimize the rendering of list items with React.memo
   const MemoizedDroppable = React.memo(Droppable);
-  
+
   return (
     <DndContext
       sensors={sensors}
@@ -940,28 +949,28 @@ import { useState, useEffect, useCallback } from 'react';
 function useDebouncedState(initialValue, delay = 300) {
   const [immediateValue, setImmediateValue] = useState(initialValue);
   const [debouncedValue, setDebouncedValue] = useState(initialValue);
-  
+
   const debouncedSetValue = useCallback(
     debounce((value) => {
       setDebouncedValue(value);
     }, delay),
     [delay]
   );
-  
+
   useEffect(() => {
     debouncedSetValue(immediateValue);
     return () => {
       debouncedSetValue.cancel();
     };
   }, [immediateValue, debouncedSetValue]);
-  
+
   return [debouncedValue, setImmediateValue, immediateValue];
 }
 
 // Example usage in a component with frequent updates
 export function OptimizedInteractiveComponent() {
   const [position, setPosition, immediatePosition] = useDebouncedState({ x: 0, y: 0 });
-  
+
   // Handle mouse move with throttling for smoother interactions
   const handleMouseMove = useCallback(
     throttle((e) => {
@@ -969,18 +978,18 @@ export function OptimizedInteractiveComponent() {
     }, 16), // Approx. 60fps
     []
   );
-  
+
   // Show immediate feedback to user while sending debounced updates to expensive components
   return (
     <div onMouseMove={handleMouseMove}>
       {/* Simple visual feedback using immediate value */}
-      <div style={{ 
+      <div style={{
         transform: `translate(${immediatePosition.x}px, ${immediatePosition.y}px)`,
-        position: 'absolute' 
+        position: 'absolute'
       }}>
         Cursor Tracker
       </div>
-      
+
       {/* Expensive component only updates when debounced value changes */}
       <ExpensiveComponent position={position} />
     </div>
@@ -1006,11 +1015,11 @@ const ExpensiveComponent = React.memo(({ position }) => {
 
 ```tsx
 // Optimized loader using SVG instead of multiple divs
-import * as React from 'react';
+import * as React from 'react'
 
 const Loader = () => (
   <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 w-full h-full">
-    <svg 
+    <svg
       width="100"
       height="100"
       viewBox="0 0 100 100"
@@ -1019,31 +1028,31 @@ const Loader = () => (
     >
       {/* SVG DNA animation - more efficient than multiple divs */}
       <path d="M20,50 Q40,5 50,50 T80,50" stroke="#3498db" strokeWidth="2" fill="none">
-        <animateTransform 
-          attributeName="transform" 
+        <animateTransform
+          attributeName="transform"
           type="rotate"
           from="0 50 50"
-          to="360 50 50" 
-          dur="1.5s" 
+          to="360 50 50"
+          dur="1.5s"
           repeatCount="indefinite"
         />
       </path>
       <path d="M20,50 Q40,95 50,50 T80,50" stroke="#e74c3c" strokeWidth="2" fill="none">
-        <animateTransform 
-          attributeName="transform" 
+        <animateTransform
+          attributeName="transform"
           type="rotate"
           from="0 50 50"
-          to="360 50 50" 
-          dur="2s" 
+          to="360 50 50"
+          dur="2s"
           repeatCount="indefinite"
         />
       </path>
     </svg>
   </div>
-);
+)
 
 // Memoize the loader to prevent unnecessary re-renders
-export default React.memo(Loader);
+export default React.memo(Loader)
 ```
 
 ### 26. Plot Options Optimization with Memoization
@@ -1074,15 +1083,15 @@ type useFrequencyUniquePlotOptionsProps = {
 const useFrequencyUniquePlotOptions = ({ data, title }: useFrequencyUniquePlotOptionsProps) => {
   const [plotOptions, setPlotOptions] = useState({})
   const { theme, systemTheme } = useTheme()
-  const t = useMemo(() => defaultTheme({theme, systemTheme}), [theme, systemTheme])
-  
+  const t = useMemo(() => defaultTheme({ theme, systemTheme }), [theme, systemTheme])
+
   // Memoize font color based on theme
-  const fontColor = useMemo(() => t === 'dark' ? '#e6e6e6' : '#262626', [t])
-  
+  const fontColor = useMemo(() => (t === 'dark' ? '#e6e6e6' : '#262626'), [t])
+
   // Memoize plot data based on actual data contents
   const plotData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    
+    if (!data || data.length === 0) return []
+
     return [
       {
         x: data.map((d) => d[0]), // frequency
@@ -1105,9 +1114,9 @@ const useFrequencyUniquePlotOptions = ({ data, title }: useFrequencyUniquePlotOp
         marker: { color: 'blue', size: 5 },
         legendgroup: `R<sup>2</sup>`
       }
-    ];
-  }, [data]);
-  
+    ]
+  }, [data])
+
   // Memoize plot layout based on theme and title
   const plotLayout = useMemo(() => {
     return {
@@ -1182,34 +1191,37 @@ const useFrequencyUniquePlotOptions = ({ data, title }: useFrequencyUniquePlotOp
         color: t === 'dark' ? '#bfbfbf' : '#404040',
         orientation: 'v'
       }
-    };
-  }, [t, fontColor, title]);
-  
+    }
+  }, [t, fontColor, title])
+
   // Memoized plot options
-  const memoizedPlotOptions = useMemo(() => ({
-    scrollZoom: true,
-    editable: true
-  }), []);
-  
+  const memoizedPlotOptions = useMemo(
+    () => ({
+      scrollZoom: true,
+      editable: true
+    }),
+    []
+  )
+
   // Expose handleSetPlotOptions for backward compatibility
   const handleSetPlotOptions = useCallback(() => {
-    setPlotOptions(memoizedPlotOptions);
-  }, [memoizedPlotOptions]);
-  
-  useEffect(() => {
-    handleSetPlotOptions();
-    // Only run once on component mount
-  }, []);
-  
-  return { 
-    plotOptions: memoizedPlotOptions,
-    plotData, 
-    plotLayout, 
-    handleSetPlotOptions
-  };
-};
+    setPlotOptions(memoizedPlotOptions)
+  }, [memoizedPlotOptions])
 
-export default useFrequencyUniquePlotOptions;
+  useEffect(() => {
+    handleSetPlotOptions()
+    // Only run once on component mount
+  }, [])
+
+  return {
+    plotOptions: memoizedPlotOptions,
+    plotData,
+    plotLayout,
+    handleSetPlotOptions
+  }
+}
+
+export default useFrequencyUniquePlotOptions
 ```
 
 ### 27. Global Performance Monitoring System
@@ -1247,11 +1259,11 @@ export const withPerformanceTracking = (WrappedComponent, componentName) => {
           renderTime: actualDuration,
           timestamp: Date.now(),
         });
-        
+
         console.warn(`Slow render detected in ${componentName || id}: ${actualDuration.toFixed(2)}ms`);
       }
     };
-    
+
     return (
       <React.Profiler id={componentName || 'Component'} onRender={onRender}>
         <WrappedComponent {...props} />
@@ -1263,11 +1275,11 @@ export const withPerformanceTracking = (WrappedComponent, componentName) => {
 // Hook to track interaction performance
 export function useInteractionTracking(interactionName) {
   const startTimeRef = useRef(0);
-  
+
   const startTracking = () => {
     startTimeRef.current = performance.now();
   };
-  
+
   const endTracking = () => {
     const duration = performance.now() - startTimeRef.current;
     if (duration > PERFORMANCE_THRESHOLD_MS) {
@@ -1276,12 +1288,12 @@ export function useInteractionTracking(interactionName) {
         renderTime: duration,
         timestamp: Date.now(),
       });
-      
+
       console.warn(`Slow interaction detected: ${interactionName} took ${duration.toFixed(2)}ms`);
     }
     return duration;
   };
-  
+
   return { startTracking, endTracking };
 }
 
@@ -1298,6 +1310,7 @@ export function clearPerformanceMetrics() {
 ### 28. Optimizing Plot Options Generation with useMemo
 
 **Problem:** The `usePlotlyOptions.tsx` hook has several performance issues:
+
 - A large complex useEffect with multiple nested conditionals
 - Redundant data transformations on every render
 - Inefficient dependency array in useEffect causing unnecessary recalculations
@@ -1332,33 +1345,36 @@ export const hovertemplate = (name: string) => `
 
 // Memoized function to generate static values
 const useStaticValues = () => {
-  return useMemo(() => ({
-    autosize: true,
-    legend: {
-      x: -5,
-      y: 1,
-      traceorder: 'normal',
-      font: {
-        family: 'sans-serif',
-        size: 12,
-        color: '#000'
-      }
-    },
-    margin: {
-      l: 50,
-      r: 50,
-      b: 100,
-      t: 50,
-      pad: 4
-    },
-    title: {
-      font: {
-        size: 18
+  return useMemo(
+    () => ({
+      autosize: true,
+      legend: {
+        x: -5,
+        y: 1,
+        traceorder: 'normal',
+        font: {
+          family: 'sans-serif',
+          size: 12,
+          color: '#000'
+        }
       },
-      xref: 'paper',
-      x: 0.005
-    }
-  }), [])
+      margin: {
+        l: 50,
+        r: 50,
+        b: 100,
+        t: 50,
+        pad: 4
+      },
+      title: {
+        font: {
+          size: 18
+        },
+        xref: 'paper',
+        x: 0.005
+      }
+    }),
+    []
+  )
 }
 
 const usePlotlyOptions = () => {
@@ -1392,20 +1408,20 @@ const usePlotlyOptions = () => {
     scrollZoom: true,
     editable: true
   })
-  const [data, setData] = useState<PlotParams['data']>([]) 
+  const [data, setData] = useState<PlotParams['data']>([])
 
   // Memoize font color based on theme
-  const fontColor = useMemo(() => t === 'dark' ? '#e6e6e6' : '#262626', [t])
-  
+  const fontColor = useMemo(() => (t === 'dark' ? '#e6e6e6' : '#262626'), [t])
+
   // Memoize static values
   const staticValues = useStaticValues()
-  
+
   // Memoized function to generate Teq4Z Bode data
   const generateTeq4zBodeData = useCallback(() => {
     if (!currentData?.length || fileType !== 'teq4z' || impedanceType !== 'Bode') {
-      return null;
+      return null
     }
-    
+
     return _.flatMapDepth(
       getModuleFace()?.map((d) => [
         // Phase data
@@ -1440,15 +1456,15 @@ const usePlotlyOptions = () => {
           legendgroup: `${d.name}`
         }
       ])
-    );
+    )
   }, [currentData, fileType, impedanceType, graftType, lineOrPointWidth, getModuleFace])
-  
+
   // Similar memoized functions for other plot types
   const generateTeq4zNyquistData = useCallback(() => {
     if (!currentData?.length || fileType !== 'teq4z' || impedanceType !== 'Nyquist') {
-      return null;
+      return null
     }
-    
+
     return getImpedanceData().map((d) => ({
       x: d.content.map((i) => i[0]),
       y: d.content.map((i) => i[1]),
@@ -1461,22 +1477,22 @@ const usePlotlyOptions = () => {
         size: graftType === 'line' ? lineOrPointWidth + 3 : lineOrPointWidth
       },
       line: { color: d.color, width: lineOrPointWidth }
-    }));
+    }))
   }, [currentData, fileType, impedanceType, graftType, lineOrPointWidth, getImpedanceData])
-  
+
   // Instead of updating state inside a large effect, use useMemo for the final data
   const plotData = useMemo(() => {
-    if (!currentData?.length) return [];
-    
+    if (!currentData?.length) return []
+
     if (fileType === 'teq4z') {
       if (impedanceType === 'Bode') {
-        return generateTeq4zBodeData() || [];
+        return generateTeq4zBodeData() || []
       } else if (impedanceType === 'Nyquist') {
-        return generateTeq4zNyquistData() || [];
+        return generateTeq4zNyquistData() || []
       } else if (impedanceType === 'ZiZrVsFreq') {
         // Similar implementation for ZiZrVsFreq
         // This would be another memoized function
-        return [];
+        return []
       }
     } else if (fileType === 'teq4') {
       return getVCData(stepBetweenPoints).map((d) => ({
@@ -1489,16 +1505,16 @@ const usePlotlyOptions = () => {
         marker: { color: d.color, size: graftType === 'line' ? 0 : lineOrPointWidth },
         line: { color: d.color, width: lineOrPointWidth },
         color: d.color
-      }));
+      }))
     } else if (fileType === 'csv') {
       // CSV data handling
       // This would be moved to a separate memoized function
     }
-    
-    return [];
+
+    return []
   }, [
     currentData,
-    fileType, 
+    fileType,
     impedanceType,
     graftType,
     lineOrPointWidth,
@@ -1506,19 +1522,19 @@ const usePlotlyOptions = () => {
     generateTeq4zBodeData,
     generateTeq4zNyquistData,
     getVCData
-  ]);
-  
+  ])
+
   // Generate layout based on current settings
   const plotLayout = useMemo(() => {
-    if (!currentData?.length) return staticValues;
-    
+    if (!currentData?.length) return staticValues
+
     // Base layout with shared properties
     const baseLayout = {
       ...staticValues,
-      hovermode: 'closest',
+      hovermode: 'closest'
       // Adjust other shared properties here
-    };
-    
+    }
+
     if (fileType === 'teq4z') {
       if (impedanceType === 'Bode') {
         return {
@@ -1548,37 +1564,37 @@ const usePlotlyOptions = () => {
             titlefont: { color: fontColor, size: 18 },
             tickfont: { color: fontColor }
           }
-        };
+        }
       } else if (impedanceType === 'Nyquist') {
         // Nyquist layout
       }
     } else if (fileType === 'teq4') {
       // VC layout
     }
-    
-    return baseLayout;
-  }, [currentData, fileType, impedanceType, staticValues, fontColor]);
-  
+
+    return baseLayout
+  }, [currentData, fileType, impedanceType, staticValues, fontColor])
+
   // Update state only when memoized values change
   useEffect(() => {
-    if (plotData.length > 0) setData(plotData);
-    if (plotLayout) setLayout(plotLayout);
-    
+    if (plotData.length > 0) setData(plotData)
+    if (plotLayout) setLayout(plotLayout)
+
     return () => {
-      setLayout(null);
-      setConfig({ scrollZoom: true, editable: true });
-      setData([]);
-    };
-  }, [plotData, plotLayout]);
+      setLayout(null)
+      setConfig({ scrollZoom: true, editable: true })
+      setData([])
+    }
+  }, [plotData, plotLayout])
 
   return {
     layout,
     config,
     data
-  };
-};
+  }
+}
 
-export default React.memo(usePlotlyOptions);
+export default React.memo(usePlotlyOptions)
 ```
 
 ### 29. Optimizing Electron Main Process Startup
@@ -1593,19 +1609,19 @@ export default React.memo(usePlotlyOptions);
 
 ```typescript
 // Optimized main process initialization
-import { app, BrowserWindow } from 'electron';
-import { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import icon from '../../resources/icon.png?asset';
+import { app, BrowserWindow } from 'electron'
+import { join } from 'path'
+import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import icon from '../../resources/icon.png?asset'
 
 // Core set of IPC handlers needed immediately
-import { setupCoreIPC } from './ipc/core';
+import { setupCoreIPC } from './ipc/core'
 
 // Handlers that can be registered on-demand
-import { setupFileIPC } from './ipc/file';
-import { setupWindowIPC } from './ipc/window';
+import { setupFileIPC } from './ipc/file'
+import { setupWindowIPC } from './ipc/window'
 
-let mainWindow: BrowserWindow | null = null;
+let mainWindow: BrowserWindow | null = null
 
 // Create window more efficiently
 async function createWindow(): Promise<void> {
@@ -1626,68 +1642,68 @@ async function createWindow(): Promise<void> {
       contextIsolation: true,
       nodeIntegration: true
     }
-  });
+  })
 
   // Setup only core IPC handlers immediately
-  setupCoreIPC(mainWindow);
+  setupCoreIPC(mainWindow)
 
   // Register event listener once
   mainWindow.once('ready-to-show', () => {
     if (mainWindow) {
-      mainWindow.show();
-      
+      mainWindow.show()
+
       // Register non-critical IPC handlers after window is shown
       setTimeout(() => {
         if (mainWindow) {
-          setupFileIPC(mainWindow);
-          setupWindowIPC(mainWindow);
+          setupFileIPC(mainWindow)
+          setupWindowIPC(mainWindow)
         }
-      }, 1000);
+      }, 1000)
     }
-  });
+  })
 
   // Set external link handling once
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
-    return { action: 'deny' };
-  });
+    shell.openExternal(details.url)
+    return { action: 'deny' }
+  })
 
   // Load the app
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    await mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
+    await mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    await mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
+    await mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
 
 // Improved app startup sequence
 app.whenReady().then(async () => {
-  electronApp.setAppUserModelId('com.electron');
-  
+  electronApp.setAppUserModelId('com.electron')
+
   // Create window
-  await createWindow();
-  
+  await createWindow()
+
   // Setup development tools conditionally
   if (is.dev) {
     app.on('browser-window-created', (_, window) => {
-      optimizer.watchWindowShortcuts(window);
-    });
+      optimizer.watchWindowShortcuts(window)
+    })
   }
-});
+})
 
 // Standard app lifecycle handlers
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    mainWindow = null;
-    app.quit();
+    mainWindow = null
+    app.quit()
   }
-});
+})
 
 app.on('activate', async () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    await createWindow();
+    await createWindow()
   }
-});
+})
 ```
 
 ### 30. Async File Processing with Worker Threads
@@ -1702,19 +1718,19 @@ app.on('activate', async () => {
 
 ```typescript
 // fileWalker.ts with worker thread optimization
-import * as fs from 'fs';
-import * as path from 'path';
-import { Worker } from 'worker_threads';
-import { FileWithRelativePath } from './files';
-import { supportedFileTypesArray } from '@shared/constants';
-import { fileType } from './utils';
+import * as fs from 'fs'
+import * as path from 'path'
+import { Worker } from 'worker_threads'
+import { FileWithRelativePath } from './files'
+import { supportedFileTypesArray } from '@shared/constants'
+import { fileType } from './utils'
 
 // Process files in batches to prevent memory issues
-const BATCH_SIZE = 50;
+const BATCH_SIZE = 50
 
 interface WorkerData {
-  filePaths: string[];
-  rootDir: string;
+  filePaths: string[]
+  rootDir: string
 }
 
 export async function walkDirectoryWithFiles(
@@ -1722,72 +1738,76 @@ export async function walkDirectoryWithFiles(
   currentDir = ''
 ): Promise<FileWithRelativePath[]> {
   // Get all files recursively but don't read them yet
-  const fileEntries = await getAllFileEntries(rootDir, currentDir);
-  
+  const fileEntries = await getAllFileEntries(rootDir, currentDir)
+
   // Filter files by supported types
-  const supportedFiles = fileEntries.filter(entry => {
-    const type = fileType(entry.name);
-    return supportedFileTypesArray.includes(type as any);
-  });
-  
+  const supportedFiles = fileEntries.filter((entry) => {
+    const type = fileType(entry.name)
+    return supportedFileTypesArray.includes(type as any)
+  })
+
   // Process files in batches using worker threads
-  const results: FileWithRelativePath[] = [];
-  const batches = [];
-  
+  const results: FileWithRelativePath[] = []
+  const batches = []
+
   for (let i = 0; i < supportedFiles.length; i += BATCH_SIZE) {
-    const batch = supportedFiles.slice(i, i + BATCH_SIZE);
-    batches.push(batch);
+    const batch = supportedFiles.slice(i, i + BATCH_SIZE)
+    batches.push(batch)
   }
-  
+
   // Process batches concurrently with limited parallelism
-  const MAX_CONCURRENT_BATCHES = 3; // Limit concurrency
+  const MAX_CONCURRENT_BATCHES = 3 // Limit concurrency
   for (let i = 0; i < batches.length; i += MAX_CONCURRENT_BATCHES) {
-    const batchGroup = batches.slice(i, i + MAX_CONCURRENT_BATCHES);
-    const batchPromises = batchGroup.map(batch => {
-      return processFileBatch(batch, rootDir);
-    });
-    
-    const batchResults = await Promise.all(batchPromises);
-    batchResults.forEach(batchResult => {
-      results.push(...batchResult);
-    });
+    const batchGroup = batches.slice(i, i + MAX_CONCURRENT_BATCHES)
+    const batchPromises = batchGroup.map((batch) => {
+      return processFileBatch(batch, rootDir)
+    })
+
+    const batchResults = await Promise.all(batchPromises)
+    batchResults.forEach((batchResult) => {
+      results.push(...batchResult)
+    })
   }
-  
-  return results;
+
+  return results
 }
 
 // Helper to get file entries without reading contents
-async function getAllFileEntries(rootDir: string, currentDir = ''): Promise<{name: string, path: string}[]> {
-  const fullPath = path.join(rootDir, currentDir);
-  const entries = fs.readdirSync(fullPath, { withFileTypes: true });
-  let files: {name: string, path: string}[] = [];
-  
+async function getAllFileEntries(
+  rootDir: string,
+  currentDir = ''
+): Promise<{ name: string; path: string }[]> {
+  const fullPath = path.join(rootDir, currentDir)
+  const entries = fs.readdirSync(fullPath, { withFileTypes: true })
+  let files: { name: string; path: string }[] = []
+
   for (const entry of entries) {
-    const entryPath = path.join(currentDir, entry.name);
-    const absolutePath = path.join(rootDir, entryPath);
-    
+    const entryPath = path.join(currentDir, entry.name)
+    const absolutePath = path.join(rootDir, entryPath)
+
     if (entry.isDirectory()) {
-      const subFiles = await getAllFileEntries(rootDir, entryPath);
-      files = files.concat(subFiles);
+      const subFiles = await getAllFileEntries(rootDir, entryPath)
+      files = files.concat(subFiles)
     } else {
       files.push({
         name: entry.name,
         path: absolutePath
-      });
+      })
     }
   }
-  
-  return files;
+
+  return files
 }
 
 // Process a batch of files using a worker thread
 function processFileBatch(
-  batch: {name: string, path: string}[], 
+  batch: { name: string; path: string }[],
   rootDir: string
 ): Promise<FileWithRelativePath[]> {
   return new Promise((resolve, reject) => {
     // Create new worker
-    const worker = new Worker(`
+    const worker = new Worker(
+      `
       const { parentPort, workerData } = require('worker_threads');
       const fs = require('fs');
       const path = require('path');
@@ -1816,18 +1836,20 @@ function processFileBatch(
       }
       
       processFiles();
-    `, { eval: true, workerData: { filePaths: batch, rootDir } });
-    
+    `,
+      { eval: true, workerData: { filePaths: batch, rootDir } }
+    )
+
     worker.on('message', (results) => {
-      resolve(results);
-      worker.terminate();
-    });
-    
+      resolve(results)
+      worker.terminate()
+    })
+
     worker.on('error', (err) => {
-      reject(err);
-      worker.terminate();
-    });
-  });
+      reject(err)
+      worker.terminate()
+    })
+  })
 }
 ```
 
@@ -1843,103 +1865,104 @@ function processFileBatch(
 
 ```typescript
 // Optimized IPC for large file transfers
-import { ipcMain, BrowserWindow } from 'electron';
-import * as fs from 'fs';
-import { createReadStream } from 'fs';
-import * as path from 'path';
-import { pipeline } from 'stream/promises';
+import { ipcMain, BrowserWindow } from 'electron'
+import * as fs from 'fs'
+import { createReadStream } from 'fs'
+import * as path from 'path'
+import { pipeline } from 'stream/promises'
 
 // Constants for stream processing
-const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+const CHUNK_SIZE = 1024 * 1024 // 1MB chunks
 
 export function setupFileIPC(mainWindow: BrowserWindow) {
   // Stream-based file reading for large files
   ipcMain.handle('readLargeFile', async (_, filePath) => {
     try {
-      const stats = await fs.promises.stat(filePath);
-      const fileSize = stats.size;
-      
+      const stats = await fs.promises.stat(filePath)
+      const fileSize = stats.size
+
       // Send file metadata first
       mainWindow.webContents.send('file-metadata', {
         path: filePath,
         size: fileSize,
         name: path.basename(filePath)
-      });
-      
+      })
+
       // Setup streaming with progress reporting
-      const fileStream = createReadStream(filePath, { highWaterMark: CHUNK_SIZE });
-      
-      let bytesRead = 0;
-      let fileContent = Buffer.alloc(0);
-      
+      const fileStream = createReadStream(filePath, { highWaterMark: CHUNK_SIZE })
+
+      let bytesRead = 0
+      let fileContent = Buffer.alloc(0)
+
       for await (const chunk of fileStream) {
         // Append chunk to file content
-        const newBuffer = Buffer.concat([fileContent, chunk]);
-        fileContent = newBuffer;
-        
-        bytesRead += chunk.length;
-        
+        const newBuffer = Buffer.concat([fileContent, chunk])
+        fileContent = newBuffer
+
+        bytesRead += chunk.length
+
         // Report progress to renderer
-        const progress = Math.round((bytesRead / fileSize) * 100);
-        if (progress % 5 === 0) { // Report every 5% progress
+        const progress = Math.round((bytesRead / fileSize) * 100)
+        if (progress % 5 === 0) {
+          // Report every 5% progress
           mainWindow.webContents.send('file-progress', {
             path: filePath,
             progress
-          });
+          })
         }
       }
-      
+
       // Complete file reading
       return {
         success: true,
         content: fileContent.toString('utf-8')
-      };
+      }
     } catch (err) {
-      console.error('Error reading file:', err);
+      console.error('Error reading file:', err)
       return {
         success: false,
         error: err.message
-      };
+      }
     }
-  });
-  
+  })
+
   // Batch processing for multiple files
   ipcMain.handle('readMultipleFiles', async (_, filePaths) => {
     try {
       // Process files in batches to avoid memory issues
-      const MAX_CONCURRENT = 5;
-      const results = {};
-      
+      const MAX_CONCURRENT = 5
+      const results = {}
+
       // Process files in batches
       for (let i = 0; i < filePaths.length; i += MAX_CONCURRENT) {
-        const batch = filePaths.slice(i, i + MAX_CONCURRENT);
+        const batch = filePaths.slice(i, i + MAX_CONCURRENT)
         const batchPromises = batch.map(async (filePath) => {
           try {
-            const content = await fs.promises.readFile(filePath, 'utf-8');
-            return { path: filePath, content, success: true };
+            const content = await fs.promises.readFile(filePath, 'utf-8')
+            return { path: filePath, content, success: true }
           } catch (err) {
-            return { path: filePath, error: err.message, success: false };
+            return { path: filePath, error: err.message, success: false }
           }
-        });
-        
-        const batchResults = await Promise.all(batchPromises);
-        
+        })
+
+        const batchResults = await Promise.all(batchPromises)
+
         // Add batch results
-        batchResults.forEach(result => {
-          results[result.path] = result;
-        });
-        
+        batchResults.forEach((result) => {
+          results[result.path] = result
+        })
+
         // Report batch progress
         mainWindow.webContents.send('batch-progress', {
           completed: Math.min(i + MAX_CONCURRENT, filePaths.length),
           total: filePaths.length
-        });
+        })
       }
-      
-      return results;
+
+      return results
     } catch (err) {
-      return { success: false, error: err.message };
+      return { success: false, error: err.message }
     }
-  });
+  })
 }
 ```
