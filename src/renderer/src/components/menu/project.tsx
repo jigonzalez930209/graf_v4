@@ -2,14 +2,7 @@ import * as React from 'react'
 import { GrafContext } from '@/context/GraftContext'
 import { useData } from '@/hooks/useData'
 
-import {
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger
-} from '../ui/menubar'
+import { MenubarItem, MenubarSeparator, MenubarShortcut } from '../ui/menubar'
 import { readGrafFile, readNativeFiles, stringifyToSave } from '@renderer/utils/connectors'
 import { IGraftState } from '@shared/models/graf'
 import { enqueueSnackbar } from 'notistack'
@@ -110,38 +103,34 @@ export const ProjectMenu = () => {
   }, [graftState, startLoading, stopLoading])
 
   return (
-    <MenubarMenu>
-      <MenubarTrigger className="relative hover:bg-secondary">Project</MenubarTrigger>
-      <MenubarContent>
-        {/* TODO: Implement handle project in next versions */}
-        <MenubarItem onClick={newProject}>
-          New Project
-          {/* <MenubarShortcut>⌘N</MenubarShortcut> */}
-        </MenubarItem>
-        <MenubarItem onClick={readFiles}>
-          Open files
-          {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
-        </MenubarItem>
-        <MenubarItem onClick={openFolder}>Open folder (recursive)</MenubarItem>
-        <MenubarItem onClick={readFiles}>
-          Add files
-          {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
-        </MenubarItem>
+    <>
+      <MenubarItem onClick={newProject}>
+        New Project
+        {/* <MenubarShortcut>⌘N</MenubarShortcut> */}
+      </MenubarItem>
+      <MenubarItem onClick={readFiles}>
+        Open files
+        {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
+      </MenubarItem>
+      <MenubarItem onClick={openFolder}>Open folder (recursive)</MenubarItem>
+      <MenubarItem onClick={readFiles}>
+        Add files
+        {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
+      </MenubarItem>
 
-        <MenubarItem disabled>
-          Save
-          {/* <MenubarShortcut>⌘S</MenubarShortcut> */}
-        </MenubarItem>
-        <MenubarSeparator />
-        <MenubarItem onClick={openProject}>
-          Import project
-          <MenubarShortcut>⌘I</MenubarShortcut>
-        </MenubarItem>
-        <MenubarItem onClick={saveProject}>
-          Save project
-          <MenubarShortcut>⌘E</MenubarShortcut>
-        </MenubarItem>
-      </MenubarContent>
-    </MenubarMenu>
+      <MenubarItem disabled>
+        Save
+        {/* <MenubarShortcut>⌘S</MenubarShortcut> */}
+      </MenubarItem>
+      <MenubarSeparator />
+      <MenubarItem onClick={openProject}>
+        Import project
+        <MenubarShortcut>⌘I</MenubarShortcut>
+      </MenubarItem>
+      <MenubarItem onClick={saveProject}>
+        Save project
+        <MenubarShortcut>⌘E</MenubarShortcut>
+      </MenubarItem>
+    </>
   )
 }

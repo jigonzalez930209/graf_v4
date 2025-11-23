@@ -10,7 +10,14 @@ import FileSort from '../file-sort'
 import { useDropzone } from 'react-dropzone'
 import { arrayBufferToString, fileType } from '@renderer/utils/common'
 
-const Drawer = () => {
+interface DrawerProps {
+  isPinned: boolean
+  onTogglePin: () => void
+  isOpen: boolean
+  onClose: () => void
+}
+
+const Drawer = ({ isPinned, isOpen }: DrawerProps) => {
   const { setFiles, setGraftState } = React.useContext(GrafContext)
 
   const onDrop = React.useCallback(
@@ -83,29 +90,48 @@ const Drawer = () => {
     e.stopPropagation()
   }, [])
 
+  if (!isOpen && !isPinned) return null
+
   return (
     <div
-      {...getRootProps()}
       className={cn(
-        'z-0 mr-2 flex w-full drop-shadow-lg animate-fade-in transition-all duration-300 ease-in-out',
-        shouldHighlight && ' bg-gray-400 ring-2'
+        'flex flex-col h-full bg-background border-r transition-all duration-300',
+        !isPinned && 'shadow-2xl'
       )}
-      onDragOver={(e) => {
-        preventDefaultHandler(e)
-        setShouldHighlight(true)
-      }}
-      onDragEnter={(e) => {
-        preventDefaultHandler(e)
-        setShouldHighlight(true)
-      }}
-      onDragLeave={(e) => {
-        preventDefaultHandler(e)
-        setShouldHighlight(false)
-      }}
-      onClick={(e) => e.preventDefault()}
     >
-      <input {...getInputProps()} className="hidden" />
-      <FileSort />
+      {/* Dropzone Content */}
+      <div
+        {...getRootProps()}
+        className={cn(
+          'flex-1 overflow-hidden relative flex flex-col',
+          shouldHighlight && 'bg-primary/10'
+        )}
+        onDragOver={(e) => {
+          preventDefaultHandler(e)
+          setShouldHighlight(true)
+        }}
+        onDragEnter={(e) => {
+          preventDefaultHandler(e)
+          setShouldHighlight(true)
+        }}
+        onDragLeave={(e) => {
+          preventDefaultHandler(e)
+          setShouldHighlight(false)
+        }}
+        onClick={(e) => e.preventDefault()}
+      >
+        <input {...getInputProps()} className="hidden" />
+        <div className="flex-1 overflow-y-auto p-2">
+          <FileSort />
+        </div>
+
+        {/* Drop Overlay Hint */}
+        {shouldHighlight && (
+          <div className="absolute inset-0 flex items-center justify-center bg-primary/20 backdrop-blur-sm z-50 pointer-events-none">
+            <p className="text-lg font-bold text-primary">Drop files here</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

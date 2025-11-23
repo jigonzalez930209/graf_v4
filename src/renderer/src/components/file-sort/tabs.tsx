@@ -15,10 +15,12 @@ import FolderView from './folder-view'
 
 const GroupFilesByType = React.forwardRef(() => {
   const {
-    graftState: { files }
+    graftState: { files },
+    activeTab
   } = React.useContext(GrafContext)
 
   const [order, setOrder] = React.useState<'asc' | 'desc' | 'none'>('none')
+  const [activeFileTab, setActiveFileTab] = React.useState('by-folder')
 
   const [internalFiles, setInternalFiles] = React.useState(files)
 
@@ -71,23 +73,52 @@ const GroupFilesByType = React.forwardRef(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files, handleSort])
 
+  React.useEffect(() => {
+    if (activeTab === 'vc-analysis') {
+      setActiveFileTab('teq4')
+    } else if (activeTab === 'frequency') {
+      setActiveFileTab('teq4z')
+    } else {
+      // For visualization or others, maybe default to 'all' or keep current?
+      // User said "last one will be all", maybe default to 'by-folder' or 'all'.
+      // Let's default to 'all' for visualization if not already set to something valid.
+      // But actually, let's just leave it or set to 'all' if it was on a disabled tab.
+      // For simplicity and per request implication, let's set to 'all' or 'by-folder'.
+      // Let's stick to 'all' as a safe default for Visualization.
+      setActiveFileTab('all')
+    }
+  }, [activeTab])
+
   const TabsListContent = (
     <TabsList className={`w-full sticky top-0 z-1`}>
-      <TabsTrigger title="All files together" value="all">
-        All
-      </TabsTrigger>
-      <TabsTrigger title="All Impedance files" value="teq4z">
-        Imp
-      </TabsTrigger>
-      <TabsTrigger title="All Cyclic Voltametry files" value="teq4">
-        VC
-      </TabsTrigger>
-      <TabsTrigger title="All csv files" value="csv">
-        CSV
-      </TabsTrigger>
       <TabsTrigger title="By Folder" value="by-folder">
         By Folder
       </TabsTrigger>
+      <TabsTrigger
+        title="All Cyclic Voltametry files"
+        value="teq4"
+        disabled={activeTab === 'frequency'}
+      >
+        VC
+      </TabsTrigger>
+      <TabsTrigger title="All Impedance files" value="teq4z" disabled={activeTab === 'vc-analysis'}>
+        Imp
+      </TabsTrigger>
+      <TabsTrigger
+        title="All csv files"
+        value="csv"
+        disabled={activeTab === 'vc-analysis' || activeTab === 'frequency'}
+      >
+        CSV
+      </TabsTrigger>
+      <TabsTrigger
+        title="All files together"
+        value="all"
+        disabled={activeTab === 'vc-analysis' || activeTab === 'frequency'}
+      >
+        All
+      </TabsTrigger>
+
       <div className="flex gap-1 justify-center items-center">
         <Button
           variant="ghost"
@@ -108,7 +139,8 @@ const GroupFilesByType = React.forwardRef(() => {
   return (
     <div ref={containerRef} className="w-full h-full pr-2">
       <Tabs
-        defaultValue="all"
+        value={activeFileTab}
+        onValueChange={setActiveFileTab}
         className="w-full relative h-full overflow-y-auto overflow-x-hidden mt-1 ml-1"
       >
         {isChange ? (
