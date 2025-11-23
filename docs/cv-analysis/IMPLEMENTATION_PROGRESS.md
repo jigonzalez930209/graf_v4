@@ -9,6 +9,7 @@ Este documento registra el progreso de implementación del roadmap de análisis 
 **Archivo:** `/src/renderer/src/hooks/cv-analysis/helpers/normalization.ts`
 
 **Funcionalidades implementadas:**
+
 - ✅ `toCVData()` - Convierte `IProcessFile` a `CVData` normalizado
 - ✅ Validación de arrays numéricos
 - ✅ Filtrado automático de valores `NaN` e `Infinity`
@@ -19,6 +20,7 @@ Este documento registra el progreso de implementación del roadmap de análisis 
 - ✅ `extractCVData()` - Helper simple para compatibilidad
 
 **Beneficios:**
+
 - Centraliza la lógica de normalización
 - Reduce código duplicado en hooks
 - Proporciona feedback detallado de errores y warnings
@@ -31,6 +33,7 @@ Este documento registra el progreso de implementación del roadmap de análisis 
 **Archivo:** `/src/renderer/src/hooks/cv-analysis/helpers/randles.ts`
 
 **Funcionalidades implementadas:**
+
 - ✅ `calculateDiffusionCoefficient()` - Calcula D desde pendiente Ip vs √v
 - ✅ `calculateDFromMultipleScans()` - Análisis completo con regresión lineal
 - ✅ `calculateDConfidenceInterval()` - Intervalos de confianza para D
@@ -40,6 +43,7 @@ Este documento registra el progreso de implementación del roadmap de análisis 
 **Componente UI:** `/src/renderer/src/components/vc-analysis/cv-multi-analysis-dialog/randles-sevcik-section.tsx`
 
 **Características de la UI:**
+
 - ✅ Inputs para parámetros experimentales (n, área, concentración, temperatura)
 - ✅ Cálculo automático de D para picos anódico y catódico
 - ✅ Visualización de R², slope, intercept
@@ -48,6 +52,7 @@ Este documento registra el progreso de implementación del roadmap de análisis 
 - ✅ Exportación a CSV
 
 **Ecuación implementada:**
+
 ```
 Ip = 2.69×10⁵ × n^(3/2) × A × D^(1/2) × C × v^(1/2)
 
@@ -62,6 +67,7 @@ D = (slope / (2.69×10⁵ × n^(3/2) × A × C))²
 **Archivo:** `/src/renderer/src/hooks/cv-analysis/helpers/laviron.ts`
 
 **Funcionalidades implementadas:**
+
 - ✅ `calculateTransferCoefficient()` - Calcula α desde pendiente Ep vs ln(v)
 - ✅ `calculateHeterogeneousRateConstant()` - Calcula ks (constante de velocidad)
 - ✅ `performLavironAnalysis()` - Análisis completo que retorna α, ks, E0', R²
@@ -71,6 +77,7 @@ D = (slope / (2.69×10⁵ × n^(3/2) × A × C))²
 **Componente UI:** Mejoras en `laviron-kinetics-section.tsx`
 
 **Características de la UI:**
+
 - ✅ Cards separadas para análisis anódico y catódico
 - ✅ Visualización de α (coeficiente de transferencia)
 - ✅ Visualización de ks (constante de velocidad heterogénea)
@@ -79,6 +86,7 @@ D = (slope / (2.69×10⁵ × n^(3/2) × A × C))²
 - ✅ Exportación a JSON
 
 **Ecuaciones implementadas:**
+
 ```
 Para sistemas quasi-reversibles/irreversibles:
 - Ep,a = E0' + (RT/αₐnF) × ln(v)
@@ -96,6 +104,7 @@ Donde:
 **Archivo:** `/src/renderer/src/components/vc-analysis/enhanced-curve-plot.tsx`
 
 **Funcionalidades implementadas:**
+
 - ✅ Capa raw (datos originales)
 - ✅ Capa smoothed (datos suavizados con promedio móvil)
 - ✅ Marcadores de picos anódico y catódico
@@ -105,6 +114,7 @@ Donde:
 - ✅ Integración con datos de picos pre-calculados
 
 **Características de la UI:**
+
 - ✅ Switches para activar/desactivar cada capa
 - ✅ Configuración dinámica de suavizado
 - ✅ Marcadores con símbolos distintivos (triángulos)
@@ -118,6 +128,7 @@ Donde:
 **Archivo:** `/src/renderer/src/components/vc-analysis/peak-inspector.tsx`
 
 **Funcionalidades implementadas:**
+
 - ✅ Tabla interactiva con Ep, Ip, prominence, index
 - ✅ Modo de edición manual de picos
 - ✅ Inputs numéricos para ajuste fino
@@ -127,6 +138,7 @@ Donde:
 - ✅ Exportación a JSON
 
 **Características de la UI:**
+
 - ✅ Badges de color para identificar picos
 - ✅ Edición in-place con inputs
 - ✅ Cards para parámetros derivados
@@ -152,6 +164,7 @@ No hay fases pendientes. El roadmap está 100% completado.
 **Archivo:** `/src/renderer/src/hooks/cv-analysis/helpers/nicholson.ts`
 
 **Funcionalidades implementadas:**
+
 - ✅ Tabla de Nicholson con valores ψ vs ΔEp
 - ✅ `interpolatePsi()` - Interpolación lineal de ψ
 - ✅ `calculateK0Nicholson()` - Cálculo de k⁰ desde ΔEp y D
@@ -163,6 +176,7 @@ No hay fases pendientes. El roadmap está 100% completado.
 **Componente UI:** `/src/renderer/src/components/vc-analysis/cv-multi-analysis-dialog/nicholson-section.tsx`
 
 **Características de la UI:**
+
 - ✅ Validación de aplicabilidad del método
 - ✅ Análisis de ΔEp vs scan rate
 - ✅ Inputs para parámetros (n, D, temperatura)
@@ -178,6 +192,7 @@ No hay fases pendientes. El roadmap está 100% completado.
 **Archivo:** `/src/renderer/src/hooks/cv-analysis/helpers/diagnostics.ts` (expandido)
 
 **Funcionalidades implementadas:**
+
 - ✅ `analyzeControl()` - Análisis completo de control
 - ✅ Regresión Ip vs √v (difusión)
 - ✅ Regresión Ip vs v (adsorción)
@@ -188,6 +203,7 @@ No hay fases pendientes. El roadmap está 100% completado.
 **Componente UI:** `/src/renderer/src/components/vc-analysis/cv-multi-analysis-dialog/control-analysis-section.tsx`
 
 **Características de la UI:**
+
 - ✅ Badge de control global (difusión/adsorción/mixto)
 - ✅ Análisis separado para picos anódico y catódico
 - ✅ Visualización de R² para cada correlación
@@ -203,6 +219,7 @@ No hay fases pendientes. El roadmap está 100% completado.
 **Archivo:** `/src/renderer/src/hooks/cv-analysis/helpers/diagnostics.ts` (expandido)
 
 **Funcionalidades implementadas:**
+
 - ✅ `classifyReversibility()` - Clasificación basada en ΔEp y ratio Ip,a/Ip,c
 - ✅ Criterios tipo "semáforo":
   - Reversible: ΔEp ≈ 59/n mV, Ip,a/Ip,c ≈ 1
@@ -214,6 +231,7 @@ No hay fases pendientes. El roadmap está 100% completado.
 **Componente UI:** Mejoras en `executive-summary-section.tsx`
 
 **Características de la UI:**
+
 - ✅ Badge de reversibilidad en resumen ejecutivo
 - ✅ Código de colores (verde/amarillo/rojo)
 - ✅ Porcentaje de confianza
@@ -240,12 +258,14 @@ No hay fases pendientes. El roadmap está 100% completado.
 Todas las 8 fases del roadmap han sido implementadas exitosamente:
 
 **Módulo 1: Importación y Visualización**
+
 - ✅ FASE 1.1: Normalización y validación de datos
 - ✅ FASE 1.2: Visualización con capas inteligentes
 - ✅ FASE 1.3: Peak Inspector UI
 - ✅ FASE 1.4: Cálculo de coeficiente de difusión (Randles-Sevcik)
 
 **Módulo 2: Análisis Avanzado**
+
 - ✅ FASE 2.1: Análisis completo de Laviron (α, ks, E0')
 - ✅ FASE 2.2: Análisis de Nicholson k⁰
 - ✅ FASE 2.3: Diagnóstico difusión vs adsorción
@@ -254,6 +274,7 @@ Todas las 8 fases del roadmap han sido implementadas exitosamente:
 ### 🚀 Funcionalidades Implementadas
 
 **Análisis Cuantitativo:**
+
 - Coeficiente de difusión (D) con intervalos de confianza
 - Constante de velocidad heterogénea (ks)
 - Constante de velocidad estándar (k⁰)
@@ -261,12 +282,14 @@ Todas las 8 fases del roadmap han sido implementadas exitosamente:
 - Potencial formal (E0')
 
 **Diagnóstico Cualitativo:**
+
 - Clasificación de reversibilidad (reversible/quasi/irreversible)
 - Tipo de control (difusión/adsorción/mixto)
 - Análisis de mecanismo electroquímico
 - Confianza estadística en todos los análisis
 
 **Visualización:**
+
 - Capas inteligentes (raw, smoothed, peaks, hysteresis)
 - Marcadores de picos interactivos
 - Controles de visualización dinámicos
@@ -275,6 +298,7 @@ Todas las 8 fases del roadmap han sido implementadas exitosamente:
 ### 📦 Archivos Entregables
 
 **Helpers Científicos:**
+
 1. `normalization.ts` - Validación y normalización
 2. `randles.ts` - Coeficiente de difusión
 3. `laviron.ts` - Cinética heterogénea
@@ -283,6 +307,7 @@ Todas las 8 fases del roadmap han sido implementadas exitosamente:
 6. `smoothing.ts` - Suavizado de datos
 
 **Componentes UI:**
+
 1. `randles-sevcik-section.tsx` - Análisis de difusión
 2. `nicholson-section.tsx` - Análisis de Nicholson
 3. `control-analysis-section.tsx` - Control difusión/adsorción
@@ -328,6 +353,7 @@ RANDLES_COEFFICIENT = 2.69e5 // A·cm⁻²·M⁻¹·(V/s)⁻¹/²
 ### Estructura de Datos
 
 Todos los helpers retornan objetos estructurados con:
+
 - Valores calculados
 - Métricas de confianza (R²)
 - Número de puntos de datos
