@@ -119,6 +119,10 @@ export const GraftProvider = ({ children, initialState }: props) => {
   const setProgressEvent = (event: IGraftState['progressEvent']) =>
     dispatch({ type: 'setProgressEvent', payload: event })
 
+  const [activeTab, setActiveTab] = React.useState<'visualization' | 'vc-analysis' | 'frequency'>(
+    'visualization'
+  )
+
   React.useEffect(() => {
     setGraftState(initialState)
   }, [initialState])
@@ -148,7 +152,9 @@ export const GraftProvider = ({ children, initialState }: props) => {
         setCalcToUniqueFrequency,
         setSelectFilesToCalcUniqueFrequency,
         setUpdateContent,
-        setProgressEvent
+        setProgressEvent,
+        activeTab,
+        setActiveTab
       }}
     >
       {children}

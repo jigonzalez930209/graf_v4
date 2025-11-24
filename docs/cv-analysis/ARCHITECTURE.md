@@ -74,6 +74,7 @@ src/renderer/src/hooks/cv-analysis/
 ### 1. **types.ts** - Definiciones de Tipos
 
 Contiene todas las interfaces TypeScript:
+
 - `CVConfig` - Configuración del análisis
 - `Peak` - Información de picos
 - `Parameters` - Parámetros calculados
@@ -92,13 +93,13 @@ Contiene todas las interfaces TypeScript:
 export const CV_DEFAULTS = {
   WINDOW_SIZE: 5,
   POLY_ORDER: 2,
-  TEMPERATURE: 298,
+  TEMPERATURE: 298
   // ...
 }
 
 export const CV_THRESHOLDS = {
   MIN_PROMINENCE: 0.1,
-  DELTA_EP_THRESHOLD: 0.06,
+  DELTA_EP_THRESHOLD: 0.06
   // ...
 }
 ```
@@ -110,6 +111,7 @@ export const CV_THRESHOLDS = {
 ### 3. **helpers/utils.ts** - Utilidades
 
 Funciones auxiliares:
+
 - `isFiniteNumber()` - Validación
 - `calculateDeltaEp()` - Diferencia de potencial
 - `trapezoidalIntegral()` - Integración numérica
@@ -341,6 +343,7 @@ Componente React que envuelve `useMultiCVAnalysis`:
 ```
 
 **Características:**
+
 - Gráficos interactivos Plotly
 - Tablas responsivas
 - Exportación a SVG
@@ -356,6 +359,7 @@ Componente React que envuelve `useMultiCVAnalysis`:
 ```
 
 **Condiciones:**
+
 - Solo visible cuando `fileType === 'teq4'`
 - Icono: `BarChart3Icon`
 - Tooltip: "Multi-CV Analysis"
@@ -366,12 +370,12 @@ Componente React que envuelve `useMultiCVAnalysis`:
 
 ### Librerías Utilizadas
 
-| Librería | Uso | Versión |
-|----------|-----|---------|
-| `react` | Hooks | ^19.0 |
-| `plotly.js` | Gráficos | Latest |
-| `next-themes` | Tema dinámico | Latest |
-| `lucide-react` | Iconos | Latest |
+| Librería       | Uso           | Versión |
+| -------------- | ------------- | ------- |
+| `react`        | Hooks         | ^19.0   |
+| `plotly.js`    | Gráficos      | Latest  |
+| `next-themes`  | Tema dinámico | Latest  |
+| `lucide-react` | Iconos        | Latest  |
 
 ### Sin Dependencias Externas
 
@@ -403,13 +407,13 @@ const result = useMemo(() => {
 
 ### Complejidad Computacional
 
-| Operación | Complejidad | Tiempo Típico |
-|-----------|-------------|---------------|
-| Smoothing | O(n) | < 1ms |
-| Peak Detection | O(n) | < 1ms |
-| Hysteresis | O(n) | < 1ms |
-| Diagnostics | O(1) | < 0.1ms |
-| Multi-CV (10 files) | O(10n) | < 50ms |
+| Operación           | Complejidad | Tiempo Típico |
+| ------------------- | ----------- | ------------- |
+| Smoothing           | O(n)        | < 1ms         |
+| Peak Detection      | O(n)        | < 1ms         |
+| Hysteresis          | O(n)        | < 1ms         |
+| Diagnostics         | O(1)        | < 0.1ms       |
+| Multi-CV (10 files) | O(10n)      | < 50ms        |
 
 ---
 
@@ -439,11 +443,13 @@ const result = useMemo(() => {
 ### Agregar Nuevo Mecanismo de Diagnóstico
 
 1. Agregar tipo en `types.ts`:
+
    ```typescript
    type MechanismType = '...' | 'newMechanism'
    ```
 
 2. Agregar lógica en `helpers/diagnostics.ts`:
+
    ```typescript
    if (/* condition for new mechanism */) {
      return { mechanism: 'newMechanism', ... }
@@ -457,6 +463,7 @@ const result = useMemo(() => {
 ### Agregar Nueva Correlación Multi-CV
 
 1. Agregar en `types.ts`:
+
    ```typescript
    interface MultiCVCorrelations {
      newCorrelation?: RegressionResult | null
@@ -464,6 +471,7 @@ const result = useMemo(() => {
    ```
 
 2. Calcular en `useMultiCVAnalysis.ts`:
+
    ```typescript
    if (/* sufficient data */) {
      correlations.newCorrelation = linearRegression(x, y)

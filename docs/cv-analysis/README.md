@@ -31,7 +31,12 @@ El **CV Analysis Hook** es un módulo TypeScript completo para análisis de Volt
 ### 1. Importar el Hook
 
 ```typescript
-import { useCVAnalysis, useMultiCVAnalysis, analyzeCV, analyzeMultiCV } from '@renderer/hooks/cv-analysis'
+import {
+  useCVAnalysis,
+  useMultiCVAnalysis,
+  analyzeCV,
+  analyzeMultiCV
+} from '@renderer/hooks/cv-analysis'
 import type { CVConfig, CVAnalysisResult, MultiCVAnalysisResult } from '@renderer/hooks/cv-analysis'
 ```
 
@@ -39,12 +44,12 @@ import type { CVConfig, CVAnalysisResult, MultiCVAnalysisResult } from '@rendere
 
 ```typescript
 const config: CVConfig = {
-  scanRate: 0.1,           // V/s (velocidad de barrido)
-  smooth: true,            // Aplicar suavizado
-  windowSize: 5,           // Tamaño de ventana Savitzky-Golay
-  polyOrder: 2,            // Orden del polinomio
-  temperature: 298,        // K (temperatura, opcional)
-  diffusionCoefficient: 1e-5  // cm²/s (coeficiente de difusión, opcional)
+  scanRate: 0.1, // V/s (velocidad de barrido)
+  smooth: true, // Aplicar suavizado
+  windowSize: 5, // Tamaño de ventana Savitzky-Golay
+  polyOrder: 2, // Orden del polinomio
+  temperature: 298, // K (temperatura, opcional)
+  diffusionCoefficient: 1e-5 // cm²/s (coeficiente de difusión, opcional)
 }
 ```
 
@@ -59,7 +64,7 @@ const file: IProcessFile = {
   content: [
     ['0.0', '0.0'],
     ['0.1', '1.5e-5'],
-    ['0.2', '2.8e-5'],
+    ['0.2', '2.8e-5']
     // ... más puntos [potencial, corriente]
   ],
   selected: true,
@@ -83,6 +88,7 @@ const file: IProcessFile = {
 Hook React para análisis de un archivo CV individual.
 
 **Parámetros:**
+
 ```typescript
 interface UseCVAnalysisParams {
   file: IProcessFile
@@ -91,11 +97,13 @@ interface UseCVAnalysisParams {
 ```
 
 **Retorna:**
+
 ```typescript
 CVAnalysisResult | null
 ```
 
 **Ejemplo:**
+
 ```typescript
 const result = useCVAnalysis({
   file: myFile,
@@ -116,6 +124,7 @@ if (result) {
 Hook React para análisis de múltiples archivos CV.
 
 **Parámetros:**
+
 ```typescript
 interface UseMultiCVAnalysisParams {
   files: IProcessFile[]
@@ -124,11 +133,13 @@ interface UseMultiCVAnalysisParams {
 ```
 
 **Retorna:**
+
 ```typescript
 MultiCVAnalysisResult | null
 ```
 
 **Ejemplo:**
+
 ```typescript
 const result = useMultiCVAnalysis({
   files: [file1, file2, file3],
@@ -145,7 +156,7 @@ if (result) {
   console.log('Mecanismo consenso:', result.mechanismConsensus)
 
   // Análisis individual por archivo
-  result.files.forEach(f => {
+  result.files.forEach((f) => {
     console.log(`${f.fileName}: ${f.analysis.diagnostics.mechanism}`)
   })
 }
@@ -158,6 +169,7 @@ if (result) {
 Función pura para análisis de un archivo CV (sin hook React).
 
 **Uso:**
+
 ```typescript
 const result = analyzeCV({
   file: myFile,
@@ -172,6 +184,7 @@ const result = analyzeCV({
 Función pura para análisis de múltiples CVs (sin hook React).
 
 **Uso:**
+
 ```typescript
 const result = analyzeMultiCV({
   files: [file1, file2, file3],
@@ -316,12 +329,12 @@ export const MultiCVAnalysisComponent: React.FC<{ files: IProcessFile[] }> = ({ 
 
 ```typescript
 interface CVConfig {
-  scanRate: number              // V/s
-  temperature?: number          // K
+  scanRate: number // V/s
+  temperature?: number // K
   diffusionCoefficient?: number // cm²/s
   smooth?: boolean
-  windowSize?: number           // Savitzky-Golay window
-  polyOrder?: number            // Savitzky-Golay polynomial order
+  windowSize?: number // Savitzky-Golay window
+  polyOrder?: number // Savitzky-Golay polynomial order
 }
 ```
 
@@ -329,9 +342,9 @@ interface CVConfig {
 
 ```typescript
 interface Peak {
-  Ep: number                    // Potencial del pico (V)
-  Ip: number                    // Corriente del pico (A)
-  index: number                 // Índice en el array
+  Ep: number // Potencial del pico (V)
+  Ip: number // Corriente del pico (A)
+  index: number // Índice en el array
   direction: 'anodic' | 'cathodic'
 }
 ```
@@ -342,7 +355,7 @@ interface Peak {
 interface Parameters {
   anodicPeak?: Peak
   cathodicPeak?: Peak
-  deltaEp?: number              // Ep(anodic) - Ep(cathodic)
+  deltaEp?: number // Ep(anodic) - Ep(cathodic)
   ipVsSqrtV?: number[]
 }
 ```
@@ -351,8 +364,8 @@ interface Parameters {
 
 ```typescript
 interface HysteresisData {
-  area: number                  // Área del lazo (A·V)
-  curve: number[]               // Puntos de la curva
+  area: number // Área del lazo (A·V)
+  curve: number[] // Puntos de la curva
 }
 ```
 
@@ -361,7 +374,7 @@ interface HysteresisData {
 ```typescript
 interface Diagnostics {
   mechanism: 'diffusion' | 'adsorption' | 'EC' | 'ECE' | 'kinetic' | 'unknown'
-  confidence: number            // 0-1
+  confidence: number // 0-1
   notes: string
 }
 ```
@@ -402,6 +415,7 @@ interface MultiCVAnalysisResult {
 **Causa:** Los datos no tienen suficientes puntos o el rango de potencial es muy pequeño.
 
 **Solución:**
+
 ```typescript
 // Verificar que los datos tengan suficientes puntos
 console.log('Data points:', file.content.length)
@@ -410,7 +424,7 @@ console.log('Data points:', file.content.length)
 const config = {
   scanRate: 0.1,
   smooth: true,
-  windowSize: 7,  // Aumentar de 5 a 7
+  windowSize: 7, // Aumentar de 5 a 7
   polyOrder: 2
 }
 ```
@@ -422,16 +436,16 @@ const config = {
 **Causa:** Los datos de múltiples archivos no siguen una correlación lineal clara.
 
 **Solución:**
+
 ```typescript
 // Verificar que los archivos tengan scan rates variados
-result.files.forEach(f => {
+result.files.forEach((f) => {
   console.log(`${f.fileName}: ${f.scanRate} V/s`)
 })
 
 // Filtrar outliers si es necesario
-const validFiles = result.files.filter(f =>
-  f.analysis.parameters.deltaEp !== undefined &&
-  f.analysis.peaks.anodic !== null
+const validFiles = result.files.filter(
+  (f) => f.analysis.parameters.deltaEp !== undefined && f.analysis.peaks.anodic !== null
 )
 ```
 
@@ -442,6 +456,7 @@ const validFiles = result.files.filter(f =>
 **Causa:** Los parámetros calculados no coinciden con el mecanismo esperado.
 
 **Solución:**
+
 ```typescript
 // Revisar los parámetros individuales
 console.log('ΔEp:', result.parameters.deltaEp)
@@ -451,8 +466,8 @@ console.log('Hysteresis:', result.hysteresis.area)
 // Ajustar config si es necesario
 const config = {
   scanRate: 0.1,
-  temperature: 298,  // Especificar temperatura
-  diffusionCoefficient: 1e-5  // Especificar coeficiente
+  temperature: 298, // Especificar temperatura
+  diffusionCoefficient: 1e-5 // Especificar coeficiente
 }
 ```
 
@@ -486,7 +501,7 @@ describe('Custom CV Analysis Tests', () => {
       name: 'my-cv.teq4',
       type: 'teq4',
       content: [
-        ['0.0', '0.0'],
+        ['0.0', '0.0']
         // ... tu data aquí
       ],
       selected: true,
@@ -516,11 +531,13 @@ describe('Custom CV Analysis Tests', () => {
 ## Performance Tips
 
 1. **Memoización:** El hook usa `useMemo` automáticamente, pero asegúrate de memoizar archivos:
+
    ```typescript
    const files = React.useMemo(() => data || [], [data])
    ```
 
 2. **Suavizado:** Desactiva si no es necesario:
+
    ```typescript
    const config = { scanRate: 0.1, smooth: false }
    ```

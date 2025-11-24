@@ -1,5 +1,5 @@
 import React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { COLUMNS_IMPEDANCE, COLUMNS_VOLTAMETER } from '@/utils'
 
 import { Button } from '../ui/button'
@@ -24,9 +24,8 @@ type ExportDialogProps = {
 }
 
 const ExportDialog = ({ children }: ExportDialogProps) => {
-  const {
-    graftState: { files: filesState, fileType }
-  } = React.useContext(GrafContext)
+  // Migrado a Zustand
+  const { files: filesState, fileType } = useGraftStore()
 
   const [selectedTab, setSelectedTab] = React.useState<'teq4' | 'teq4z'>(
     (fileType as 'teq4' | 'teq4z') || 'teq4'

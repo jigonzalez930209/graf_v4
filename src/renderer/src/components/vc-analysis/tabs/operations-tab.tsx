@@ -1,5 +1,5 @@
 import { useVCAnalysis } from '../context/use-vc-analysis'
-import { OperationButtons } from '../process-buttons'
+import { OperationButtons } from '../components/process-buttons'
 import {
   AvgIcon,
   ElementWisePowerIcon,
@@ -7,7 +7,7 @@ import {
   MinComponentWiseIcon,
   ProcessIcon,
   ProcessMultipleIcon
-} from '../icons'
+} from '../components/icons'
 import { MinusIcon, ProjectorIcon, PlusIcon, XIcon, DivideIcon } from 'lucide-react'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'

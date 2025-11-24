@@ -11,13 +11,12 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { GrafContext } from '@renderer/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { cn } from '@renderer/utils'
 
 export function AboutDialog() {
-  const {
-    graftState: { updateContent }
-  } = React.useContext(GrafContext)
+  // Migrado a Zustand
+  const { updateContent } = useGraftStore()
 
   const [updateText, setUpdateText] = useState('')
 

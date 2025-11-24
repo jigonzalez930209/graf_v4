@@ -1,7 +1,7 @@
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../ui/resizable'
-import { CurvePlot } from './curve-plot'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../../ui/resizable'
+import { CurvePlot } from '../charts/curve-plot'
 import { FileList } from './file-list'
-import { useVCAnalysis } from './context/use-vc-analysis'
+import { useVCAnalysis } from '../context/use-vc-analysis'
 
 const CommonDialog = () => {
   const { internalFiles, newFiles, handleFileSelectedChange } = useVCAnalysis()

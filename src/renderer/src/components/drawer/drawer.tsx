@@ -2,7 +2,7 @@ import React from 'react'
 import { enqueueSnackbar } from 'notistack'
 
 import { readFilesUnsortedFileType } from '@renderer/utils/connectors'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { cn, COLORS } from '@/utils'
 
 import FileSort from '../file-sort'
@@ -10,8 +10,16 @@ import FileSort from '../file-sort'
 import { useDropzone } from 'react-dropzone'
 import { arrayBufferToString, fileType } from '@renderer/utils/common'
 
-const Drawer = () => {
-  const { setFiles, setGraftState } = React.useContext(GrafContext)
+interface DrawerProps {
+  isPinned: boolean
+  onTogglePin: () => void
+  isOpen: boolean
+  onClose: () => void
+}
+
+const Drawer = ({ isPinned, isOpen }: DrawerProps) => {
+  // Migrado a Zustand
+  const { setFiles, setFileType, setSelectedColumns } = useGraftStore()
 
   const onDrop = React.useCallback(
     async (acceptedFiles) => {
@@ -58,11 +66,15 @@ const Drawer = () => {
         const validFiles = files.filter((file) => file !== null)
 
         const filesProcessed = readFilesUnsortedFileType(validFiles)
-        if (Array.isArray(filesProcessed)) setFiles(filesProcessed)
-        else if (filesProcessed === undefined) {
+        if (Array.isArray(filesProcessed)) {
+          setFiles(filesProcessed)
+        } else if (filesProcessed === undefined) {
           enqueueSnackbar('error', { variant: 'error' })
         } else {
-          setGraftState(filesProcessed)
+          // setGraftState reemplazado con setters individuales
+          if (filesProcessed.files) setFiles(filesProcessed.files)
+          if (filesProcessed.fileType) setFileType(filesProcessed.fileType)
+          if (filesProcessed.csvFileColum) setSelectedColumns(filesProcessed.csvFileColum)
         }
         setShouldHighlight(false)
       } catch (error) {
@@ -71,7 +83,7 @@ const Drawer = () => {
         setShouldHighlight(false)
       }
     },
-    [setFiles, setGraftState]
+    [setFiles, setFileType, setSelectedColumns]
   )
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop })
@@ -83,29 +95,48 @@ const Drawer = () => {
     e.stopPropagation()
   }, [])
 
+  if (!isOpen && !isPinned) return null
+
   return (
     <div
-      {...getRootProps()}
       className={cn(
-        'z-0 mr-2 flex w-full drop-shadow-lg animate-fade-in transition-all duration-300 ease-in-out',
-        shouldHighlight && ' bg-gray-400 ring-2'
+        'flex flex-col h-full bg-background border-r transition-all duration-300',
+        !isPinned && 'shadow-2xl'
       )}
-      onDragOver={(e) => {
-        preventDefaultHandler(e)
-        setShouldHighlight(true)
-      }}
-      onDragEnter={(e) => {
-        preventDefaultHandler(e)
-        setShouldHighlight(true)
-      }}
-      onDragLeave={(e) => {
-        preventDefaultHandler(e)
-        setShouldHighlight(false)
-      }}
-      onClick={(e) => e.preventDefault()}
     >
-      <input {...getInputProps()} className="hidden" />
-      <FileSort />
+      {/* Dropzone Content */}
+      <div
+        {...getRootProps()}
+        className={cn(
+          'flex-1 overflow-hidden relative flex flex-col',
+          shouldHighlight && 'bg-primary/10'
+        )}
+        onDragOver={(e) => {
+          preventDefaultHandler(e)
+          setShouldHighlight(true)
+        }}
+        onDragEnter={(e) => {
+          preventDefaultHandler(e)
+          setShouldHighlight(true)
+        }}
+        onDragLeave={(e) => {
+          preventDefaultHandler(e)
+          setShouldHighlight(false)
+        }}
+        onClick={(e) => e.preventDefault()}
+      >
+        <input {...getInputProps()} className="hidden" />
+        <div className="flex-1 overflow-y-auto p-2">
+          <FileSort />
+        </div>
+
+        {/* Drop Overlay Hint */}
+        {shouldHighlight && (
+          <div className="absolute inset-0 flex items-center justify-center bg-primary/20 backdrop-blur-sm z-50 pointer-events-none">
+            <p className="text-lg font-bold text-primary">Drop files here</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

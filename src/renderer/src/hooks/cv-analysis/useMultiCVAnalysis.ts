@@ -7,6 +7,14 @@ import {
   regressionVsSqrt,
   linearRegressionThroughOrigin
 } from './helpers/slopes'
+import {
+  calculateCriticalScanRate,
+  calculateFormalPotential,
+  calculateTransferCoefficient,
+  calculateBilinearRegression,
+  type CriticalScanRateResult,
+  type BilinearRegressionResult
+} from './helpers/laviron'
 import type { CVConfig, CVAnalysisResult, RegressionResult } from './types'
 
 /**
@@ -27,6 +35,9 @@ export interface MultiCVCorrelations {
   ipVsV?: { anodic?: RegressionResult | null; cathodic?: RegressionResult | null } | null
   logIpVsLogV?: { anodic?: RegressionResult | null; cathodic?: RegressionResult | null } | null
   epVsLnV?: RegressionResult | null
+  // Laviron analysis: Ep vs ln(v)
+  epAVsLnV?: RegressionResult | null
+  epCVsLnV?: RegressionResult | null
 }
 
 /**
@@ -38,6 +49,16 @@ export interface MultiCVAnalysisResult {
   averageDeltaEp?: number
   averageHysteresisArea?: number
   mechanismConsensus?: string
+  // Laviron kinetics analysis
+  laviron?: {
+    criticalScanRateAnodic?: CriticalScanRateResult
+    criticalScanRateCathodic?: CriticalScanRateResult
+    formalPotential?: number
+    transferCoefficientAnodic?: number
+    transferCoefficientCathodic?: number
+    bilinearAnodicRegression?: BilinearRegressionResult
+    bilinearCathodicRegression?: BilinearRegressionResult
+  }
 }
 
 export interface UseMultiCVAnalysisParams {
@@ -66,6 +87,8 @@ export const analyzeMultiCV = (params: UseMultiCVAnalysisParams): MultiCVAnalysi
     const cathodicCurrents: number[] = []
     const deltaEps: number[] = []
     const hysteresisAreas: number[] = []
+    const anodicPotentials: number[] = []
+    const cathodicPotentials: number[] = []
 
     for (const file of files) {
       const scanRate = file.voltammeter?.scanRate
@@ -90,11 +113,17 @@ export const analyzeMultiCV = (params: UseMultiCVAnalysisParams): MultiCVAnalysi
       if (anodicPeak && Number.isFinite(anodicPeak.Ip)) {
         anodicCurrents.push(anodicPeak.Ip)
       }
+      if (anodicPeak && Number.isFinite(anodicPeak.Ep)) {
+        anodicPotentials.push(anodicPeak.Ep)
+      }
 
       // Pico catódico (negativo, mantener signo)
       const cathodicPeak = analysis.peaks.cathodic
       if (cathodicPeak && Number.isFinite(cathodicPeak.Ip)) {
         cathodicCurrents.push(cathodicPeak.Ip)
+      }
+      if (cathodicPeak && Number.isFinite(cathodicPeak.Ep)) {
+        cathodicPotentials.push(cathodicPeak.Ep)
       }
 
       // Delta Ep
@@ -170,6 +199,18 @@ export const analyzeMultiCV = (params: UseMultiCVAnalysisParams): MultiCVAnalysi
       correlations.epVsLnV = linearRegression(lnScanRates, deltaEpsInVolts)
     }
 
+    // Laviron analysis: Ep,a vs ln(v) - anodic peak potential
+    if (anodicPotentials.length >= 2 && scanRates.length === anodicPotentials.length) {
+      const lnScanRates = scanRates.map((v) => Math.log(v))
+      correlations.epAVsLnV = linearRegression(lnScanRates, anodicPotentials)
+    }
+
+    // Laviron analysis: Ep,c vs ln(v) - cathodic peak potential
+    if (cathodicPotentials.length >= 2 && scanRates.length === cathodicPotentials.length) {
+      const lnScanRates = scanRates.map((v) => Math.log(v))
+      correlations.epCVsLnV = linearRegression(lnScanRates, cathodicPotentials)
+    }
+
     // Calcular promedios
     const averageDeltaEp =
       deltaEps.length > 0 ? deltaEps.reduce((a, b) => a + b, 0) / deltaEps.length : undefined
@@ -189,12 +230,76 @@ export const analyzeMultiCV = (params: UseMultiCVAnalysisParams): MultiCVAnalysi
     )
     const mechanismConsensus = Object.entries(mechanismCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
 
+    // Laviron analysis: Detectar velocidad crítica y parámetros cinéticos
+    let laviron: MultiCVAnalysisResult['laviron'] | undefined
+
+    if (anodicPotentials.length >= 4 || cathodicPotentials.length >= 4) {
+      laviron = {}
+
+      // Detectar velocidad crítica para picos anódicos
+      if (anodicPotentials.length >= 4) {
+        const criticalAnodic = calculateCriticalScanRate(scanRates, anodicPotentials, 4, 0.95, 2)
+        laviron.criticalScanRateAnodic = criticalAnodic
+
+        // Calcular coeficiente de transferencia si se encontró correlación
+        if (correlations.epAVsLnV?.slope) {
+          laviron.transferCoefficientAnodic =
+            calculateTransferCoefficient(correlations.epAVsLnV.slope, 1, 298.15) ?? undefined
+        }
+
+        // Calcular regresión bilineal para picos anódicos
+        if (criticalAnodic.isFound) {
+          const lnScanRates = scanRates.map((v) => Math.log(v))
+          laviron.bilinearAnodicRegression = calculateBilinearRegression(
+            lnScanRates,
+            anodicPotentials,
+            criticalAnodic.indexCritical
+          )
+        }
+      }
+
+      // Detectar velocidad crítica para picos catódicos
+      if (cathodicPotentials.length >= 4) {
+        const criticalCathodic = calculateCriticalScanRate(
+          scanRates,
+          cathodicPotentials,
+          4,
+          0.95,
+          2
+        )
+        laviron.criticalScanRateCathodic = criticalCathodic
+
+        // Calcular coeficiente de transferencia si se encontró correlación
+        if (correlations.epCVsLnV?.slope) {
+          laviron.transferCoefficientCathodic =
+            calculateTransferCoefficient(correlations.epCVsLnV.slope, 1, 298.15) ?? undefined
+        }
+
+        // Calcular regresión bilineal para picos catódicos
+        if (criticalCathodic.isFound) {
+          const lnScanRates = scanRates.map((v) => Math.log(v))
+          laviron.bilinearCathodicRegression = calculateBilinearRegression(
+            lnScanRates,
+            cathodicPotentials,
+            criticalCathodic.indexCritical
+          )
+        }
+      }
+
+      // Calcular potencial formal
+      if (anodicPotentials.length > 0 && cathodicPotentials.length > 0) {
+        laviron.formalPotential =
+          calculateFormalPotential(anodicPotentials, cathodicPotentials) ?? undefined
+      }
+    }
+
     return {
       files: fileAnalyses,
       correlations,
       averageDeltaEp,
       averageHysteresisArea,
-      mechanismConsensus
+      mechanismConsensus,
+      laviron
     }
   } catch (error) {
     console.error('Error in analyzeMultiCV:', error)

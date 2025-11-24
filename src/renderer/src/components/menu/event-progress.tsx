@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { GrafContext } from '@renderer/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { ShieldCloseIcon, ShieldCheckIcon, RefreshCcw } from 'lucide-react'
 import CustomTooltip from '../ui/tooltip'
 
@@ -11,10 +11,8 @@ const icons = {
 }
 
 const EventProgress = () => {
-  const {
-    graftState: { progressEvent },
-    setProgressEvent
-  } = React.useContext(GrafContext)
+  // Migrado a Zustand
+  const { progressEvent, setProgressEvent } = useGraftStore()
 
   React.useEffect(() => {
     if (!progressEvent.timeOut) return
@@ -22,7 +20,7 @@ const EventProgress = () => {
       setProgressEvent({ type: undefined, name: '', message: '', timeOut: undefined })
     }, progressEvent.timeOut || 10000)
     return () => clearTimeout(timer)
-  }, [progressEvent])
+  }, [progressEvent, setProgressEvent])
 
   if (!progressEvent.type) return null
 

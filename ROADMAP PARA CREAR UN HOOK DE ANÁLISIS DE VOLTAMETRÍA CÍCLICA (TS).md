@@ -5,27 +5,24 @@ Plan de trabajo organizado por fases para implementar un hook `useCyclicVoltamme
 ## Visión general del hook
 
 ```ts
-const {
-  peaks,
-  parameters,
-  hysteresis,
-  diagnostics,
-  plotsData
-} = useCyclicVoltammetryAnalysis(data, config);
+const { peaks, parameters, hysteresis, diagnostics, plotsData } = useCyclicVoltammetryAnalysis(
+  data,
+  config
+)
 ```
 
-| Entrada | Descripción |
-| --- | --- |
-| `data` | `{ potential: number[]; current: number[]; }` — arrays alineados E (V) e I (A). |
+| Entrada  | Descripción                                                                                |
+| -------- | ------------------------------------------------------------------------------------------ |
+| `data`   | `{ potential: number[]; current: number[]; }` — arrays alineados E (V) e I (A).            |
 | `config` | `{ scanRate: number; area?: number; concentration?: number; ... }` — metadatos y opciones. |
 
-| Salida | Descripción |
-| --- | --- |
-| `peaks` | Picos anódico y catódico detectados. |
-| `parameters` | Métricas clave (ΔEp, Ip, Ep). |
-| `hysteresis` | Área del lazo y trazas asociadas. |
+| Salida        | Descripción                                        |
+| ------------- | -------------------------------------------------- |
+| `peaks`       | Picos anódico y catódico detectados.               |
+| `parameters`  | Métricas clave (ΔEp, Ip, Ep).                      |
+| `hysteresis`  | Área del lazo y trazas asociadas.                  |
 | `diagnostics` | Hipótesis de mecanismo electroquímico + confianza. |
-| `plotsData` | Datos ya listos para graficar (Plotly/Recharts). |
+| `plotsData`   | Datos ya listos para graficar (Plotly/Recharts).   |
 
 > Cada checklist está pensado para marcarse una vez completado el paso correspondiente. Los diagramas sugeridos sirven como soporte documental y pueden residir en `/docs/` o Notion.
 
@@ -51,6 +48,7 @@ Para aterrizar el roadmap en la base existente:
 - [x] Diagramar arquitectura de datos (E/I crudos → helpers → hook → UI).
 
 **Diagramas/artefactos:**
+
 - [x] Diagrama de bloques del flujo CV (entrada → smoothing → picos → diagnósticos → plots).
 - [x] Tabla de dependencias externas (libs matemáticas, plotting, formatos de archivo).
 
@@ -86,6 +84,7 @@ src/renderer/src/components/vc-analysis/
 - [ ] Actualizar README/OPTIMIZATION.md con la nueva arquitectura.
 
 **Diagramas/artefactos:**
+
 - [x] Diagrama de módulos mostrando entradas/salidas entre helpers y el contexto `VCAnalysis`.
 
 ---
@@ -96,60 +95,60 @@ Archivo `types.ts`:
 
 ```ts
 export interface CVData {
-  potential: number[]; // E (V)
-  current: number[];   // I (A)
+  potential: number[] // E (V)
+  current: number[] // I (A)
 }
 
 export interface CVConfig {
-  scanRate: number; // V/s
-  area?: number;    // cm2
-  concentration?: number; // mol/cm3
-  n?: number; // electrones
-  temperature?: number; // K
-  diffusionCoefficient?: number; // cm2/s
-  smooth?: boolean;
-  windowSize?: number;
-  polyOrder?: number;
+  scanRate: number // V/s
+  area?: number // cm2
+  concentration?: number // mol/cm3
+  n?: number // electrones
+  temperature?: number // K
+  diffusionCoefficient?: number // cm2/s
+  smooth?: boolean
+  windowSize?: number
+  polyOrder?: number
 }
 
 export interface Peak {
-  Ep: number;
-  Ip: number;
-  index: number;
-  direction: "anodic" | "cathodic";
+  Ep: number
+  Ip: number
+  index: number
+  direction: 'anodic' | 'cathodic'
 }
 
 export interface Parameters {
-  anodicPeak?: Peak;
-  cathodicPeak?: Peak;
-  deltaEp?: number;
-  ipVsSqrtV?: number[];
+  anodicPeak?: Peak
+  cathodicPeak?: Peak
+  deltaEp?: number
+  ipVsSqrtV?: number[]
 }
 
 export interface HysteresisData {
-  area: number;
-  curve: number[];
+  area: number
+  curve: number[]
 }
 
 export interface Diagnostics {
-  mechanism: "diffusion" | "adsorption" | "EC" | "ECE" | "kinetic" | "unknown";
-  confidence: number;
-  notes: string[];
+  mechanism: 'diffusion' | 'adsorption' | 'EC' | 'ECE' | 'kinetic' | 'unknown'
+  confidence: number
+  notes: string[]
 }
 
 export interface RegressionResult {
-  slope: number;
-  intercept: number;
-  r2: number;
-  points: number;
+  slope: number
+  intercept: number
+  r2: number
+  points: number
 }
 
 export interface DiagnoseParams {
-  anodicPeak?: Peak;
-  cathodicPeak?: Peak;
-  deltaEp?: number;
-  hysteresisArea: number;
-  slopeLogLog?: number | null;
+  anodicPeak?: Peak
+  cathodicPeak?: Peak
+  deltaEp?: number
+  hysteresisArea: number
+  slopeLogLog?: number | null
 }
 
 export type MechanismType = 'diffusion' | 'adsorption' | 'EC' | 'ECE' | 'kinetic' | 'unknown'
@@ -192,6 +191,7 @@ export interface UseCVAnalysisParams {
 - [x] Exportar enums/constantes compartidas (por ejemplo, `MechanismType`).
 
 **Diagramas/artefactos:**
+
 - [x] Tabla que mapée cada tipo → archivo/consumidor.
 
 ---
@@ -206,6 +206,7 @@ export interface UseCVAnalysisParams {
 - [x] Preparar esquema de validación para múltiples curvas (consistencia de longitud, metadata compartida).
 
 **Diagramas/artefactos:**
+
 - [x] Diagrama de secuencia que detalle las etapas de procesamiento dentro del hook.
 
 ---
@@ -213,27 +214,32 @@ export interface UseCVAnalysisParams {
 ## 🔵 FASE 4 — Helpers matemáticos esenciales ✅ COMPLETADA
 
 ### 4.1 Suavizado (`helpers/smoothing.ts`) ✅
+
 - [x] Implementar `applySavitzkyGolay(data, window = 11, poly = 3)` usando `savitzkyGolaySmooth` de `utils/math`.
 - [x] Incluir validaciones (ventana impar, `window > poly`).
 - [ ] Añadir pruebas con señales sintéticas y curvas reales.
 
 ### 4.2 Detección de picos (`helpers/peaks.ts`) ✅
+
 - [x] Implementar derivada por diferencias finitas centrales.
 - [x] Detectar cambios de signo para clasificar picos anódico/catódico.
 - [x] Permitir filtros por prominencia/anchura opcionales.
 - [x] Exponer `detectPeaks(E, I): Peak[]`.
 
 ### 4.3 Cálculo de histéresis (`helpers/hysteresis.ts`) ✅
+
 - [x] Separar curva de ida/vuelta mediante `idxMax` del potencial.
 - [x] Calcular área del lazo con integrales trapezoidales (`∑ (I_forward - I_reverse) * dE`).
 - [x] Retornar también la curva diferencial para plotting.
 
 ### 4.4 Slopes & regresiones (`helpers/slopes.ts`) ✅
+
 - [x] Implementar `linearRegression(x, y)` con slope/intercept/R².
 - [x] Calcular: `log(ip) vs log(v)`, `ip vs sqrt(v)`, `Ep vs ln(v)`.
 - [x] Guardar resultados en estructuras tipadas (`RegressionResult`).
 
 ### 4.5 Diagnósticos automáticos (`helpers/diagnostics.ts`) ✅
+
 - [x] Implementar heurísticas:
   - `|slope - 0.5| < 0.1 → diffusion`
   - `|slope - 1| < 0.1 → adsorption`
@@ -242,10 +248,12 @@ export interface UseCVAnalysisParams {
 - [x] Definir `threshold` y reglas ajustables en `constants.ts`.
 
 ### 4.6 Randles & utilidades (`helpers/randles.ts`, `helpers/utils.ts`) ✅
+
 - [x] Implementar fórmulas para `ip = (2.69e5) * n^3/2 * A * D^1/2 * C * v^1/2` (Randles-Sevcik).
 - [x] Añadir helpers numéricos: normalización, derivadas generales, integración trapezoidal, clamp.
 
 **Diagramas/artefactos:**
+
 - [x] Tabla de fórmulas utilizadas + referencias bibliográficas.
 - [x] Diagrama de dependencias entre helpers matemáticos.
 
@@ -260,6 +268,7 @@ export interface UseCVAnalysisParams {
 - [x] Escribir pruebas unitarias con Vitest (53 tests, 100% passing).
 
 **Diagramas/artefactos:**
+
 - [x] Diagrama de secuencia `VCAnalysisContext → useCVAnalysis → helpers → UI`.
 - [x] Tabla de casos de prueba (dataset, configuración, resultado esperado).
 
@@ -274,6 +283,7 @@ export interface UseCVAnalysisParams {
 - [x] Tests unitarios para multi-CV (10 tests, 100% passing).
 
 **Diagramas/artefactos:**
+
 - [ ] Diagrama de flujo multi-scan (por curva → agregados → diagnóstico global) enlazado con componentes existentes.
 
 ---
@@ -303,6 +313,7 @@ export interface UseCVAnalysisParams {
 - [x] Casos de uso especiales
 
 **Diagramas/artefactos:**
+
 - [x] Diagrama de flujo general
 - [x] Estructura de directorios
 - [x] Flujo de datos (individual y multi-CV)
@@ -318,12 +329,14 @@ export interface UseCVAnalysisParams {
 - [ ] Integración futura con ML para clasificación de mecanismos.
 
 **Diagramas/artefactos:**
+
 - [ ] Roadmap de investigación (Nicholson/Laviron/ML) con dependencias.
 - [ ] Referencias bibliográficas y papers base.
 
 ---
 
 ### Indicadores de finalización
+
 - [x] Checklists de Fases 0-5 completados (core hook implementation).
 - [ ] Checklists de Fases 6-8 pendientes (multi-scan, UI integration, advanced features).
 - [ ] Diagrama + documentación disponibles en `/docs/cv-analysis/`.
@@ -342,6 +355,7 @@ export interface UseCVAnalysisParams {
 **Compilación:** ✅ TypeScript sin errores
 
 ### Archivos Creados (19 archivos):
+
 ✅ `src/renderer/src/hooks/cv-analysis/types.ts` — Tipos e interfaces completos
 ✅ `src/renderer/src/hooks/cv-analysis/constants.ts` — Defaults y thresholds
 ✅ `src/renderer/src/hooks/cv-analysis/helpers/utils.ts` — Utilidades de extracción y cálculo
@@ -367,6 +381,7 @@ export interface UseCVAnalysisParams {
 ✅ `docs/cv-analysis/ADVANCED_EXAMPLES.md` — Ejemplos avanzados
 
 ### Características Implementadas:
+
 ✅ Extracción de datos CV desde `IProcessFile`
 ✅ Suavizado opcional Savitzky-Golay con validación de parámetros
 ✅ Detección automática de picos anódico/catódico con filtro de prominencia
@@ -400,17 +415,17 @@ export interface UseCVAnalysisParams {
 
 ### Resumen de Fases Completadas:
 
-| Fase | Descripción | Status |
-|------|-------------|--------|
-| **0** | Diseño y tipos | ✅ Completada |
-| **1** | Helpers matemáticos | ✅ Completada |
-| **2** | Suavizado y picos | ✅ Completada |
-| **3** | Histéresis y diagnósticos | ✅ Completada |
-| **4** | Randles-Sevcik | ✅ Completada |
-| **5** | Hook principal + tests | ✅ Completada (53 tests) |
-| **6** | Multi-CV + tests | ✅ Completada (10 tests) |
-| **7** | UI + menú | ✅ Completada |
-| **8** | Documentación | ✅ Completada |
+| Fase  | Descripción               | Status                   |
+| ----- | ------------------------- | ------------------------ |
+| **0** | Diseño y tipos            | ✅ Completada            |
+| **1** | Helpers matemáticos       | ✅ Completada            |
+| **2** | Suavizado y picos         | ✅ Completada            |
+| **3** | Histéresis y diagnósticos | ✅ Completada            |
+| **4** | Randles-Sevcik            | ✅ Completada            |
+| **5** | Hook principal + tests    | ✅ Completada (53 tests) |
+| **6** | Multi-CV + tests          | ✅ Completada (10 tests) |
+| **7** | UI + menú                 | ✅ Completada            |
+| **8** | Documentación             | ✅ Completada            |
 
 ### Métricas Finales:
 

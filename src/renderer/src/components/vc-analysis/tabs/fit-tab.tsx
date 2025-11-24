@@ -9,13 +9,13 @@ import {
   PolynomialIcon,
   ProcessIcon,
   ProcessMultipleIcon
-} from '../icons'
+} from '../components/icons'
 import { Button } from '@renderer/components/ui/button'
 import { useVCAnalysis } from '../context/use-vc-analysis'
-import { FitButtons } from '../process-buttons'
+import { FitButtons } from '../components/process-buttons'
 import { LineChartIcon } from 'lucide-react'
 import { Slider } from '@renderer/components/ui/slider'
-import { ManualSelection } from '../manual-selection'
+import { ManualSelection } from '../components/manual-selection'
 import { Label } from '@renderer/components/ui/label'
 
 const fitButtons = [

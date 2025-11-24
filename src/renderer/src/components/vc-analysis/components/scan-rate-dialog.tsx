@@ -1,13 +1,11 @@
 import * as React from 'react'
-import { LineChartIcon } from 'lucide-react'
-import Plot from '../plot/new-plot'
+import Plot from '../../plot/new-plot'
 import type { Data, Layout, Config } from 'plotly.js'
 import { useTheme } from 'next-themes'
 
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../ui/dialog'
-import { Input } from '../ui/input'
-import { Label } from '../ui/label'
-import { Button } from '../ui/button'
+import { Input } from '../../ui/input'
+import { Label } from '../../ui/label'
+import { Button } from '../../ui/button'
 import { ProcessIcon } from './icons'
 import {
   useScanRateCorrelation,
@@ -186,7 +184,7 @@ const buildFitArtifacts = (
   return { lineTrace, annotation }
 }
 
-const ScanRateAnalysisDialog: React.FC = () => {
+const ScanRateAnalysisPanel: React.FC = () => {
   const { data } = useData()
   const files = React.useMemo(() => data || [], [data])
   const { calculateCorrelation } = useScanRateCorrelation()
@@ -430,172 +428,160 @@ const ScanRateAnalysisDialog: React.FC = () => {
   const currentChart = currentInsights.chart
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="rounded-full border-0"
-          size="icon"
-          title="Process scan rate"
-        >
-          <LineChartIcon className="h-5 w-5" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="h-[90vh] max-w-[90%] w-[90%] gap-4 overflow-y-auto">
-        <DialogTitle className="mb-1 flex h-6 w-full items-center gap-6 p-0">
-          Scan rate vs peaks analysis
-        </DialogTitle>
+    <div className="h-full flex flex-col gap-4 overflow-y-auto p-4">
+      <div className="mb-1 flex h-6 w-full items-center gap-6 p-0 font-semibold text-lg">
+        Scan rate vs peaks analysis
+      </div>
 
-        <div className="flex gap-4 items-center bg-accent/20 p-2 rounded-md">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="emin">Emin (V)</Label>
-            <Input
-              id="emin"
-              type="number"
-              className="w-28"
-              value={emin}
-              onChange={(e) => setEmin(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Label htmlFor="emax">Emax (V)</Label>
-            <Input
-              id="emax"
-              type="number"
-              className="w-28"
-              value={emax}
-              onChange={(e) => setEmax(e.target.value)}
-            />
-          </div>
-
-          <Button
-            disabled={!hasSelectedFiles}
-            size="icon"
-            onClick={handleCalculate}
-            className="border-0 bg-blue-500"
-            title="Calculate scan rate correlations"
-          >
-            {ProcessIcon}
-          </Button>
+      <div className="flex gap-4 items-center bg-accent/20 p-2 rounded-md">
+        <div className="flex items-center gap-2">
+          <Label htmlFor="emin">Emin (V)</Label>
+          <Input
+            id="emin"
+            type="number"
+            className="w-28"
+            value={emin}
+            onChange={(e) => setEmin(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="emax">Emax (V)</Label>
+          <Input
+            id="emax"
+            type="number"
+            className="w-28"
+            value={emax}
+            onChange={(e) => setEmax(e.target.value)}
+          />
         </div>
 
-        {result && (
-          <div className="mt-4 flex flex-col gap-6">
-            {/* Gráficos */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {potentialChart && (
-                <div className="p-1 rounded-md border">
-                  <Plot
-                    data={potentialChart.data}
-                    layout={potentialChart.layout}
-                    config={PLOTLY_CONFIG}
-                    exportFileName="Potential vs Scan Rate"
-                    isNecessaryRefreshZoom
-                  />
-                </div>
-              )}
+        <Button
+          disabled={!hasSelectedFiles}
+          size="icon"
+          onClick={handleCalculate}
+          className="border-0 bg-blue-500"
+          title="Calculate scan rate correlations"
+        >
+          {ProcessIcon}
+        </Button>
+      </div>
 
-              {currentChart && (
-                <div className="p-1 rounded-md border">
-                  <Plot
-                    data={currentChart.data}
-                    layout={currentChart.layout}
-                    config={PLOTLY_CONFIG}
-                    exportFileName="Current (Imax / Imin) vs Scan Rate"
-                    isNecessaryRefreshZoom
-                  />
+      {result && (
+        <div className="mt-4 flex flex-col gap-6">
+          {/* Gráficos */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {potentialChart && (
+              <div className="p-1 rounded-md border">
+                <Plot
+                  data={potentialChart.data}
+                  layout={potentialChart.layout}
+                  config={PLOTLY_CONFIG}
+                  exportFileName="Potential vs Scan Rate"
+                  isNecessaryRefreshZoom
+                />
+              </div>
+            )}
+
+            {currentChart && (
+              <div className="p-1 rounded-md border">
+                <Plot
+                  data={currentChart.data}
+                  layout={currentChart.layout}
+                  config={PLOTLY_CONFIG}
+                  exportFileName="Current (Imax / Imin) vs Scan Rate"
+                  isNecessaryRefreshZoom
+                />
+              </div>
+            )}
+          </div>
+          {/* Tabla de resultados de ajuste lineal */}
+          <div className="p-4 rounded-md">
+            <h3 className="font-semibold mb-3">Linear Fit Results</h3>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              {result.positive.potential && (
+                <div className="bg-white/50 p-2 rounded">
+                  <div className="font-semibold text-green-700">
+                    Positive Potential (E vs scan rate)
+                  </div>
+                  <div>m = {result.positive.potential.m.toFixed(6)}</div>
+                  <div>b = {result.positive.potential.b.toFixed(6)}</div>
+                  <div>R² = {result.positive.potential.r.toFixed(6)}</div>
                 </div>
               )}
-            </div>
-            {/* Tabla de resultados de ajuste lineal */}
-            <div className="p-4 rounded-md">
-              <h3 className="font-semibold mb-3">Linear Fit Results</h3>
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                {result.positive.potential && (
-                  <div className="bg-white/50 p-2 rounded">
-                    <div className="font-semibold text-green-700">
-                      Positive Potential (E vs scan rate)
-                    </div>
-                    <div>m = {result.positive.potential.m.toFixed(6)}</div>
-                    <div>b = {result.positive.potential.b.toFixed(6)}</div>
-                    <div>R² = {result.positive.potential.r.toFixed(6)}</div>
+              {result.positive.current && (
+                <div className="bg-white/50 p-2 rounded">
+                  <div className="font-semibold text-green-700">
+                    Positive Current (Imax vs scan rate)
                   </div>
-                )}
-                {result.positive.current && (
-                  <div className="bg-white/50 p-2 rounded">
-                    <div className="font-semibold text-green-700">
-                      Positive Current (Imax vs scan rate)
-                    </div>
-                    <div>m = {result.positive.current.m.toFixed(6)}</div>
-                    <div>b = {result.positive.current.b.toFixed(6)}</div>
-                    <div>R² = {result.positive.current.r.toFixed(6)}</div>
+                  <div>m = {result.positive.current.m.toFixed(6)}</div>
+                  <div>b = {result.positive.current.b.toFixed(6)}</div>
+                  <div>R² = {result.positive.current.r.toFixed(6)}</div>
+                </div>
+              )}
+              {result.negative.potential && (
+                <div className="bg-white/50 p-2 rounded">
+                  <div className="font-semibold text-red-700">
+                    Negative Potential (E vs scan rate)
                   </div>
-                )}
-                {result.negative.potential && (
-                  <div className="bg-white/50 p-2 rounded">
-                    <div className="font-semibold text-red-700">
-                      Negative Potential (E vs scan rate)
-                    </div>
-                    <div>m = {result.negative.potential.m.toFixed(6)}</div>
-                    <div>b = {result.negative.potential.b.toFixed(6)}</div>
-                    <div>R² = {result.negative.potential.r.toFixed(6)}</div>
+                  <div>m = {result.negative.potential.m.toFixed(6)}</div>
+                  <div>b = {result.negative.potential.b.toFixed(6)}</div>
+                  <div>R² = {result.negative.potential.r.toFixed(6)}</div>
+                </div>
+              )}
+              {result.negative.current && (
+                <div className="bg-white/50 p-2 rounded">
+                  <div className="font-semibold text-red-700">
+                    Negative Current (Imin vs scan rate)
                   </div>
-                )}
-                {result.negative.current && (
-                  <div className="bg-white/50 p-2 rounded">
-                    <div className="font-semibold text-red-700">
-                      Negative Current (Imin vs scan rate)
-                    </div>
-                    <div>m = {result.negative.current.m.toFixed(6)}</div>
-                    <div>b = {result.negative.current.b.toFixed(6)}</div>
-                    <div>R² = {result.negative.current.r.toFixed(6)}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-            {/* Tabla de datos de archivos */}
-            <div className="p-4 rounded-md">
-              <h3 className="font-semibold mb-3">Files Data</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead className="bg-accent/20">
-                    <tr>
-                      <th className="text-left p-2">File</th>
-                      <th className="text-right p-2">Scan Rate (mV/s)</th>
-                      <th className="text-right p-2">Positive E (V)</th>
-                      <th className="text-right p-2">Positive I (A)</th>
-                      <th className="text-right p-2">Negative E (V)</th>
-                      <th className="text-right p-2">Negative I (A)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.files.map((file) => (
-                      <tr key={file.fileId} className="border-t hover:bg-accent/5">
-                        <td className="p-2">{file.fileName}</td>
-                        <td className="text-right p-2">{file.scanRate.toFixed(2)}</td>
-                        <td className="text-right p-2">
-                          {file.positivePeak?.potential.toFixed(4) || '-'}
-                        </td>
-                        <td className="text-right p-2">
-                          {file.positivePeak?.current.toExponential(2) || '-'}
-                        </td>
-                        <td className="text-right p-2">
-                          {file.negativePeak?.potential.toFixed(4) || '-'}
-                        </td>
-                        <td className="text-right p-2">
-                          {file.negativePeak?.current.toExponential(2) || '-'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  <div>m = {result.negative.current.m.toFixed(6)}</div>
+                  <div>b = {result.negative.current.b.toFixed(6)}</div>
+                  <div>R² = {result.negative.current.r.toFixed(6)}</div>
+                </div>
+              )}
             </div>
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+          {/* Tabla de datos de archivos */}
+          <div className="p-4 rounded-md">
+            <h3 className="font-semibold mb-3">Files Data</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="bg-accent/20">
+                  <tr>
+                    <th className="text-left p-2">File</th>
+                    <th className="text-right p-2">Scan Rate (mV/s)</th>
+                    <th className="text-right p-2">Positive E (V)</th>
+                    <th className="text-right p-2">Positive I (A)</th>
+                    <th className="text-right p-2">Negative E (V)</th>
+                    <th className="text-right p-2">Negative I (A)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.files.map((file) => (
+                    <tr key={file.fileId} className="border-t hover:bg-accent/5">
+                      <td className="p-2">{file.fileName}</td>
+                      <td className="text-right p-2">{file.scanRate.toFixed(2)}</td>
+                      <td className="text-right p-2">
+                        {file.positivePeak?.potential.toFixed(4) || '-'}
+                      </td>
+                      <td className="text-right p-2">
+                        {file.positivePeak?.current.toExponential(2) || '-'}
+                      </td>
+                      <td className="text-right p-2">
+                        {file.negativePeak?.potential.toFixed(4) || '-'}
+                      </td>
+                      <td className="text-right p-2">
+                        {file.negativePeak?.current.toExponential(2) || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
-export default ScanRateAnalysisDialog
+export default ScanRateAnalysisPanel

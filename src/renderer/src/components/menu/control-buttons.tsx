@@ -1,10 +1,50 @@
 import * as React from 'react'
 import { Minus, Maximize2, Minimize2, X } from 'lucide-react'
-import { GrafContext } from '@renderer/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 
 const WindowControls = () => {
   const [isMaximized, setIsMaximized] = React.useState(false)
-  const { graftState } = React.useContext(GrafContext)
+
+  // Migrado a Zustand - obtenemos todo el estado necesario
+  const {
+    files,
+    csvFileColum,
+    fileType,
+    graftType,
+    impedanceType,
+    stepBetweenPoints,
+    lineOrPointWidth,
+    colorScheme,
+    isFilesGrouped,
+    selectedFilesCount,
+    uniqueFrequencyCalc,
+    concInputValues,
+    platform
+  } = useGraftStore()
+
+  // Reconstruir graftState para compatibilidad con el guardado
+  const graftState = {
+    files,
+    csvFileColum,
+    fileType,
+    graftType,
+    impedanceType,
+    stepBetweenPoints,
+    lineOrPointWidth,
+    colorScheme,
+    isFilesGrouped,
+    selectedFilesCount,
+    uniqueFrequencyCalc,
+    concInputValues,
+    platform,
+    drawerOpen: true,
+    loading: false,
+    notifications: { content: [''], title: '', type: undefined },
+    state: null,
+    updateContent: null,
+    progressEvent: { message: '', name: '', type: undefined, timeOut: 0 }
+  }
+
   const handleQuit = () => {
     window.context.saveProject(JSON.stringify(graftState), true).then(() => {
       window.context.quit()

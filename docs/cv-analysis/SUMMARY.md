@@ -3,6 +3,7 @@
 ## 🎯 Objetivo Completado
 
 Implementar un **hook React completo para análisis de Voltametría Cíclica (CV)** con:
+
 - Análisis individual de archivos CV
 - Análisis de múltiples scan rates
 - Interfaz UI intuitiva
@@ -14,6 +15,7 @@ Implementar un **hook React completo para análisis de Voltametría Cíclica (CV
 ## ✅ Entregables
 
 ### 1. Core Hook (`useCVAnalysis`)
+
 ```typescript
 const result = useCVAnalysis({
   file: myFile,
@@ -22,6 +24,7 @@ const result = useCVAnalysis({
 ```
 
 **Retorna:**
+
 - Picos anódico/catódico
 - Parámetros (ΔEp, Ip ratio, etc.)
 - Histéresis (área del lazo)
@@ -31,6 +34,7 @@ const result = useCVAnalysis({
 ---
 
 ### 2. Multi-CV Hook (`useMultiCVAnalysis`)
+
 ```typescript
 const result = useMultiCVAnalysis({
   files: [file1, file2, file3],
@@ -39,6 +43,7 @@ const result = useMultiCVAnalysis({
 ```
 
 **Retorna:**
+
 - Análisis individual por archivo
 - Correlaciones (Randles-Sevcik, ΔEp vs ln(v), etc.)
 - Estadísticas agregadas
@@ -47,6 +52,7 @@ const result = useMultiCVAnalysis({
 ---
 
 ### 3. Componente UI (`CVMultiAnalysisDialog`)
+
 - Diálogo interactivo con Plotly
 - Gráficos: Ip vs √v, ΔEp vs ln(v)
 - Tablas de resultados y datos
@@ -56,6 +62,7 @@ const result = useMultiCVAnalysis({
 ---
 
 ### 4. Documentación Completa
+
 - **README.md** - API Reference + ejemplos básicos
 - **ARCHITECTURE.md** - Diseño interno + diagramas
 - **ADVANCED_EXAMPLES.md** - Casos de uso avanzados
@@ -65,18 +72,21 @@ const result = useMultiCVAnalysis({
 ## 📊 Estadísticas
 
 ### Código
+
 - **19 archivos** creados
 - **~3,500+ líneas** de código
 - **100% TypeScript** (strict mode)
 - **0 dependencias externas** para helpers
 
 ### Tests
+
 - **63 tests** implementados
 - **100% passing**
 - **6 archivos** de test
 - Cobertura: helpers, hooks, integración
 
 ### Compilación
+
 - ✅ TypeScript sin errores
 - ✅ ESLint limpio
 - ✅ Vitest configurado
@@ -86,12 +96,14 @@ const result = useMultiCVAnalysis({
 ## 🚀 Uso Rápido
 
 ### Instalación
+
 ```bash
 # Ya está en el proyecto
 import { useCVAnalysis, useMultiCVAnalysis } from '@renderer/hooks/cv-analysis'
 ```
 
 ### Ejemplo Básico
+
 ```typescript
 import React from 'react'
 import { useCVAnalysis } from '@renderer/hooks/cv-analysis'
@@ -114,6 +126,7 @@ export const MyComponent = ({ file }) => {
 ```
 
 ### Ejemplo Multi-CV
+
 ```typescript
 import { useMultiCVAnalysis } from '@renderer/hooks/cv-analysis'
 
@@ -139,6 +152,7 @@ export const MultiAnalysis = ({ files }) => {
 ## 🔧 Características Principales
 
 ### Análisis Individual
+
 ✅ Extracción de datos CV
 ✅ Suavizado Savitzky-Golay (opcional)
 ✅ Detección de picos anódico/catódico
@@ -148,6 +162,7 @@ export const MultiAnalysis = ({ files }) => {
 ✅ Estimación Randles-Sevcik
 
 ### Análisis Multi-CV
+
 ✅ Análisis individual de cada archivo
 ✅ Correlación Ip vs √v (Randles-Sevcik)
 ✅ Correlación Ip vs v (lineal)
@@ -157,6 +172,7 @@ export const MultiAnalysis = ({ files }) => {
 ✅ Consenso de mecanismo
 
 ### UI
+
 ✅ Gráficos interactivos Plotly
 ✅ Tablas responsivas
 ✅ Exportación a SVG
@@ -168,6 +184,7 @@ export const MultiAnalysis = ({ files }) => {
 ## 📈 Mecanismos Soportados
 
 El hook detecta automáticamente:
+
 - **Diffusion** - Procesos controlados por difusión
 - **Adsorption** - Procesos de adsorción
 - **EC** - Mecanismos acoplados electroquímico-químicos
@@ -180,6 +197,7 @@ El hook detecta automáticamente:
 ## 🎨 Integración UI
 
 ### Ubicación en Menú
+
 ```
 Menu Bar
 ├── File
@@ -193,6 +211,7 @@ Menu Bar
 ```
 
 ### Activación
+
 - Solo visible cuando `fileType === 'teq4'`
 - Icono: `BarChart3Icon` (📊)
 - Tooltip: "Multi-CV Analysis"
@@ -202,6 +221,7 @@ Menu Bar
 ## 📚 Documentación
 
 ### Archivos Disponibles
+
 1. **README.md** (esta carpeta)
    - API Reference
    - Ejemplos básicos
@@ -224,6 +244,7 @@ Menu Bar
 ## 🧪 Testing
 
 ### Ejecutar Tests
+
 ```bash
 # Todos los tests
 pnpm test -- src/renderer/src/hooks/cv-analysis/__tests__/ --run
@@ -233,6 +254,7 @@ pnpm test:coverage -- src/renderer/src/hooks/cv-analysis/
 ```
 
 ### Cobertura
+
 - **Utilidades:** 14 tests
 - **Picos:** 6 tests
 - **Regresiones:** 9 tests
@@ -246,12 +268,14 @@ pnpm test:coverage -- src/renderer/src/hooks/cv-analysis/
 ## 🔐 Validación
 
 ### Entrada
+
 - ✅ Arrays no vacíos
 - ✅ Valores finitos
 - ✅ Longitudes coincidentes
 - ✅ Scan rate > 0
 
 ### Salida
+
 - ✅ Retorna `null` en caso de error
 - ✅ Logs en consola para debugging
 - ✅ Try/catch en funciones principales
@@ -261,19 +285,21 @@ pnpm test:coverage -- src/renderer/src/hooks/cv-analysis/
 ## 🚀 Performance
 
 ### Optimizaciones
+
 - Memoización con `useMemo`
 - Lazy evaluation
 - Sin dependencias externas para helpers
 - Complejidad O(n) para operaciones principales
 
 ### Benchmarks
-| Operación | Tiempo Típico |
-|-----------|--------------|
-| Smoothing | < 1ms |
-| Peak Detection | < 1ms |
-| Hysteresis | < 1ms |
-| Diagnostics | < 0.1ms |
-| Multi-CV (10 files) | < 50ms |
+
+| Operación           | Tiempo Típico |
+| ------------------- | ------------- |
+| Smoothing           | < 1ms         |
+| Peak Detection      | < 1ms         |
+| Hysteresis          | < 1ms         |
+| Diagnostics         | < 0.1ms       |
+| Multi-CV (10 files) | < 50ms        |
 
 ---
 
@@ -291,11 +317,13 @@ pnpm test:coverage -- src/renderer/src/hooks/cv-analysis/
 ## 📞 Soporte
 
 ### Documentación
+
 - Leer `README.md` para API reference
 - Consultar `ARCHITECTURE.md` para diseño interno
 - Ver `ADVANCED_EXAMPLES.md` para casos de uso
 
 ### Debugging
+
 - Revisar logs en consola
 - Usar `analyzeCV` (función pura) para testing
 - Ejecutar tests con `pnpm test`

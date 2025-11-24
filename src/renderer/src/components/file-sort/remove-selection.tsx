@@ -1,5 +1,5 @@
 import React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { useData } from '@/hooks/useData'
 import { BookIcon, BookXIcon } from 'lucide-react'
 
@@ -7,9 +7,9 @@ import { Button } from '../ui/button'
 
 const RemoveSelection = () => {
   const { cleanSelectionFiles } = useData()
-  const {
-    graftState: { selectedFilesCount }
-  } = React.useContext(GrafContext)
+  
+  // Migrado a Zustand
+  const { selectedFilesCount } = useGraftStore()
 
   const handleRemoveSelection = () => cleanSelectionFiles()
 

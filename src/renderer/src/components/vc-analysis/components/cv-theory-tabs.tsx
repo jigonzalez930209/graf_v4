@@ -1,14 +1,15 @@
 import * as React from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs'
 
 export const CVTheoryTabs: React.FC = () => {
   return (
     <Tabs defaultValue="randles" className="w-full">
-      <TabsList className="grid w-full grid-cols-4 mb-4">
+      <TabsList className="grid w-full grid-cols-5 mb-4">
         <TabsTrigger value="randles">Randles-Sevcik</TabsTrigger>
         <TabsTrigger value="linear">Linear</TabsTrigger>
         <TabsTrigger value="powerlaw">Power Law</TabsTrigger>
         <TabsTrigger value="kinetics">Kinetics</TabsTrigger>
+        <TabsTrigger value="laviron">Laviron</TabsTrigger>
       </TabsList>
 
       {/* Randles-Sevcik */}
@@ -259,6 +260,111 @@ export const CVTheoryTabs: React.FC = () => {
               because the electron transfer becomes slower relative to the scan rate, causing peaks
               to separate more.
             </p>
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* Laviron */}
+      <TabsContent value="laviron" className="space-y-4">
+        <div className="bg-accent/10 p-4 rounded-lg space-y-3">
+          <h3 className="font-bold text-base">Laviron Theory: Peak Potential vs Scan Rate</h3>
+
+          <div className="bg-white/50 dark:bg-slate-800/50 p-3 rounded space-y-2">
+            <p className="text-sm font-semibold">Overview:</p>
+            <p className="text-xs text-muted-foreground">
+              Laviron theory describes how peak potentials shift with scan rate in quasi-reversible
+              and irreversible electrochemical systems. Unlike reversible systems where peak
+              potentials remain constant, irreversible systems show potential shifts that depend on
+              electron transfer kinetics.
+            </p>
+          </div>
+
+          <div className="bg-white/50 dark:bg-slate-800/50 p-3 rounded space-y-2">
+            <p className="text-sm font-semibold">Laviron Equation for Peak Potential:</p>
+            <div className="bg-slate-100 dark:bg-slate-900 p-2 rounded font-mono text-xs overflow-x-auto">
+              Ep = E° + (RT/αnF) × ln(k°) + (RT/αnF) × ln(v)
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Where: E° = formal potential, α = transfer coefficient, n = electrons, F = Faraday
+              constant, k° = standard rate constant, v = scan rate, R = gas constant, T =
+              temperature
+            </p>
+          </div>
+
+          <div className="bg-white/50 dark:bg-slate-800/50 p-3 rounded space-y-2">
+            <p className="text-sm font-semibold">Linear Form (Ep vs ln(v)):</p>
+            <div className="bg-slate-100 dark:bg-slate-900 p-2 rounded font-mono text-xs overflow-x-auto">
+              Ep = (RT/αnF) × ln(v) + const
+            </div>
+            <p className="text-xs text-muted-foreground">
+              At 25°C: Ep = (59/αn) × log(v) + const (in mV)
+            </p>
+          </div>
+
+          <div className="bg-white/50 dark:bg-slate-800/50 p-3 rounded space-y-2">
+            <p className="text-sm font-semibold">What We Plot:</p>
+            <ul className="text-xs space-y-1 list-disc list-inside">
+              <li>
+                <strong>X-axis:</strong> ln(Scan Rate)
+              </li>
+              <li>
+                <strong>Y-axis (Anodic):</strong> Ep,a [V] - anodic peak potential
+              </li>
+              <li>
+                <strong>Y-axis (Cathodic):</strong> Ep,c [V] - cathodic peak potential
+              </li>
+              <li>
+                <strong>Slope:</strong> (RT/αnF) - reveals transfer coefficient
+              </li>
+              <li>
+                <strong>Intercept:</strong> Contains E° and k° information
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-white/50 dark:bg-slate-800/50 p-3 rounded space-y-2">
+            <p className="text-sm font-semibold">Extracting Kinetic Parameters:</p>
+            <ul className="text-xs space-y-2 list-disc list-inside">
+              <li>
+                <strong>Transfer Coefficient (α):</strong> From slope = (RT/αnF), solve for α
+              </li>
+              <li>
+                <strong>Formal Potential (E°):</strong> Average of Ep,a and Ep,c (for reversible
+                systems)
+              </li>
+              <li>
+                <strong>Standard Rate Constant (k°):</strong> From intercept and E°
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded space-y-2 border border-orange-200 dark:border-orange-800">
+            <p className="text-sm font-semibold text-orange-900 dark:text-orange-100">
+              Physical Meaning:
+            </p>
+            <p className="text-xs text-orange-800 dark:text-orange-200">
+              Laviron analysis reveals electron transfer kinetics. In reversible systems, Ep remains
+              constant with scan rate. In quasi-reversible/irreversible systems, Ep shifts linearly
+              with ln(v). The slope magnitude indicates how fast the electron transfer is: steeper
+              slopes indicate slower electron transfer (higher α or lower k°).
+            </p>
+          </div>
+
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded space-y-2 border border-blue-200 dark:border-blue-800">
+            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+              Typical Values:
+            </p>
+            <ul className="text-xs space-y-1 text-blue-800 dark:text-blue-200 list-disc list-inside">
+              <li>
+                <strong>Reversible:</strong> Slope ≈ 0 (Ep independent of v)
+              </li>
+              <li>
+                <strong>Quasi-reversible:</strong> Slope = (30-60) mV/decade (at 25°C)
+              </li>
+              <li>
+                <strong>Irreversible:</strong> Slope = (60-120) mV/decade (at 25°C)
+              </li>
+            </ul>
           </div>
         </div>
       </TabsContent>

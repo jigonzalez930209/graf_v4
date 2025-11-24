@@ -1,9 +1,7 @@
-import * as React from 'react'
-
-import { GrafContext } from '../context/GraftContext'
 import { IProcessFile } from '@shared/models/files'
 import { generateRandomId } from '../utils/common'
 import { supportedFileTypeObject } from '@shared/constants'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 
 export type ImportData = {
   name: string
@@ -13,7 +11,7 @@ export type ImportData = {
 }
 
 const useImportData = () => {
-  const { setFile } = React.useContext(GrafContext)
+  const { setFile } = useGraftStore()
 
   const importDataTeq4Z = ({ name, content, color, impParams }: ImportData) => {
     const file: IProcessFile = {

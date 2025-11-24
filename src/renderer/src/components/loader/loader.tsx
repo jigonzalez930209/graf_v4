@@ -1,7 +1,7 @@
 import './styles.css'
 
 const Loader = () => (
-  <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 w-full h-full">
+  <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm w-full h-full">
     <div
       style={{
         boxSizing: 'border-box',

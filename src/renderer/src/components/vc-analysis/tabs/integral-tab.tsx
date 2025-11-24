@@ -1,4 +1,4 @@
-import IntegralResultsTable from '../integral-results-table'
+import IntegralResultsTable from '../components/integral-results-table'
 
 export default function IntegralTab() {
   return (

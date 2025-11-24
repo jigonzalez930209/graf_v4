@@ -31,13 +31,13 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10
-          
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Install wasm-pack
         run: cargo install wasm-pack
-      
+
       - name: Build WebAssembly module
         run: |
           cd math-lib
@@ -52,7 +52,7 @@ jobs:
         run: pnpm run build
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-          NODE_OPTIONS: "--max_old_space_size=4096"
+          NODE_OPTIONS: '--max_old_space_size=4096'
 
       - name: |
           Compile artifacts to mac and upload them to github release

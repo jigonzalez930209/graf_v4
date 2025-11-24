@@ -1,7 +1,7 @@
 import * as React from 'react'
 import _ from 'lodash'
 
-import { GrafContext } from '../context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { IProcessFile } from '@shared/models/files'
 import { ICsvFileColum, IStepBetweenPoints } from '@shared/models/graf'
 
@@ -22,17 +22,21 @@ type ReturnGetCSVData =
 
 // TODO: refactor this hook in different and more specific hooks to each cain of data
 export const useData = () => {
+  // Migrado a Zustand
   const {
-    graftState,
-    setSelectedFile,
+    files,
+    csvFileColum,
+    selectedFilesCount,
+    fileType,
+    setFiles,
+    setFileType: setSelectedFile,
     setGraftType,
     setSelectedColumns: setColumns,
-    setFiles,
     updateFile,
     updateCSVfileColumn,
     setSelectedFilesCount,
     addFiles
-  } = React.useContext(GrafContext)
+  } = useGraftStore()
 
   const setData = (payload: IProcessFile[]) => {
     setColumns([])
@@ -99,8 +103,8 @@ export const useData = () => {
     fileName: string
     newSelectedIndex: number
   }) => {
-    const selectedFile = graftState.files.find((file) => file.id === id) ?? null
-    const selectedColumn = graftState.csvFileColum.find((c) => c.fileName === fileName)
+    const selectedFile = files.find((file) => file.id === id) ?? null
+    const selectedColumn = csvFileColum.find((c) => c.fileName === fileName)
 
     const notSelected = selectedFile?.invariableContent?.[newSelectedIndex].map((val, index) => ({
       name: val,
@@ -131,54 +135,65 @@ export const useData = () => {
 
   const changeSelectedFile = React.useCallback(
     async (id: string) => {
-      const file = graftState.files.find((file) => file.id === id)
+      const file = files.find((file) => file.id === id)
 
       if (!file) throw new Error('File not found')
 
-      if (graftState.selectedFilesCount === 10 && file.selected === false)
+      if (selectedFilesCount === 10 && file.selected === false)
         throw new Error('You can select only 10 files')
 
-      if (file.selected) {
-        await setSelectedFilesCount(graftState.selectedFilesCount - 1)
+      // Guardamos el contador actual ANTES de modificarlo
+      const currentCount = selectedFilesCount
+      const isDeselecting = !!file.selected
+
+      // Actualizamos el contador
+      if (isDeselecting) {
+        await setSelectedFilesCount(currentCount - 1)
       } else {
-        await setSelectedFilesCount(graftState.selectedFilesCount + 1)
+        await setSelectedFilesCount(currentCount + 1)
       }
 
       if (file.type === 'csv') {
         setSelectedFile('csv')
         setSelectedFilesCount(1)
         setFiles(
-          graftState.files.map((file) => ({
+          files.map((file) => ({
             ...file,
             selected: file.id === id
           }))
         )
         setColumns(
-          graftState.csvFileColum.map((c) => ({
+          csvFileColum.map((c) => ({
             ...c,
             selected: c.fileName === file.name
           }))
         )
-      } else if (file.type === graftState.fileType) {
-        const files = graftState.files.map((f) =>
+      } else if (file.type === fileType) {
+        const updatedFiles = files.map((f) =>
           f.id === id
             ? {
                 ...f,
-                selected: f.selected ? false : `${graftState.selectedFilesCount}`
+                // Usamos currentCount en lugar de selectedFilesCount
+                selected: f.selected ? false : `${currentCount}`
               }
-            : {
-                ...f,
-                selected:
-                  parseInt(file.selected.toString()) < parseInt(f.selected.toString())
-                    ? `${parseInt(f.selected.toString()) - 1}`
-                    : f.selected
-              }
+            : // Para los demás archivos
+              isDeselecting && f.selected !== false
+              ? // Si estamos deseleccionando Y el archivo está seleccionado
+                // Solo ajustamos si el índice del archivo es mayor
+                parseInt(file.selected.toString()) < parseInt(f.selected.toString())
+                ? {
+                    ...f,
+                    selected: `${parseInt(f.selected.toString()) - 1}`
+                  }
+                : f
+              : // Si estamos seleccionando O el archivo no está seleccionado, no lo tocamos
+                f
         )
-        setFiles(files)
+        setFiles(updatedFiles)
       } else {
         setSelectedFile(file.type)
         setFiles(
-          graftState.files.map((file) => ({
+          files.map((file) => ({
             ...file,
             selected: file.id === id ? '0' : false
           }))
@@ -186,10 +201,10 @@ export const useData = () => {
       }
     },
     [
-      graftState.files,
-      graftState.selectedFilesCount,
-      graftState.fileType,
-      graftState.csvFileColum,
+      files,
+      selectedFilesCount,
+      fileType,
+      csvFileColum,
       setSelectedFile,
       setSelectedFilesCount,
       setFiles,
@@ -199,7 +214,7 @@ export const useData = () => {
 
   const cleanSelectionFiles = () => {
     setFiles(
-      graftState.files.map((file) => ({
+      files.map((file) => ({
         ...file,
         selected: false
       }))
@@ -208,11 +223,11 @@ export const useData = () => {
   }
 
   const getImpedanceData = () => {
-    if (graftState.files === null) {
+    if (files === null) {
       return []
     }
 
-    return graftState.files
+    return files
       .filter((file) => file.selected)
       .sort((a, b) => parseInt(a.selected.toString()) - parseInt(b.selected.toString()))
       .map((file) => ({
@@ -225,10 +240,10 @@ export const useData = () => {
   }
 
   const getModuleFace = () => {
-    if (graftState.files === null) {
+    if (files === null) {
       return null
     }
-    const impedanceData = graftState.files
+    const impedanceData = files
       .filter((file) => file.selected)
       .sort((a, b) => parseInt(a.selected.toString()) - parseInt(b.selected.toString()))
       .map((file) => ({
@@ -267,7 +282,7 @@ export const useData = () => {
 
   const exportImpedanceDataToExcel = (columns: string[]) => {
     if (columns.length > 0) {
-      return graftState.files
+      return files
         ?.filter((f) => f.selected)
         .map((file, i) => {
           return {
@@ -290,7 +305,7 @@ export const useData = () => {
 
   const exportVoltammeterDataToExcel = (columns: string[]) => {
     if (columns.length > 0) {
-      return graftState.files
+      return files
         ?.filter((f) => f.selected)
         .map((file, i) => {
           return {
@@ -330,10 +345,10 @@ export const useData = () => {
   }
 
   const getVCData = (stepBetweens: IStepBetweenPoints) => {
-    if (graftState.files === null) {
+    if (files === null) {
       return []
     }
-    return graftState.files
+    return files
       .map((file) => ({ ...file, content: _.dropRight(file.content) }))
       .filter((file) => file.selected)
       .map((file) => ({
@@ -343,10 +358,10 @@ export const useData = () => {
   }
 
   const getZIZRvsFrequency = () => {
-    if (graftState.files === null) {
+    if (files === null) {
       return []
     }
-    return graftState.files
+    return files
       .filter((file) => file.selected)
       .sort((a, b) => parseInt(a.selected.toString()) - parseInt(b.selected.toString()))
       .map((file) => ({
@@ -365,12 +380,10 @@ export const useData = () => {
   }
 
   const getCSVData = (cols: ICsvFileColum | undefined): ReturnGetCSVData => {
-    if (graftState.files === null || _.isEmpty(cols)) {
+    if (files === null || _.isEmpty(cols)) {
       return undefined
     }
-    const csvData = graftState.files
-      .filter((file) => file.selected)
-      .find((file) => file.type === 'csv')
+    const csvData = files.filter((file) => file.selected).find((file) => file.type === 'csv')
 
     // group columns by axis
     const x = cols?.x
@@ -406,7 +419,7 @@ export const useData = () => {
   }
 
   return {
-    data: graftState?.files,
+    data: files,
     updateData: setData,
     cleanData,
     changeSelectedFile,

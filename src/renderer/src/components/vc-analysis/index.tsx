@@ -9,10 +9,10 @@ import {
   AlertDialogTrigger
 } from '../ui/alert-dialog'
 import VCAnalysisProvider from './context/vc-analysis-context'
-import CommonDialog from './common-dialog'
+import CommonDialog from './components/common-dialog'
 import TabsRoot, { TabType } from './tabs/tabs-root'
-import TitleAction from './title-action'
-import IntegralResultsTable from './integral-results-table'
+import TitleAction from './components/title-action'
+import IntegralResultsTable from './components/integral-results-table'
 
 export default function VCAnalysisDialog() {
   const [open, setOpen] = React.useState(false)

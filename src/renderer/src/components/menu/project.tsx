@@ -1,15 +1,8 @@
 import * as React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { useData } from '@/hooks/useData'
 
-import {
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger
-} from '../ui/menubar'
+import { MenubarItem, MenubarSeparator, MenubarShortcut } from '../ui/menubar'
 import { readGrafFile, readNativeFiles, stringifyToSave } from '@renderer/utils/connectors'
 import { IGraftState } from '@shared/models/graf'
 import { enqueueSnackbar } from 'notistack'
@@ -17,9 +10,111 @@ import useLoader from '@renderer/hooks/useLoader'
 import { INITIAL_STATE } from '@renderer/context/GraftProvider'
 
 export const ProjectMenu = () => {
-  const { graftState, setGraftState } = React.useContext(GrafContext)
+  // Migrado a Zustand - obtenemos todos los estados y setters necesarios
+  const {
+    files,
+    csvFileColum,
+    fileType,
+    graftType,
+    impedanceType,
+    stepBetweenPoints,
+    lineOrPointWidth,
+    colorScheme,
+    isFilesGrouped,
+    selectedFilesCount,
+    uniqueFrequencyCalc,
+    concInputValues,
+    platform,
+    setFiles,
+    setSelectedColumns,
+    setFileType,
+    setGraftType,
+    setImpedanceType,
+    setStepBetweenPoints,
+    setLineOrPointWidth,
+    setColorScheme,
+    setIsFilesGrouped,
+    setSelectedFilesCount,
+    setCalcToUniqueFrequency,
+    setSelectFilesToCalcUniqueFrequency
+  } = useGraftStore()
+
   const { startLoading, stopLoading } = useLoader()
   const { addFiles, updateData } = useData()
+
+  // Helper para reconstruir graftState
+  const graftState = React.useMemo(
+    () => ({
+      files,
+      csvFileColum,
+      fileType,
+      graftType,
+      impedanceType,
+      stepBetweenPoints,
+      lineOrPointWidth,
+      colorScheme,
+      isFilesGrouped,
+      selectedFilesCount,
+      uniqueFrequencyCalc,
+      concInputValues,
+      platform,
+      drawerOpen: true,
+      loading: false,
+      notifications: { content: [''], title: '', type: undefined },
+      state: null,
+      updateContent: null,
+      progressEvent: { message: '', name: '', type: undefined, timeOut: 0 }
+    }),
+    [
+      files,
+      csvFileColum,
+      fileType,
+      graftType,
+      impedanceType,
+      stepBetweenPoints,
+      lineOrPointWidth,
+      colorScheme,
+      isFilesGrouped,
+      selectedFilesCount,
+      uniqueFrequencyCalc,
+      concInputValues,
+      platform
+    ]
+  )
+
+  // Helper para actualizar todo el estado (reemplaza setGraftState)
+  const setGraftState = React.useCallback(
+    (newState: IGraftState) => {
+      if (newState.files) setFiles(newState.files)
+      if (newState.csvFileColum) setSelectedColumns(newState.csvFileColum)
+      if (newState.fileType !== undefined) setFileType(newState.fileType)
+      if (newState.graftType) setGraftType(newState.graftType)
+      if (newState.impedanceType) setImpedanceType(newState.impedanceType)
+      if (newState.stepBetweenPoints !== undefined)
+        setStepBetweenPoints(newState.stepBetweenPoints)
+      if (newState.lineOrPointWidth !== undefined) setLineOrPointWidth(newState.lineOrPointWidth)
+      if (newState.colorScheme) setColorScheme(newState.colorScheme)
+      if (newState.isFilesGrouped !== undefined) setIsFilesGrouped(newState.isFilesGrouped)
+      if (newState.selectedFilesCount !== undefined)
+        setSelectedFilesCount(newState.selectedFilesCount)
+      if (newState.uniqueFrequencyCalc) setCalcToUniqueFrequency(newState.uniqueFrequencyCalc)
+      if (newState.concInputValues) setSelectFilesToCalcUniqueFrequency(newState.concInputValues)
+    },
+    [
+      setFiles,
+      setSelectedColumns,
+      setFileType,
+      setGraftType,
+      setImpedanceType,
+      setStepBetweenPoints,
+      setLineOrPointWidth,
+      setColorScheme,
+      setIsFilesGrouped,
+      setSelectedFilesCount,
+      setCalcToUniqueFrequency,
+      setSelectFilesToCalcUniqueFrequency
+    ]
+  )
 
   const newProject = () => setGraftState(INITIAL_STATE)
 
@@ -110,38 +205,34 @@ export const ProjectMenu = () => {
   }, [graftState, startLoading, stopLoading])
 
   return (
-    <MenubarMenu>
-      <MenubarTrigger className="relative hover:bg-secondary">Project</MenubarTrigger>
-      <MenubarContent>
-        {/* TODO: Implement handle project in next versions */}
-        <MenubarItem onClick={newProject}>
-          New Project
-          {/* <MenubarShortcut>⌘N</MenubarShortcut> */}
-        </MenubarItem>
-        <MenubarItem onClick={readFiles}>
-          Open files
-          {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
-        </MenubarItem>
-        <MenubarItem onClick={openFolder}>Open folder (recursive)</MenubarItem>
-        <MenubarItem onClick={readFiles}>
-          Add files
-          {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
-        </MenubarItem>
+    <>
+      <MenubarItem onClick={newProject}>
+        New Project
+        {/* <MenubarShortcut>⌘N</MenubarShortcut> */}
+      </MenubarItem>
+      <MenubarItem onClick={readFiles}>
+        Open files
+        {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
+      </MenubarItem>
+      <MenubarItem onClick={openFolder}>Open folder (recursive)</MenubarItem>
+      <MenubarItem onClick={readFiles}>
+        Add files
+        {/* <MenubarShortcut>⌘O</MenubarShortcut> */}
+      </MenubarItem>
 
-        <MenubarItem disabled>
-          Save
-          {/* <MenubarShortcut>⌘S</MenubarShortcut> */}
-        </MenubarItem>
-        <MenubarSeparator />
-        <MenubarItem onClick={openProject}>
-          Import project
-          <MenubarShortcut>⌘I</MenubarShortcut>
-        </MenubarItem>
-        <MenubarItem onClick={saveProject}>
-          Save project
-          <MenubarShortcut>⌘E</MenubarShortcut>
-        </MenubarItem>
-      </MenubarContent>
-    </MenubarMenu>
+      <MenubarItem disabled>
+        Save
+        {/* <MenubarShortcut>⌘S</MenubarShortcut> */}
+      </MenubarItem>
+      <MenubarSeparator />
+      <MenubarItem onClick={openProject}>
+        Import project
+        <MenubarShortcut>⌘I</MenubarShortcut>
+      </MenubarItem>
+      <MenubarItem onClick={saveProject}>
+        Save project
+        <MenubarShortcut>⌘E</MenubarShortcut>
+      </MenubarItem>
+    </>
   )
 }

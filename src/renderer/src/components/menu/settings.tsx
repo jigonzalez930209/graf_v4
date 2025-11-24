@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
@@ -9,13 +8,18 @@ import { IGrafType, IGraftImpedanceType } from '@shared/models/graf'
 import { IMPEDANCE_TYPE } from '@shared/constants'
 
 export const Settings = () => {
+  // Migrado a Zustand
   const {
-    graftState: { stepBetweenPoints, fileType, impedanceType, lineOrPointWidth, graftType },
+    stepBetweenPoints,
+    fileType,
+    impedanceType,
+    lineOrPointWidth,
+    graftType,
     setImpedanceType,
     setLineOrPointWidth,
     setStepBetweenPoints,
     setGraftType
-  } = React.useContext(GrafContext)
+  } = useGraftStore()
 
   return (
     <ul className="m-0 grid w-[600px] list-none gap-y-[20px]">

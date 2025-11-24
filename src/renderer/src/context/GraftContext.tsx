@@ -39,6 +39,8 @@ export type GrafContextProps = {
   setSelectFilesToCalcUniqueFrequency: (inputFiles: ConcInputValue[]) => void
   setUpdateContent: (updateContent: UpdateInfo | null) => void
   setProgressEvent: (event: IGraftState['progressEvent']) => void
+  activeTab: 'visualization' | 'vc-analysis' | 'frequency'
+  setActiveTab: (tab: 'visualization' | 'vc-analysis' | 'frequency') => void
 }
 
 export const GrafContext = React.createContext<GrafContextProps>({} as GrafContextProps)

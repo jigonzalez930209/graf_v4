@@ -4,10 +4,10 @@ import {
   ProcessIcon,
   ProcessMultipleIcon,
   SavitzkyGolayIcon
-} from '../icons'
+} from '../components/icons'
 import { Button } from '@renderer/components/ui/button'
 import { useVCAnalysis } from '../context/use-vc-analysis'
-import { DerivateButtons } from '../derivate-buttons'
+import { DerivateButtons } from '../components/derivate-buttons'
 import { Slider } from '@renderer/components/ui/slider'
 import { Label } from '@renderer/components/ui/label'
 

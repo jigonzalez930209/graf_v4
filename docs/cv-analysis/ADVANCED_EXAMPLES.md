@@ -154,7 +154,7 @@ export const exportAnalysisToJSON = (
           }
         : null
     },
-    files: result.files.map(f => ({
+    files: result.files.map((f) => ({
       fileName: f.fileName,
       scanRate: f.scanRate,
       peaks: {
@@ -227,7 +227,7 @@ export const exportAnalysisToCSV = (
   ]
 
   // Datos
-  const rows = result.files.map(f => [
+  const rows = result.files.map((f) => [
     f.fileName,
     f.scanRate.toFixed(6),
     f.analysis.peaks.anodic?.Ep.toFixed(6) || '',
@@ -243,7 +243,7 @@ export const exportAnalysisToCSV = (
   // Crear CSV
   const csv = [
     headers.join(','),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))
   ].join('\n')
 
   // Descargar
@@ -441,7 +441,7 @@ export const analyzeWithValidation = (
   }
 
   // Validar scan rates
-  const scanRates = files.map(f => f.voltammeter?.scanRate).filter(Boolean)
+  const scanRates = files.map((f) => f.voltammeter?.scanRate).filter(Boolean)
   if (scanRates.length !== files.length) {
     warnings.push('Some files missing scan rate information')
   }
@@ -463,9 +463,7 @@ export const analyzeWithValidation = (
 
   // Validar resultado
   if (expectedMechanism && result.mechanismConsensus !== expectedMechanism) {
-    warnings.push(
-      `Expected mechanism ${expectedMechanism}, got ${result.mechanismConsensus}`
-    )
+    warnings.push(`Expected mechanism ${expectedMechanism}, got ${result.mechanismConsensus}`)
   }
 
   if (result.correlations.ipVsSqrtV && result.correlations.ipVsSqrtV.r2 < 0.8) {
