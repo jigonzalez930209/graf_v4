@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { useDroppable } from '@dnd-kit/core'
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 
@@ -24,9 +24,9 @@ const Droppable = ({
   isNotIndex = false
 }: DroppableProps) => {
   const { setNodeRef, over, active } = useDroppable({ id })
-  const {
-    graftState: { drawerOpen }
-  } = React.useContext(GrafContext)
+  
+  // Migrado a Zustand
+  const { drawerOpen } = useGraftStore()
 
   const isHovering = over?.id === id || over?.data?.current?.sortable?.containerId === id
 

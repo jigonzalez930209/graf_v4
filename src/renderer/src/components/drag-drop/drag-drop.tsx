@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { useData } from '@/hooks/useData'
 import {
   DndContext,
@@ -35,10 +35,9 @@ export type ColumnsGroup = {
 
 const DragDrop = ({ PlotlyChart }: { PlotlyChart: React.ReactElement }) => {
   const { data } = useData()
-  const {
-    graftState: { csvFileColum },
-    setSelectedColumns
-  } = React.useContext(GrafContext)
+  
+  // Migrado a Zustand
+  const { csvFileColum, setSelectedColumns } = useGraftStore()
 
   const { enqueueSnackbar } = useSnackbar()
 
