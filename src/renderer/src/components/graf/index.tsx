@@ -6,7 +6,7 @@ import Drawer from '@/components/drawer'
 import PlotlyChart from '@/components/plot/plot'
 import { Button } from '@/components/ui/button'
 
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import useLoading from '@/hooks/useLoader'
 import { PlotParams } from 'react-plotly.js'
 
@@ -20,8 +20,9 @@ import VCAnalysisView from '../vc-analysis/view'
 import FrequencyAnalysisView from '../frequency-analysis/view'
 
 const Graf = () => {
-  const { graftState, setDrawerOpen, activeTab } = React.useContext(GrafContext)
-  const drawerOpen = graftState?.drawerOpen
+  // Migrado a Zustand
+  const { drawerOpen, setDrawerOpen, activeTab, fileType, files } = useGraftStore()
+  
   const { isLoading } = useLoading()
   const { data, config, layout } = usePlotlyOptions()
 
@@ -29,15 +30,15 @@ const Graf = () => {
 
   const ChartContent = (
     <>
-      {graftState?.fileType === 'csv' ? (
+      {fileType === 'csv' ? (
         <DragDrop
           PlotlyChart={
             <PlotlyChart
               layout={layout as PlotParams['layout']}
               config={config}
               data={data}
-              fileType={graftState.fileType}
-              exportFileName={graftState.files.find((file) => file.selected)?.name ?? undefined}
+              fileType={fileType}
+              exportFileName={files.find((file) => file.selected)?.name ?? undefined}
             />
           }
         />
@@ -46,8 +47,8 @@ const Graf = () => {
           layout={layout as PlotParams['layout']}
           config={config}
           data={data}
-          fileType={graftState.fileType as IProcessFile['type']}
-          exportFileName={graftState.files.find((file) => file.selected)?.name}
+          fileType={fileType as IProcessFile['type']}
+          exportFileName={files.find((file) => file.selected)?.name}
         />
       )}
     </>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import List from './list'
-import { GrafContext } from '@renderer/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { useData } from '@renderer/hooks/useData'
 import { useSnackbar } from 'notistack'
 import Item from './item'
@@ -14,10 +14,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import FolderView from './folder-view'
 
 const GroupFilesByType = React.forwardRef(() => {
-  const {
-    graftState: { files },
-    activeTab
-  } = React.useContext(GrafContext)
+  // Migrado a Zustand
+  const { files, activeTab } = useGraftStore()
 
   const [order, setOrder] = React.useState<'asc' | 'desc' | 'none'>('none')
   const [activeFileTab, setActiveFileTab] = React.useState('by-folder')

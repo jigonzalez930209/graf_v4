@@ -5,7 +5,7 @@ import TabsRoot, { TabType } from './tabs/tabs-root'
 import TitleAction from './components/title-action'
 import IntegralResultsTable from './components/integral-results-table'
 
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import ScanRateAnalysisPanel from './components/scan-rate-dialog'
 import CVMultiAnalysisPanel from './cv-multi-analysis-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
@@ -13,8 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 export default function VCAnalysisView() {
   const [open, setOpen] = React.useState(true) // Always open in view mode
   const [selectedTab, setSelectedTab] = React.useState<TabType>('operations')
-  const { graftState } = React.useContext(GrafContext)
-  const { fileType } = graftState
+  
+  // Migrado a Zustand
+  const { fileType } = useGraftStore()
 
   return (
     <div className="h-full flex flex-col w-full p-4">

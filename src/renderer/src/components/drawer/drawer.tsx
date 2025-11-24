@@ -2,7 +2,7 @@ import React from 'react'
 import { enqueueSnackbar } from 'notistack'
 
 import { readFilesUnsortedFileType } from '@renderer/utils/connectors'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { cn, COLORS } from '@/utils'
 
 import FileSort from '../file-sort'
@@ -18,7 +18,8 @@ interface DrawerProps {
 }
 
 const Drawer = ({ isPinned, isOpen }: DrawerProps) => {
-  const { setFiles, setGraftState } = React.useContext(GrafContext)
+  // Migrado a Zustand
+  const { setFiles, setFileType, setSelectedColumns } = useGraftStore()
 
   const onDrop = React.useCallback(
     async (acceptedFiles) => {
@@ -65,11 +66,15 @@ const Drawer = ({ isPinned, isOpen }: DrawerProps) => {
         const validFiles = files.filter((file) => file !== null)
 
         const filesProcessed = readFilesUnsortedFileType(validFiles)
-        if (Array.isArray(filesProcessed)) setFiles(filesProcessed)
-        else if (filesProcessed === undefined) {
+        if (Array.isArray(filesProcessed)) {
+          setFiles(filesProcessed)
+        } else if (filesProcessed === undefined) {
           enqueueSnackbar('error', { variant: 'error' })
         } else {
-          setGraftState(filesProcessed)
+          // setGraftState reemplazado con setters individuales
+          if (filesProcessed.files) setFiles(filesProcessed.files)
+          if (filesProcessed.fileType) setFileType(filesProcessed.fileType)
+          if (filesProcessed.csvFileColum) setSelectedColumns(filesProcessed.csvFileColum)
         }
         setShouldHighlight(false)
       } catch (error) {
@@ -78,7 +83,7 @@ const Drawer = ({ isPinned, isOpen }: DrawerProps) => {
         setShouldHighlight(false)
       }
     },
-    [setFiles, setGraftState]
+    [setFiles, setFileType, setSelectedColumns]
   )
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop })
