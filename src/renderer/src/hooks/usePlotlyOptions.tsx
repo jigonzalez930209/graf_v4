@@ -9,7 +9,7 @@ import { PlotParams } from 'react-plotly.js'
 
 import { defaultTheme, COLORS } from '@/utils'
 
-import { GrafContext } from '../context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { useData } from './useData'
 
 type CsvValues =
@@ -70,17 +70,17 @@ export const hovertemplate = (name: string) => `
 `
 
 const usePlotlyOptions = () => {
+  // Migrado a Zustand
   const {
-    graftState: {
-      fileType,
-      graftType,
-      impedanceType,
-      stepBetweenPoints,
-      drawerOpen,
-      csvFileColum,
-      lineOrPointWidth
-    }
-  } = React.useContext(GrafContext)
+    fileType,
+    graftType,
+    impedanceType,
+    stepBetweenPoints,
+    drawerOpen,
+    csvFileColum,
+    lineOrPointWidth
+  } = useGraftStore()
+  
   const { height, width } = useWindowSize()
 
   const theme = useTheme()
