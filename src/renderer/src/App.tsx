@@ -7,15 +7,62 @@ import { ThemeProvider } from '@/components/theme-provider'
 
 import { LoaderProvider } from './context/Loading'
 import Graf from '@/components/graf'
-import { GrafContext } from './context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { readFilesUnsortedFileType } from './utils/connectors'
+import { IGraftState } from '@shared/models/graf'
 
 const App = () => {
+  // Migrado a Zustand - obtenemos todos los setters necesarios
   const {
     setFiles,
-    setGraftState
-    // setUpdateContent, setProgressEvent
-  } = React.useContext(GrafContext)
+    setSelectedColumns,
+    setFileType,
+    setGraftType,
+    setImpedanceType,
+    setStepBetweenPoints,
+    setLineOrPointWidth,
+    setColorScheme,
+    setIsFilesGrouped,
+    setSelectedFilesCount,
+    setCalcToUniqueFrequency,
+    setSelectFilesToCalcUniqueFrequency,
+    setPlatform
+  } = useGraftStore()
+
+  // Helper para actualizar todo el estado (reemplaza setGraftState)
+  const setGraftState = React.useCallback(
+    (newState: IGraftState) => {
+      if (newState.files) setFiles(newState.files)
+      if (newState.csvFileColum) setSelectedColumns(newState.csvFileColum)
+      if (newState.fileType !== undefined) setFileType(newState.fileType)
+      if (newState.graftType) setGraftType(newState.graftType)
+      if (newState.impedanceType) setImpedanceType(newState.impedanceType)
+      if (newState.stepBetweenPoints !== undefined) setStepBetweenPoints(newState.stepBetweenPoints)
+      if (newState.lineOrPointWidth !== undefined) setLineOrPointWidth(newState.lineOrPointWidth)
+      if (newState.colorScheme) setColorScheme(newState.colorScheme)
+      if (newState.isFilesGrouped !== undefined) setIsFilesGrouped(newState.isFilesGrouped)
+      if (newState.selectedFilesCount !== undefined)
+        setSelectedFilesCount(newState.selectedFilesCount)
+      if (newState.uniqueFrequencyCalc) setCalcToUniqueFrequency(newState.uniqueFrequencyCalc)
+      if (newState.concInputValues) setSelectFilesToCalcUniqueFrequency(newState.concInputValues)
+      if (newState.platform) setPlatform(newState.platform)
+    },
+    [
+      setFiles,
+      setSelectedColumns,
+      setFileType,
+      setGraftType,
+      setImpedanceType,
+      setStepBetweenPoints,
+      setLineOrPointWidth,
+      setColorScheme,
+      setIsFilesGrouped,
+      setSelectedFilesCount,
+      setCalcToUniqueFrequency,
+      setSelectFilesToCalcUniqueFrequency,
+      setPlatform
+    ]
+  )
 
   React.useEffect(() => {
     window.context
