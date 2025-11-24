@@ -1,5 +1,5 @@
 import React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { exportExcelFrequency } from '@/utils/common'
 import { FileUp } from 'lucide-react'
 
@@ -7,9 +7,8 @@ import { Button } from '../ui/button'
 import { enqueueSnackbar } from 'notistack'
 
 const ExportToExcel = () => {
-  const {
-    graftState: { uniqueFrequencyCalc, concInputValues }
-  } = React.useContext(GrafContext)
+  // Migrado a Zustand
+  const { uniqueFrequencyCalc, concInputValues } = useGraftStore()
 
   const handleExport = React.useCallback(async () => {
     const dataBlob = await exportExcelFrequency({

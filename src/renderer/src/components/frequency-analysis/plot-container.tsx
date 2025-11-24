@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 
 import { cn } from '@/utils'
 
@@ -17,9 +17,8 @@ const PlotContainer = ({ className }: PlotContainerProps) => {
     zr: [number, number, number][]
   }>()
 
-  const {
-    graftState: { uniqueFrequencyCalc }
-  } = React.useContext(GrafContext)
+  // Migrado a Zustand
+  const { uniqueFrequencyCalc } = useGraftStore()
 
   React.useEffect(() => {
     if (uniqueFrequencyCalc) {

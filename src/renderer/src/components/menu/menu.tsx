@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/menubar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import { AboutDialog } from './about-dialog'
 import { Settings } from './settings'
 import ExportModal from '../export-dialog'
@@ -29,8 +29,9 @@ import WindowControls from './control-buttons'
 
 export function Menu() {
   const [name, setName] = React.useState('')
-  const { graftState, activeTab, setActiveTab } = React.useContext(GrafContext)
-  const { files } = graftState
+  
+  // Migrado a Zustand
+  const { files, activeTab, setActiveTab } = useGraftStore()
 
   const progress = React.useRef(0)
 

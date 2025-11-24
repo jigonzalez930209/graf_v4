@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { GrafContext } from '@/context/GraftContext'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 import useFrequencyAnalysis from '@/hooks/useFrequencyAnalysis'
 import { ConcInputValue } from '@shared/models/graf'
 import { XIcon } from 'lucide-react'
@@ -10,11 +10,9 @@ import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '../ui/select'
 
 const ParameterInput = () => {
-  const {
-    graftState: { files, concInputValues },
-    setSelectFilesToCalcUniqueFrequency,
-    setCalcToUniqueFrequency
-  } = React.useContext(GrafContext)
+  // Migrado a Zustand
+  const { files, concInputValues, setSelectFilesToCalcUniqueFrequency, setCalcToUniqueFrequency } =
+    useGraftStore()
 
   const { calculateLinearRegressionByConc } = useFrequencyAnalysis()
 
