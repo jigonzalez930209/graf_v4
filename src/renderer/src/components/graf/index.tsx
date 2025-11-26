@@ -22,7 +22,6 @@ import FrequencyAnalysisView from '../frequency-analysis/view'
 const Graf = () => {
   // Migrado a Zustand
   const { drawerOpen, setDrawerOpen, activeTab, fileType, files } = useGraftStore()
-  
   const { isLoading } = useLoading()
   const { data, config, layout } = usePlotlyOptions()
 

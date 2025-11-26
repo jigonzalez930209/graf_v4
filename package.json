@@ -78,7 +78,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "start": "electron-vite preview",
-    "dev": "electron-vite dev",
+    "dev": "electron-vite dev -- --no-sandbox",
     "build:wasm": "cd math-lib && PATH=$HOME/.cargo/bin:$PATH wasm-pack build --target web",
     "build": "pnpm run build:wasm && pnpm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",

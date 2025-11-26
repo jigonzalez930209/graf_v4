@@ -1,22 +1,14 @@
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../../ui/resizable'
 import { CurvePlot } from '../charts/curve-plot'
-import { FileList } from './file-list'
-import { useVCAnalysis } from '../context/use-vc-analysis'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 
 const CommonDialog = () => {
-  const { internalFiles, newFiles, handleFileSelectedChange } = useVCAnalysis()
+  const { files } = useGraftStore()
+  const selectedFiles = files.filter((f) => f.selected)
+
   return (
-    <ResizablePanelGroup direction="horizontal" className="w-full">
-      <ResizablePanel defaultSize={25} minSize={15} className="max-h-[70vh] min-h-[70vh]">
-        <FileList files={[...internalFiles, ...newFiles]} onSelect={handleFileSelectedChange} />
-      </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={75} minSize={15} maxSize={85}>
-        <CurvePlot
-          data={[...internalFiles.filter((f) => f.selected), ...newFiles.filter((f) => f.selected)]}
-        />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+    <div className="w-full h-full">
+      <CurvePlot data={selectedFiles} />
+    </div>
   )
 }
 

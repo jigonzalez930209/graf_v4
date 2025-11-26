@@ -10,16 +10,29 @@ import ScanRateAnalysisPanel from './components/scan-rate-dialog'
 import CVMultiAnalysisPanel from './cv-multi-analysis-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 
+import { useLocalStorage } from 'usehooks-ts'
+
 export default function VCAnalysisView() {
   const [open, setOpen] = React.useState(true) // Always open in view mode
-  const [selectedTab, setSelectedTab] = React.useState<TabType>('operations')
-  
+  const [selectedTab, setSelectedTab] = useLocalStorage<TabType>(
+    'vc-analysis-inner-tab',
+    'operations'
+  )
+  const [activeAnalysisTab, setActiveAnalysisTab] = useLocalStorage(
+    'vc-analysis-active-tab',
+    'multi-scan'
+  )
+
   // Migrado a Zustand
   const { fileType } = useGraftStore()
 
   return (
     <div className="h-full flex flex-col w-full p-4">
-      <Tabs defaultValue="multi-scan" className="h-full flex flex-col">
+      <Tabs
+        value={activeAnalysisTab}
+        onValueChange={setActiveAnalysisTab}
+        className="h-full flex flex-col"
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-6">
             <div className="font-semibold text-lg">Process VC</div>

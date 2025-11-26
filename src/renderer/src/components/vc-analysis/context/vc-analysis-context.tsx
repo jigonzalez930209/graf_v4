@@ -32,8 +32,6 @@ export interface VCAnalysisContextType {
       Record<string, Array<{ x: Decimal; y: Decimal; uid: string; pointIndex: number }>>
     >
   >
-  internalFiles: IProcessFile[]
-  newFiles: IProcessFile[]
 
   selectedOperation: string | null
   selectedFit: string | null
@@ -46,16 +44,13 @@ export interface VCAnalysisContextType {
   windowSize: number
   polyOrder: number
 
-  selectionOrder: string[]
   inputExpression: { '1': string; '2': string }
 
   handleProcess: () => void
   handleProcessMultiple: () => void
-  handleFileSelectedChange: (id: string, action?: 'selected' | 'deselected') => void
   handleFit: () => void
   handleFitMultiple: () => void
   handleManualSelection: (points: number[], degree: number) => void
-  handleSetGlobalSelectedFiles: () => void
   setInputExpression: React.Dispatch<React.SetStateAction<{ '1': string; '2': string }>>
   setSelectedOperation: React.Dispatch<React.SetStateAction<string | null>>
   setSelectedFit: React.Dispatch<React.SetStateAction<string | null>>
@@ -65,8 +60,6 @@ export interface VCAnalysisContextType {
   setSelectedDegree: React.Dispatch<React.SetStateAction<number>>
   setWindowSize: React.Dispatch<React.SetStateAction<number>>
   setPolyOrder: React.Dispatch<React.SetStateAction<number>>
-  setSelectionOrder: React.Dispatch<React.SetStateAction<string[]>>
-  setNewFiles: React.Dispatch<React.SetStateAction<IProcessFile[]>>
 
   // Integral results for all analyzed curves
   integralResults: IntegralResultRow[]
@@ -88,11 +81,8 @@ export type VCAnalysisProviderProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open, setOpen }) => {
+const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children }) => {
   const { data: files, addFiles } = useData()
-
-  const [internalFiles, setInternalFiles] = useState<IProcessFile[]>([])
-  const [newFiles, setNewFiles] = useState<IProcessFile[]>([])
 
   const [selectedOperation, setSelectedOperation] = useState<string | null>(null)
   const [selectedFit, setSelectedFit] = useState<string | null>(null)
@@ -115,7 +105,6 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
   const [selectedPoints, setSelectedPoints] = useLocalStorage<number[]>('selectedPoints', [])
   const [selectedDegree, setSelectedDegree] = useLocalStorage<number>('selectedDegree', 0)
 
-  const [selectionOrder, setSelectionOrder] = useState<string[]>([])
   const [inputExpression, setInputExpression] = useState<{ '1': string; '2': string }>({
     '1': '',
     '2': ''
@@ -140,26 +129,24 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
   const { handleOperation } = useMathOperation()
   const { fit, fitMultiple } = useFit()
 
+  const getSelectedFiles = useCallback(() => {
+    return files.filter((f) => f.selected).sort((a, b) => Number(a.selected) - Number(b.selected))
+  }, [files])
+
   const handleProcess = useCallback(() => {
-    const selectedFiles = [...internalFiles, ...newFiles].filter((f) => f.selected)
+    const selectedFiles = getSelectedFiles()
 
     if (selectedFiles.length < 2) {
       alert('Please select at least two files')
       return
     }
 
-    const fileA = _.find(selectedFiles, ['id', selectionOrder[0]])
-    const fileB = _.find(selectedFiles, ['id', selectionOrder[1]])
+    const fileA = selectedFiles[0]
+    const fileB = selectedFiles[1]
 
-    const arrA = _.find(selectedFiles, ['id', selectionOrder[0]])?.content.map((c) => [
-      Decimal(c[0]),
-      Decimal(c[1])
-    ])
-    const arrB = _.find(selectedFiles, ['id', selectionOrder[1]])?.content.map((c) => [
-      Decimal(c[0]),
-      Decimal(c[1])
-    ])
-    console.log({ arrA, arrB, selectedFiles, selectionOrder, selectedOperation })
+    const arrA = fileA?.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
+    const arrB = fileB?.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
+    console.log({ arrA, arrB, selectedFiles, selectedOperation })
 
     if (!arrA || !arrB) {
       alert('Invalid input, Arr1 or Arr2 is undefined')
@@ -179,23 +166,23 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       },
       arr2: arrB
     })
-    setNewFiles((prev) => [...prev, res])
-  }, [internalFiles, selectionOrder, selectedOperation, handleOperation, newFiles])
+    addFiles([res])
+  }, [selectedOperation, handleOperation, addFiles, getSelectedFiles])
 
   const handleProcessMultiple = useCallback(() => {
     if (!inputExpression['1'] || !inputExpression['2'] || !selectedOperation) {
       alert('Please enter both expressions and select an operation')
       return
     }
-    const groupByFolder = _.groupBy([...internalFiles, ...newFiles], 'relativePath')
+    const groupByFolder = _.groupBy(files, 'relativePath')
 
     const filesToWork = Object.entries(groupByFolder).map(([folderPath, files]) => {
       const a = files.find((f) => f.name.toLowerCase().includes(inputExpression['1'].toLowerCase()))
       const b = files.find((f) => f.name.toLowerCase().includes(inputExpression['2'].toLowerCase()))
       if (!a || !b) {
         console.error('Invalid input, Arr1 or Arr2 is undefined')
-        alert('Invalid input, Arr1 or Arr2 is undefined')
-        return
+        // alert('Invalid input, Arr1 or Arr2 is undefined')
+        return null
       }
 
       const arrA = a.content.map((c) => [Decimal(c[0]), Decimal(c[1])])
@@ -211,44 +198,11 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       })
       return res
     })
-    setNewFiles((prev) => [...prev, ...filesToWork.filter((f) => !!f)])
-  }, [internalFiles, inputExpression, selectedOperation, handleOperation, newFiles])
-
-  const handleFileSelectedChange = useCallback((id: string, action?: 'selected' | 'deselected') => {
-    console.log({ id })
-    setSelectionOrder((prev) => {
-      if (action === 'deselected') {
-        return prev.filter((f) => f !== id)
-      } else {
-        return [...prev, id]
-      }
-    })
-    setNewFiles((prev) =>
-      prev.map((file) => {
-        if (file.id === id) {
-          return {
-            ...file,
-            selected: action === 'selected'
-          }
-        }
-        return file
-      })
-    )
-    setInternalFiles((prev) =>
-      prev.map((file) => {
-        if (file.id === id) {
-          return {
-            ...file,
-            selected: action === 'selected'
-          }
-        }
-        return file
-      })
-    )
-  }, [])
+    addFiles(filesToWork.filter((f) => !!f) as IProcessFile[])
+  }, [files, inputExpression, selectedOperation, handleOperation, addFiles])
 
   const handleFit = useCallback(() => {
-    const files = internalFiles.filter((f) => f.selected)
+    const files = getSelectedFiles()
     if (files.length > 1 || files.length === 0) {
       alert('Please select one file')
       return
@@ -271,18 +225,18 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
       type: file.type
     }
     console.log({ f })
-    setNewFiles((prev) => [...prev, f])
-  }, [internalFiles, fit, selectedPoints, selectedDegree])
+    addFiles([f])
+  }, [fit, selectedPoints, selectedDegree, addFiles, getSelectedFiles])
 
   const handleFitMultiple = useCallback(() => {
-    const selectedFiles = internalFiles.filter((f) => f.selected)
+    const selectedFiles = getSelectedFiles()
     if (selectedFiles.length === 0) {
       alert('Please select at least one file')
       return
     }
     const res = fitMultiple(selectedFiles)
-    setNewFiles((prev) => [...prev, ...res.map((r) => r.file)])
-  }, [internalFiles, fitMultiple])
+    addFiles(res.map((r) => r.file))
+  }, [fitMultiple, addFiles, getSelectedFiles])
 
   const handleManualSelection = useCallback(
     (points: number[], degree: number) => {
@@ -292,20 +246,6 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
     },
     [setSelectedPoints, setSelectedDegree]
   )
-
-  const handleSetGlobalSelectedFiles = useCallback(() => {
-    const filesToGlobalState = newFiles.filter((f) => f.selected)
-    if (filesToGlobalState.length === 0) {
-      alert('Please select at least one file')
-      return
-    }
-    const continueAdd = confirm(
-      `Are you sure you want to add ${filesToGlobalState.length} files to the global state?`
-    )
-    if (!continueAdd) return
-    setOpen(false)
-    addFiles(filesToGlobalState)
-  }, [addFiles, newFiles, setOpen])
 
   const derivate = useCallback(
     (
@@ -423,37 +363,25 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
 
   const derivateMultiple = useCallback(
     (operation: string, windowSize?: number, polyOrder?: number): IProcessFile[] => {
-      const selectedFiles = [...internalFiles, ...newFiles].filter((f) => f.selected)
+      const selectedFiles = getSelectedFiles()
       if (selectedFiles.length < 2) {
         alert('Please select at least two files')
         return []
       }
-      return selectedFiles
+      const newFiles = selectedFiles
         .map((file) => derivate(operation, windowSize, polyOrder, file))
         .filter((file) => file !== null) as IProcessFile[]
+      addFiles(newFiles)
+      return newFiles
     },
-    [derivate, internalFiles, newFiles]
+    [derivate, getSelectedFiles, addFiles]
   )
-
-  useEffect(() => {
-    if (!open) return setInternalFiles([])
-    if (!files) return setInternalFiles([])
-    if (files.length === 0) return setInternalFiles([])
-    const nF = files
-      .filter((file) => file.type === 'teq4')
-      .map((file) => ({ ...file, selected: false }))
-    setInternalFiles(nF)
-    setNewFiles([])
-  }, [open, files])
 
   return (
     <VCAnalysisContext.Provider
       value={{
         selectedPoint,
         setSelectedPoint,
-        internalFiles,
-        newFiles,
-        setNewFiles,
         selectedOperation,
         setSelectedOperation,
         selectedFit,
@@ -470,17 +398,13 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children, open,
         setWindowSize,
         polyOrder,
         setPolyOrder,
-        selectionOrder,
-        setSelectionOrder,
         inputExpression,
         setInputExpression,
         handleProcess,
         handleProcessMultiple,
-        handleFileSelectedChange,
         handleFit,
         handleFitMultiple,
         handleManualSelection,
-        handleSetGlobalSelectedFiles,
         derivate,
         derivateMultiple,
         integralResults,

@@ -1,8 +1,3 @@
-import { useFit } from '@renderer/hooks/useFit'
-import { generateRandomId } from '@renderer/utils/common'
-import { IProcessFile } from '@shared/models/files'
-import Decimal from 'decimal.js'
-import React from 'react'
 import {
   ExponentialIcon,
   LogarithmicIcon,
@@ -17,6 +12,7 @@ import { LineChartIcon } from 'lucide-react'
 import { Slider } from '@renderer/components/ui/slider'
 import { ManualSelection } from '../components/manual-selection'
 import { Label } from '@renderer/components/ui/label'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 
 const fitButtons = [
   { key: 'linear', label: 'Linear', tooltip: 'Fit a linear curve', icon: <LineChartIcon /> },
@@ -41,64 +37,24 @@ const fitButtons = [
 ]
 
 const FitTab = () => {
+  const { files } = useGraftStore()
   const {
     selectedPoints,
     selectedDegree,
-    internalFiles,
-    newFiles,
-    setNewFiles,
     setSelectedFit,
     selectedFit,
     setCountPoints,
     countPoints,
-    handleManualSelection
+    handleManualSelection,
+    handleFit,
+    handleFitMultiple
   } = useVCAnalysis()
-
-  const { fit, fitMultiple } = useFit()
-
-  const handleFit = React.useCallback(() => {
-    const files = internalFiles.filter((f) => f.selected)
-    if (files.length > 1 || files.length === 0) {
-      alert('Please select one file')
-      return
-    }
-    const file = files[0]
-    const res = fit(
-      file.content.map((c) => [Decimal(c[0]), Decimal(c[1])]),
-      selectedPoints,
-      selectedDegree
-    )
-    if (!res) return
-    console.log({ res })
-    const id = generateRandomId()
-    const f: IProcessFile = {
-      ...file,
-      id,
-      content: res.point.map((p) => [p[0].toString(), p[1].toString()]),
-      selected: true,
-      name: `fit ${res.fit.degree}°, r² ${res.fit.r2}, mse ${res.fit.mse} ${file.name}`,
-      type: file.type
-    }
-    console.log({ f })
-    setNewFiles((prev) => [...prev, f])
-  }, [internalFiles, fit, selectedPoints, selectedDegree, setNewFiles])
-
-  const handleFitMultiple = React.useCallback(() => {
-    const selectedFiles = internalFiles.filter((f) => f.selected)
-    if (selectedFiles.length === 0) {
-      alert('Please select at least one file')
-      return
-    }
-    const res = fitMultiple(selectedFiles)
-    console.log({ res })
-    setNewFiles((prev) => [...prev, ...res.map((r) => r.file)])
-  }, [internalFiles, fitMultiple, setNewFiles])
 
   return (
     <div className="flex gap-3 items-center bg-accent/20 p-2">
       <FitButtons fitButtons={fitButtons} selected={selectedFit} onSelect={setSelectedFit} />
       <Button
-        disabled={[...internalFiles, ...newFiles].filter((f) => f.selected).length === 0}
+        disabled={files.filter((f) => f.selected).length === 0}
         size="icon"
         onClick={handleFit}
         className="border-0 bg-blue-500"

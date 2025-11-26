@@ -11,6 +11,7 @@ import {
 import { MinusIcon, ProjectorIcon, PlusIcon, XIcon, DivideIcon } from 'lucide-react'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 
 const operations = [
   { key: 'sum', label: 'Sum', tooltip: 'Sum the selected files', icon: <PlusIcon /> },
@@ -55,12 +56,11 @@ const operations = [
 ]
 
 const MathOperationsTab = () => {
+  const { files } = useGraftStore()
   const {
     selectedOperation,
     setSelectedOperation,
     inputExpression,
-    internalFiles,
-    newFiles,
     setInputExpression,
     handleProcess,
     handleProcessMultiple
@@ -77,7 +77,7 @@ const MathOperationsTab = () => {
         <Button
           disabled={
             !selectedOperation ||
-            [...internalFiles, ...newFiles].filter((f) => f.selected).length < 2
+            files.filter((f) => f.selected).length < 2
           }
           size="icon"
           onClick={handleProcess}

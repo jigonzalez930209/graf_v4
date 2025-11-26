@@ -12,13 +12,14 @@ import RemoveSelection from './remove-selection'
 import useResizeObserver from '@renderer/hooks/useResizeObserve'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import FolderView from './folder-view'
+import { useLocalStorage } from 'usehooks-ts'
 
 const GroupFilesByType = React.forwardRef(() => {
   // Migrado a Zustand
   const { files, activeTab } = useGraftStore()
 
   const [order, setOrder] = React.useState<'asc' | 'desc' | 'none'>('none')
-  const [activeFileTab, setActiveFileTab] = React.useState('by-folder')
+  const [activeFileTab, setActiveFileTab] = useLocalStorage('drawer-active-tab', 'by-folder')
 
   const [internalFiles, setInternalFiles] = React.useState(files)
 
@@ -70,22 +71,6 @@ const GroupFilesByType = React.forwardRef(() => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files, handleSort])
-
-  React.useEffect(() => {
-    if (activeTab === 'vc-analysis') {
-      setActiveFileTab('teq4')
-    } else if (activeTab === 'frequency') {
-      setActiveFileTab('teq4z')
-    } else {
-      // For visualization or others, maybe default to 'all' or keep current?
-      // User said "last one will be all", maybe default to 'by-folder' or 'all'.
-      // Let's default to 'all' for visualization if not already set to something valid.
-      // But actually, let's just leave it or set to 'all' if it was on a disabled tab.
-      // For simplicity and per request implication, let's set to 'all' or 'by-folder'.
-      // Let's stick to 'all' as a safe default for Visualization.
-      setActiveFileTab('all')
-    }
-  }, [activeTab])
 
   const TabsListContent = (
     <TabsList className={`w-full sticky top-0 z-1`}>

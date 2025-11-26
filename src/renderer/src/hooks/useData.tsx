@@ -139,9 +139,6 @@ export const useData = () => {
 
       if (!file) throw new Error('File not found')
 
-      if (selectedFilesCount === 10 && file.selected === false)
-        throw new Error('You can select only 10 files')
-
       // Guardamos el contador actual ANTES de modificarlo
       const currentCount = selectedFilesCount
       const isDeselecting = !!file.selected
@@ -221,6 +218,55 @@ export const useData = () => {
     )
     setSelectedFilesCount(0)
   }
+
+  const toggleMultipleFiles = React.useCallback(
+    (fileIds: string[], shouldSelect: boolean) => {
+      if (fileIds.length === 0) return
+
+      const currentCount = selectedFilesCount
+      let newCount = currentCount
+
+      const updatedFiles = files.map((file) => {
+        if (fileIds.includes(file.id)) {
+          if (shouldSelect && !file.selected) {
+            // Selecting this file
+            const newSelected = `${newCount}`
+            newCount++
+            return { ...file, selected: newSelected }
+          } else if (!shouldSelect && file.selected) {
+            // Deselecting this file
+            return { ...file, selected: false }
+          }
+        }
+        return file
+      })
+
+      // Adjust indices for remaining selected files if we deselected some
+      if (!shouldSelect) {
+        const finalFiles = updatedFiles.map((file) => {
+          if (file.selected !== false && typeof file.selected === 'string') {
+            const currentIndex = parseInt(file.selected)
+            const deselectedBefore = fileIds.filter((id) => {
+              const deselectedFile = files.find((f) => f.id === id)
+              return (
+                deselectedFile &&
+                deselectedFile.selected !== false &&
+                parseInt(deselectedFile.selected.toString()) < currentIndex
+              )
+            }).length
+            return { ...file, selected: `${currentIndex - deselectedBefore}` }
+          }
+          return file
+        })
+        setFiles(finalFiles)
+        setSelectedFilesCount(currentCount - fileIds.length)
+      } else {
+        setFiles(updatedFiles)
+        setSelectedFilesCount(newCount)
+      }
+    },
+    [files, selectedFilesCount, setFiles, setSelectedFilesCount]
+  )
 
   const getImpedanceData = () => {
     if (files === null) {
@@ -423,6 +469,7 @@ export const useData = () => {
     updateData: setData,
     cleanData,
     changeSelectedFile,
+    toggleMultipleFiles,
     getImpedanceData,
     getModuleFace,
     exportImpedanceDataToExcel,

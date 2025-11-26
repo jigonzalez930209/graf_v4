@@ -10,6 +10,7 @@ import { useVCAnalysis } from '../context/use-vc-analysis'
 import { DerivateButtons } from '../components/derivate-buttons'
 import { Slider } from '@renderer/components/ui/slider'
 import { Label } from '@renderer/components/ui/label'
+import { useGraftStore } from '@renderer/stores/useGraftStore'
 
 const derivateButtons = [
   {
@@ -33,10 +34,8 @@ const derivateButtons = [
 ]
 
 const DerivateTab = () => {
+  const { files } = useGraftStore()
   const {
-    internalFiles,
-    newFiles,
-    setNewFiles,
     selectedDerivate,
     setSelectedDerivate,
     windowSize,
@@ -47,10 +46,7 @@ const DerivateTab = () => {
     derivateMultiple
   } = useVCAnalysis()
 
-  const selectedFile = React.useMemo(
-    () => [...internalFiles, ...newFiles].find((f) => f.selected),
-    [internalFiles, newFiles]
-  )
+  const selectedFile = React.useMemo(() => files.find((f) => f.selected), [files])
 
   const maxWindowSize = React.useMemo(() => {
     if (!selectedFile) return 99 // Default max if no file is selected
@@ -117,13 +113,11 @@ const DerivateTab = () => {
       return
     }
 
-    const res = derivate(selectedDerivate, windowSize, polyOrder, selectedFile)
-    if (!res) return
-    setNewFiles((prev) => [...prev, res])
-  }, [derivate, selectedDerivate, windowSize, polyOrder, setNewFiles, selectedFile])
+    derivate(selectedDerivate, windowSize, polyOrder, selectedFile)
+  }, [derivate, selectedDerivate, windowSize, polyOrder, selectedFile])
 
   const handleDerivateMultiple = React.useCallback(() => {
-    const selectedFiles = [...internalFiles, ...newFiles].filter((f) => f.selected)
+    const selectedFiles = files.filter((f) => f.selected)
     if (selectedFiles.length === 0) {
       alert('Please select at least one file')
       return
@@ -139,17 +133,8 @@ const DerivateTab = () => {
       return
     }
 
-    const res = derivateMultiple(selectedDerivate, windowSize, polyOrder)
-    setNewFiles((prev) => [...prev, ...res])
-  }, [
-    internalFiles,
-    newFiles,
-    selectedDerivate,
-    derivateMultiple,
-    windowSize,
-    polyOrder,
-    setNewFiles
-  ])
+    derivateMultiple(selectedDerivate, windowSize, polyOrder)
+  }, [files, selectedDerivate, derivateMultiple, windowSize, polyOrder])
 
   return (
     <div className="flex gap-3 items-center bg-accent/20 p-2">
@@ -159,7 +144,7 @@ const DerivateTab = () => {
         onSelect={setSelectedDerivate}
       />
       <Button
-        disabled={[...internalFiles, ...newFiles].filter((f) => f.selected).length === 0}
+        disabled={files.filter((f) => f.selected).length === 0}
         size="icon"
         onClick={handleDerivate}
         className="border-0 bg-blue-500"

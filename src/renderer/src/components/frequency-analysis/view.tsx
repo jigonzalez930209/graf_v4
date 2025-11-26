@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
 import { Button } from '../ui/button'
@@ -7,8 +6,10 @@ import ParameterInput from './parameter-input'
 import PlotContainer from './plot-container'
 import { ScrollArea } from '../ui/scroll-area'
 
+import { useLocalStorage } from 'usehooks-ts'
+
 const FrequencyAnalysisView = () => {
-  const [openInputs, setOpenInputs] = React.useState(true)
+  const [openInputs, setOpenInputs] = useLocalStorage('frequency-analysis-open-inputs', true)
   return (
     <div className="flex flex-col h-full w-full p-4">
       <div className="mb-4 flex h-6 w-full items-center gap-6 p-0">
