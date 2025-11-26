@@ -52,7 +52,7 @@ export default function VCAnalysisView() {
             <div className="flex flex-col h-full w-full">
               <div className="flex flex-col space-y-2 mb-4">
                 <div className="relative flex h-6 w-full items-center gap-6 p-0 mb-0">
-                  <TitleAction setOpen={() => {}} />
+                  <TitleAction />
                 </div>
                 <TabsRoot selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
               </div>

@@ -48,6 +48,7 @@ export interface VCAnalysisContextType {
 
   handleProcess: () => void
   handleProcessMultiple: () => void
+  handleSetGlobalSelectedFiles: () => void
   handleFit: () => void
   handleFitMultiple: () => void
   handleManualSelection: (points: number[], degree: number) => void
@@ -200,6 +201,10 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children }) => 
     })
     addFiles(filesToWork.filter((f) => !!f) as IProcessFile[])
   }, [files, inputExpression, selectedOperation, handleOperation, addFiles])
+
+  const handleSetGlobalSelectedFiles = useCallback(() => {
+    console.warn('handleSetGlobalSelectedFiles is not implemented yet')
+  }, [])
 
   const handleFit = useCallback(() => {
     const files = getSelectedFiles()
@@ -402,6 +407,7 @@ const VCAnalysisProvider: React.FC<VCAnalysisProviderProps> = ({ children }) => 
         setInputExpression,
         handleProcess,
         handleProcessMultiple,
+        handleSetGlobalSelectedFiles,
         handleFit,
         handleFitMultiple,
         handleManualSelection,

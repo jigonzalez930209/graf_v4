@@ -34,7 +34,7 @@ export default function VCAnalysisDialog() {
         <AlertDialogContent className="w-[90vw] h-[90vh] max-w-[90vw] max-h-[90vh] flex flex-col">
           <div className="flex flex-col space-y-2">
             <AlertDialogTitle className="relative flex h-6 w-full items-center gap-6 p-0 mb-0">
-              Process VC <TitleAction setOpen={setOpen} />
+              Process VC <TitleAction />
             </AlertDialogTitle>
             <AlertDialogDescription className="sr-only"></AlertDialogDescription>
             <TabsRoot selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
